@@ -2,7 +2,9 @@
 
 namespace Orbit;
 
+use Exception;
 use Illuminate\Support\ServiceProvider;
+use Orbit\Contracts\Driver;
 
 class OrbitServiceProvider extends ServiceProvider
 {
@@ -14,6 +16,12 @@ class OrbitServiceProvider extends ServiceProvider
             $manager = new OrbitManager($app);
 
             foreach ($this->app['config']->get('orbit.drivers') as $key => $driver) {
+                $implements = class_implements($driver);
+
+                if (! in_array(Driver::class, $implements)) {
+                    throw new Exception('[Orbit] The '.$driver.' driver must implement the '.Driver::class.' interface.');
+                }
+
                 $manager->extend($key, fn () => new $driver($app));
             }
 

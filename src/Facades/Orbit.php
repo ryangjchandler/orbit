@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static \Orbit\OrbitManager extend(string $driver, \Closure $callback)
  * @method static array getDrivers()
  * @method static string getDefaultDriver()
+ * @method static string getDatabasePath()
  *
  * @see \Orbit\OrbitManager
  */

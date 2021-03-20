@@ -10,4 +10,9 @@ class OrbitManager extends Manager
     {
         return $this->config->get('orbit.default');
     }
+
+    public function getDatabasePath()
+    {
+        return config('orbit.paths.cache') . DIRECTORY_SEPARATOR . 'orbit.sqlite';
+    }
 }
