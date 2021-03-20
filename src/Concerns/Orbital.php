@@ -22,7 +22,7 @@ trait Orbital
 
     public function migrate()
     {
-w
+
     }
 
     public static function resolveConnection($connection = null)
