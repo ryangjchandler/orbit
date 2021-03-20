@@ -1,0 +1,39 @@
+{
+    "name": "ryangjchandler/orbit",
+    "description": "A flat-file database driver for Eloquent.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ryan Chandler",
+            "email": "support@ryangjchandler.co.uk",
+            "homepage": "https://ryangjchandler.co.uk",
+            "role": "Developer"
+        }
+    ],
+    "prefer-stable": true,
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "Orbit\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Orbit\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "illuminate/support": "^8.0",
+        "illuminate/database": "^8.0"
+    },
+    "require-dev": {
+
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Orbit\\OrbitServiceProvider"
+            ]
+        }
+    }
+}
