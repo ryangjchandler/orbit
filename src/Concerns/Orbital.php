@@ -2,10 +2,10 @@
 
 namespace Orbit\Concerns;
 
-use Facade\FlareClient\Stacktrace\File;
 use Illuminate\Support\Str;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\Connectors\ConnectionFactory;
+use Illuminate\Database\Schema\Blueprint;
 use Orbit\Facades\Orbit;
 
 trait Orbital
@@ -22,7 +22,12 @@ trait Orbital
 
     public function migrate()
     {
+        $driver = Orbit::driver(static::getOrbitalDriver());
 
+        static::resolveConnection()->getSchemaBuilder()->create(
+            $this->getTable(),
+            fn (Blueprint $table) => $driver->table($table)
+        );
     }
 
     public static function resolveConnection($connection = null)
@@ -58,14 +63,17 @@ trait Orbital
 
         $database = Orbit::getDatabasePath();
 
-        if (! $fs->exists($database)) {
-            $fs->put($database, null);
-        }
+        $fs->put($database, '');
     }
 
     public static function getOrbitalName()
     {
         return (string) Str::of(class_basename(static::class))->lower()->kebab();
+    }
+
+    public static function getOrbitalDriver()
+    {
+        return static::$driver ?? null;
     }
 
     public static function shouldCacheWithOrbit()
