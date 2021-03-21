@@ -28,14 +28,14 @@
         "spatie/yaml-front-matter": "^2.0",
         "symplify/git-wrapper": "^9.2"
     },
+    "require-dev": {
+        "vimeo/psalm": "^4.6"
+    },
     "extra": {
         "laravel": {
             "providers": [
                 "Orbit\\OrbitServiceProvider"
             ]
         }
-    },
-    "require-dev": {
-        "vimeo/psalm": "^4.6"
     }
 }
