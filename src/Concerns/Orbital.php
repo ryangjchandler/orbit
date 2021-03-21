@@ -4,10 +4,12 @@ namespace Orbit\Concerns;
 
 use Facade\FlareClient\Stacktrace\File;
 use Illuminate\Database\Connectors\ConnectionFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Orbit\Facades\Orbit;
 use Illuminate\Support\Str;
 use Illuminate\Filesystem\Filesystem;
+use ReflectionClass;
 
 trait Orbital
 {
@@ -21,10 +23,21 @@ trait Orbital
         static::setSqliteConnection();
 
         $driver = Orbit::driver(static::getOrbitalDriver());
+        $modelFile = (new ReflectionClass(static::class))->getFileName();
 
-        if ($driver->shouldRestoreCache(static::getOrbitalPath())) {
+        if (
+            filemtime($modelFile) > filemtime(Orbit::getDatabasePath()) ||
+            $driver->shouldRestoreCache(static::getOrbitalPath())
+        ) {
             (new static)->migrate();
         }
+
+        static::updating(function (Model $model) {
+            return Orbit::driver(static::getOrbitalDriver())->save(
+                $model,
+                static::getOrbitalPath()
+            );
+        });
     }
 
     public static function getOrbitalSchema(Blueprint $table)
@@ -45,13 +58,15 @@ trait Orbital
 
         static::resolveConnection()->getSchemaBuilder()->create($table, function (Blueprint $table) {
             static::getOrbitalSchema($table);
+
+            if ($this->usesTimestamps()) {
+                $table->timestamps();
+            }
         });
 
         $driver = Orbit::driver(static::getOrbitalDriver());
 
-        $driver->all(static::getOrbitalPath())->each(function (array $row) {
-            static::insert($row);
-        });
+        $driver->all(static::getOrbitalPath())->each(fn ($row) => static::insert($row));
     }
 
     protected static function getOrbitalDriver()
