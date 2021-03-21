@@ -46,7 +46,6 @@ class Markdown implements Driver
             '---',
             rtrim($yaml, PHP_EOL),
             '---',
-            PHP_EOL,
             $model->getAttribute('content'),
         ]);
 
