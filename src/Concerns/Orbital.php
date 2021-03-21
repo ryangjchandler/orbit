@@ -86,7 +86,7 @@ trait Orbital
         static::resolveConnection()->getSchemaBuilder()->drop($table);
 
         static::resolveConnection()->getSchemaBuilder()->create($table, function (Blueprint $table) {
-            static::getOrbitalSchema($table);
+            static::schema($table);
 
             if ($this->usesTimestamps()) {
                 $table->timestamps();
