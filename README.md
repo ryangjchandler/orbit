@@ -158,6 +158,21 @@ By default, Orbit uses the `base_path` as your repositories root directory. If t
 
 By default, Orbit will use the system's name and email address when making commits to your repository. If you wish to change the name, use the `ORBIT_GIT_NAME` and `ORBIT_GIT_EMAIL` environment variables.
 
+If you would like to use a more dynamic name and email address, you can use the `Orbit::resolveGitNameUsing` and `Orbit::resolveGitEmailUsing` methods instead:
+
+```php
+public function boot()
+{
+    Orbit::resolveGitNameUsing(function () {
+        return Auth::user()->name;
+    });
+
+    Orbit::resolveGitEmailUsing(function () {
+        return Auth::user()->email;
+    });
+}
+```
+
 ### Customising the Git binary
 
 If your Git binary is not found in the usual place (`/usr/bin/git` on most UNIX machines), you can customise the location using the `ORBIT_GIT_BINARY` environment variable.
