@@ -106,4 +106,4 @@ class Post extends Model
 }
 ```
 
-> Driver names are determined when they are registered with Orbit.
+> Driver names are determined when they are registered with Orbit. You should always use the string name of the driver instead of the fully-qualified class name.
