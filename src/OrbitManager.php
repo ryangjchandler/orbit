@@ -53,4 +53,14 @@ class OrbitManager extends Manager
 
         return config('orbit.git.email');
     }
+
+    public function getGitRoot()
+    {
+        return config('orbit.git.root');
+    }
+
+    public function getGitBinary()
+    {
+        return config('orbit.git.binary');
+    }
 }

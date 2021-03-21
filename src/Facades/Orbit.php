@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static string getDatabasePath()
  * @method static string getGitName()
  * @method static string getGitEmail()
+ * @method static string getGitRoot()
  *
  * @see \Orbit\OrbitManager
  */

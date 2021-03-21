@@ -17,6 +17,8 @@ return [
         'enabled' => env('ORBIT_GIT_ENABLED', false),
         'name' => env('ORBIT_GIT_NAME'),
         'email' => env('ORBIT_GIT_EMAIL'),
+        'root' => env('ORBIT_GIT_ROOT', base_path()),
+        'binary' => env('ORBIT_GIT_BINARY', '/usr/bin/git'),
     ],
 
 ];
