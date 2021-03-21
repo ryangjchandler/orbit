@@ -51,7 +51,7 @@ class Markdown implements Driver
 
         file_put_contents($path, $contents);
 
-        return false;
+        return true;
     }
 
     public function all(string $directory): Collection

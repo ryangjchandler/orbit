@@ -32,7 +32,14 @@ trait Orbital
             (new static)->migrate();
         }
 
-        static::updating(function (Model $model) {
+        static::created(function (Model $model) {
+            return Orbit::driver(static::getOrbitalDriver())->save(
+                $model,
+                static::getOrbitalPath()
+            );
+        });
+
+        static::updated(function (Model $model) {
             return Orbit::driver(static::getOrbitalDriver())->save(
                 $model,
                 static::getOrbitalPath()
