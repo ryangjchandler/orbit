@@ -58,6 +58,15 @@ class Markdown implements Driver
         return true;
     }
 
+    public function delete(Model $model, string $directory): bool
+    {
+        $key = $model->getKey();
+
+        unlink($directory . DIRECTORY_SEPARATOR . $key . '.md');
+
+        return true;
+    }
+
     public function all(string $directory): Collection
     {
         $collection = Collection::make();

@@ -4,6 +4,7 @@ namespace Orbit\Listeners;
 
 use Exception;
 use Orbit\Events\OrbitalCreated;
+use Orbit\Events\OrbitalDeleted;
 use Orbit\Events\OrbitalUpdated;
 use Orbit\Facades\Orbit;
 use Symplify\GitWrapper\Exception\GitException;
@@ -25,6 +26,13 @@ class ProcessGitTransaction
         $this->commit($message);
     }
 
+    public function deleted(OrbitalDeleted $event)
+    {
+        $message = 'orbit: deleted ' . class_basename($event->model) . ' ' . $event->model->getKey();
+
+        $this->commit($message);
+    }
+
     protected function commit(string $message)
     {
         $wrapper = new GitWrapper(
@@ -40,7 +48,7 @@ class ProcessGitTransaction
         }
 
         $git->add(
-            config('orbit.paths.content')
+            config('orbit.paths.content') . DIRECTORY_SEPARATOR . '*'
         );
 
         $git->commit($message);

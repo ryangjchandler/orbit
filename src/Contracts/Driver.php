@@ -12,5 +12,7 @@ interface Driver
 
     public function save(Model $model, string $directory): bool;
 
+    public function delete(Model $model, string $directory): bool;
+
     public function all(string $directory): Collection;
 }

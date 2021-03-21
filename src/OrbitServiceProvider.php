@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Orbit\Contracts\Driver;
 use Orbit\Events\OrbitalCreated;
+use Orbit\Events\OrbitalDeleted;
 use Orbit\Events\OrbitalUpdated;
 use Orbit\Listeners\ProcessGitTransaction;
 
@@ -44,6 +45,7 @@ class OrbitServiceProvider extends ServiceProvider
         if ($this->app['config']->get('orbit.git.enabled')) {
             Event::listen(OrbitalCreated::class, [ProcessGitTransaction::class, 'created']);
             Event::listen(OrbitalUpdated::class, [ProcessGitTransaction::class, 'updated']);
+            Event::listen(OrbitalDeleted::class, [ProcessGitTransaction::class, 'deleted']);
         }
     }
 }

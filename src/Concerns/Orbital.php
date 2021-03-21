@@ -10,6 +10,7 @@ use Orbit\Facades\Orbit;
 use Illuminate\Support\Str;
 use Illuminate\Filesystem\Filesystem;
 use Orbit\Events\OrbitalCreated;
+use Orbit\Events\OrbitalDeleted;
 use Orbit\Events\OrbitalUpdated;
 use ReflectionClass;
 
@@ -52,6 +53,17 @@ trait Orbital
             );
 
             OrbitalUpdated::dispatch($model);
+
+            return $status;
+        });
+
+        static::deleted(function (Model $model) {
+            $status = Orbit::driver(static::getOrbitalDriver())->delete(
+                $model,
+                static::getOrbitalPath()
+            );
+
+            OrbitalDeleted::dispatch($model);
 
             return $status;
         });
