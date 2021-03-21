@@ -149,3 +149,15 @@ To enable Git integration, define a new `ORBIT_GIT_ENABLED` environment variable
 When Git integration is enabled, Orbit will add event listeners to the `OrbitalCreated`, `OrbitalUpdated` and `OrbitalDeleted` events and commit any changed files back to your repository.
 
 This is extremely powerful and can greatly improve your local - production workflows.
+
+### Customising the repository root
+
+By default, Orbit uses the `base_path` as your repositories root directory. If this is not applicable to your application, you can change the path by defining an `ORBIT_GIT_ROOT` environment variable and setting it's value to the root of your Git repository.
+
+### Customising the author name and email
+
+By default, Orbit will use the system's name and email address when making commits to your repository. If you wish to change the name, use the `ORBIT_GIT_NAME` and `ORBIT_GIT_EMAIL` environment variables.
+
+### Customising the Git binary
+
+If your Git binary is not found in the usual place (`/usr/bin/git` on most UNIX machines), you can customise the location using the `ORBIT_GIT_BINARY` environment variable.
