@@ -61,6 +61,8 @@ Orbit will transform the base name of your model into a pluralized snake-cased s
 
 > 🚨 Changing the name of a model will prevent Orbit from finding any existing records in the old folder. If you wish to change the name of the folder, overwrite the `public static function getOrbitalName` method on your model class and return the old name instead.
 
+Any time you call `Model::create()`, `Model::update` or `Model::delete`, Orbit will intercept those calls and forward to the necessary driver method. The driver is then responsible for performing the necessary file system calls.
+
 ## Drivers
 
 Orbit is a driver-based package, making it very easy to change the storage format of your data.
