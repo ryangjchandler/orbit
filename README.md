@@ -63,6 +63,26 @@ Orbit will transform the base name of your model into a pluralized snake-cased s
 
 Any time you call `Model::create()`, `Model::update` or `Model::delete`, Orbit will intercept those calls and forward to the necessary driver method. The driver is then responsible for performing the necessary file system calls.
 
+### Changing the primary key
+
+Just like a normal Eloquent model, you can change the primary key of your Orbit model. Overwrite the `Model::getKeyName` method and return the name of your new model.
+
+```php
+class Post extends Model
+{
+    use Orbital;
+
+    public function getKeyName()
+    {
+        return 'slug';
+    }
+}
+```
+
+Standard Orbit drivers will respect the new key name and use that when creating, updating and deleting files on disk, e.g. a `Post` with the slug `hello-world` will write to the `content/posts/hello-world.md` file.
+
+> 🚨 Changing the key for a model after records already exist can cause damage. Be sure to rename your files afterwards so that Orbit doesn't create duplicate content.
+
 ## Drivers
 
 Orbit is a driver-based package, making it very easy to change the storage format of your data.
@@ -117,3 +137,15 @@ class Post extends Model
 ```
 
 > Driver names are determined when they are registered with Orbit. You should always use the string name of the driver instead of the fully-qualified class name.
+
+## Git Integration (experimental)
+
+Orbit comes with convenient Git integration out of the box. This means that any changes made to your content can be automatically persisted back to your Git repository, keeping everything up-to-date.
+
+To enable Git integration, define a new `ORBIT_GIT_ENABLED` environment variable in your `.env` file and set the value to `true`.
+
+### Events
+
+When Git integration is enabled, Orbit will add event listeners to the `OrbitalCreated`, `OrbitalUpdated` and `OrbitalDeleted` events and commit any changed files back to your repository.
+
+This is extremely powerful and can greatly improve your local - production workflows.
