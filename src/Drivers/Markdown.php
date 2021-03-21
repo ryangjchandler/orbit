@@ -32,6 +32,10 @@ class Markdown implements Driver
     {
         $key = $model->getKey();
 
+        if ($model->wasChanged($model->getKeyName())) {
+            unlink($directory . DIRECTORY_SEPARATOR . $model->getOriginal($model->getKeyName()) . '.md');
+        }
+
         if (! file_exists($path = $directory . DIRECTORY_SEPARATOR . $key . '.md')) {
             touch($path);
         }
