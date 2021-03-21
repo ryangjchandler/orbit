@@ -61,4 +61,49 @@ Out of the box, Orbit provides the following drivers:
 
 * `md` -> `Orbit\Drivers\Markdown`
 
+### Registering drivers
 
+You can register custom Orbit drivers by using the `Orbit::extend` method. You should call this method from the `boot` method in a `ServiceProvider`.
+
+```php
+\Orbit\Facades\Orbit::extend('json', function ($app) {
+    return new \App\Drivers\JsonDriver($app);
+})
+```
+
+All drivers must implement the `Orbit\Contracts\Driver` contract. This enforces drivers to have at least 4 methods:
+
+```php
+interface Driver
+{
+    public function shouldRestoreCache(string $directory): bool;
+
+    public function save(Model $model, string $directory): bool;
+
+    public function delete(Model $model, string $directory): bool;
+
+    public function all(string $directory): Collection;
+}
+```
+
+Here is what each of the methods are for:
+
+* `shouldRestoreCache` - used to determine if the file cache should be updated. 
+* `save` - used to persist model changes to a file on disk, or create a new file.
+* `delete` - used to delete an existing file on disk
+* `all` - used to retrieve all records from disk and cache.
+
+### Changing drivers
+
+If you wish to use a different driver for one of your models, you can add a `public static $driver` property to your model and set the value to the name of a driver.
+
+```php
+class Post extends Model
+{
+    use Orbital;
+
+    public static $driver = 'json';
+}
+```
+
+> Driver names are determined when they are registered with Orbit.
