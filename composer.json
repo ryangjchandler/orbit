@@ -24,10 +24,8 @@
     },
     "require": {
         "illuminate/support": "^8.0",
-        "illuminate/database": "^8.0"
-    },
-    "require-dev": {
-
+        "illuminate/database": "^8.0",
+        "spatie/yaml-front-matter": "^2.0"
     },
     "extra": {
         "laravel": {
