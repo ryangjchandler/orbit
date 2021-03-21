@@ -29,7 +29,7 @@ class Markdown implements Driver
 
             $collection->push(array_merge(
                 $document->matter(),
-                ['content' => $document->body()]
+                ['content' => trim($document->body())]
             ));
         }
 
