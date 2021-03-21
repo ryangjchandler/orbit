@@ -22,9 +22,9 @@ trait Orbital
 
         $driver = Orbit::driver(static::getOrbitalDriver());
 
-        // if ($driver->shouldRestoreCache(static::getOrbitalPath())) {
+        if ($driver->shouldRestoreCache(static::getOrbitalPath())) {
             (new static)->migrate();
-        // }
+        }
     }
 
     public static function getOrbitalSchema(Blueprint $table)
