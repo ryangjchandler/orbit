@@ -25,7 +25,8 @@
     "require": {
         "illuminate/support": "^8.0",
         "illuminate/database": "^8.0",
-        "spatie/yaml-front-matter": "^2.0"
+        "spatie/yaml-front-matter": "^2.0",
+        "symplify/git-wrapper": "^9.2"
     },
     "extra": {
         "laravel": {

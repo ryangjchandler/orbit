@@ -9,6 +9,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Orbit\Facades\Orbit;
 use Illuminate\Support\Str;
 use Illuminate\Filesystem\Filesystem;
+use Orbit\Events\OrbitalCreated;
+use Orbit\Events\OrbitalUpdated;
 use ReflectionClass;
 
 trait Orbital
@@ -33,17 +35,25 @@ trait Orbital
         }
 
         static::created(function (Model $model) {
-            return Orbit::driver(static::getOrbitalDriver())->save(
+            $status = Orbit::driver(static::getOrbitalDriver())->save(
                 $model,
                 static::getOrbitalPath()
             );
+
+            OrbitalCreated::dispatch($model);
+
+            return $status;
         });
 
         static::updated(function (Model $model) {
-            return Orbit::driver(static::getOrbitalDriver())->save(
+            $status = Orbit::driver(static::getOrbitalDriver())->save(
                 $model,
                 static::getOrbitalPath()
             );
+
+            OrbitalUpdated::dispatch($model);
+
+            return $status;
         });
     }
 

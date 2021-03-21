@@ -3,8 +3,12 @@
 namespace Orbit;
 
 use Exception;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Orbit\Contracts\Driver;
+use Orbit\Events\OrbitalCreated;
+use Orbit\Events\OrbitalUpdated;
+use Orbit\Listeners\ProcessGitTransaction;
 
 class OrbitServiceProvider extends ServiceProvider
 {
@@ -35,6 +39,11 @@ class OrbitServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../config/orbit.php' => config_path('orbit.php'),
             ], 'orbit:config');
+        }
+
+        if ($this->app['config']->get('orbit.git.enabled')) {
+            Event::listen(OrbitalCreated::class, [ProcessGitTransaction::class, 'created']);
+            Event::listen(OrbitalUpdated::class, [ProcessGitTransaction::class, 'updated']);
         }
     }
 }

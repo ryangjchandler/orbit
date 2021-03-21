@@ -14,6 +14,7 @@ return [
     ],
 
     'git' => [
+        'enabled' => env('ORBIT_GIT_ENABLED', false),
         'name' => env('ORBIT_GIT_NAME'),
         'email' => env('ORBIT_GIT_EMAIL'),
     ],
