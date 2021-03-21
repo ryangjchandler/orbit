@@ -3,6 +3,7 @@
 namespace Orbit;
 
 use Closure;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Manager;
 
 class OrbitManager extends Manager
@@ -33,5 +34,23 @@ class OrbitManager extends Manager
         $this->resolveGitEmail = $callback;
 
         return $this;
+    }
+
+    public function getGitName()
+    {
+        if ($this->resolveGitName) {
+            return value($this->resolveGitName);
+        }
+
+        return config('orbit.git.name');
+    }
+
+    public function getGitEmail()
+    {
+        if ($this->resolveGitEmail) {
+            return value($this->resolveGitEmail);
+        }
+
+        return config('orbit.git.email');
     }
 }

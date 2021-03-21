@@ -13,4 +13,9 @@ return [
         'cache' => storage_path('framework/cache/orbit'),
     ],
 
+    'git' => [
+        'name' => env('ORBIT_GIT_NAME'),
+        'email' => env('ORBIT_GIT_EMAIL'),
+    ],
+
 ];

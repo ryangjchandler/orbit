@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Facade;
  * @method static array getDrivers()
  * @method static string getDefaultDriver()
  * @method static string getDatabasePath()
+ * @method static string getGitName()
+ * @method static string getGitEmail()
  *
  * @see \Orbit\OrbitManager
  */
