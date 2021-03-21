@@ -69,7 +69,7 @@ trait Orbital
         });
     }
 
-    public static function getOrbitalSchema(Blueprint $table)
+    public static function schema(Blueprint $table)
     {
         //
     }
