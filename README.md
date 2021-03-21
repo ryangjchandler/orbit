@@ -53,6 +53,14 @@ class Post extends Model
 
 > If some of your data is optional, make sure the corresponding column is `nullable`.
 
+### Storing content
+
+By default, all content is stored inside of a `content` folder in the root of your application. If you wish to change this, publish the `orbit.php` configuration file and change the `orbit.paths.content` option.
+
+Orbit will transform the base name of your model into a pluralized snake-cased string and use that as the main folder name, e.g. `Post` -> `content/posts`, `PostCategory` => `content/post_categories`.
+
+> 🚨 Changing the name of a model will prevent Orbit from finding any existing records in the old folder. If you wish to change the name of the folder, overwrite the `public static function getOrbitalName` method on your model class and return the old name instead.
+
 ## Drivers
 
 Orbit is a driver-based package, making it very easy to change the storage format of your data.
