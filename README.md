@@ -17,7 +17,7 @@ composer require ryangjchandler/orbit
 
 ## Usage
 
-To being using Orbit, create a Laravel model and use the `Orbit\Concerns\Orbital` trait.
+To begin using Orbit, create a Laravel model and use the `Orbit\Concerns\Orbital` trait.
 
 ```php
 class Post extends Model
