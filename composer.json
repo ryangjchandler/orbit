@@ -34,5 +34,8 @@
                 "Orbit\\OrbitServiceProvider"
             ]
         }
+    },
+    "require-dev": {
+        "vimeo/psalm": "^4.6"
     }
 }
