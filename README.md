@@ -27,3 +27,28 @@ class Post extends Model
 ```
 
 The `Orbital` trait is responsible for hooking into the Eloquent lifecycle and ensuring all of your interactions are handled correctly.
+
+### Defining the Schema
+
+Just like a database migration, you need to define the different pieces of data that your Orbit model can have. Add a `Model::schema` method to your model.
+
+This method will need to accept an instance of `Illuminate\Database\Schema\Blueprint`, just like a migration.
+
+```php
+use Illuminate\Database\Schema\Blueprint;
+
+class Post extends Model
+{
+    use Orbit\Concerns\Orbital;
+
+    public function schema(Blueprint $table)
+    {
+        $table->string('title');
+        $table->string('slug');
+        $table->text('content')->nullable();
+        $table->timestamp('published_at');
+    }
+}
+```
+
+> If some of your data is optional, make sure you make the corresponding column `nullable` as well.
