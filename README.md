@@ -6,3 +6,24 @@
 </p>
 
 Orbit is a flat-file driver for Laravel Eloquent. It allows you to replace your generic database with real files that you can manipulate using the methods you're familiar with.
+
+## Installation
+
+To install Orbit, run the following command in your project:
+
+```bash
+composer require ryangjchandler/orbit
+```
+
+## Usage
+
+To being using Orbit, create a Laravel model and use the `Orbit\Concerns\Orbital` trait.
+
+```php
+class Post extends Model
+{
+    use Orbit\Concerns\Orbital;
+}
+```
+
+The `Orbital` trait is responsible for hooking into the Eloquent lifecycle and ensuring all of your interactions are handled correctly.
