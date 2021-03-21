@@ -51,4 +51,4 @@ class Post extends Model
 }
 ```
 
-> If some of your data is optional, make sure you make the corresponding column `nullable` as well.
+> If some of your data is optional, make sure the corresponding column is `nullable`.
