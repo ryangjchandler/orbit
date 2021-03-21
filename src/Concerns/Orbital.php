@@ -26,7 +26,7 @@ trait Orbital
         );
 
         $fs->ensureDirectoryExists(
-            config('orbit.paths.cache') . DIRECTORY_SEPARATOR . 'orbit'
+            config('orbit.paths.cache')
         );
 
         $database = Orbit::getDatabasePath();
