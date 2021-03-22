@@ -132,7 +132,7 @@ trait Orbital
         );
 
         $fs->ensureDirectoryExists(
-            config('orbit.paths.cache')
+            \config('orbit.paths.cache')
         );
 
         $database = Orbit::getDatabasePath();
@@ -149,6 +149,6 @@ trait Orbital
 
     public static function getOrbitalPath()
     {
-        return config('orbit.paths.content') . DIRECTORY_SEPARATOR . static::getOrbitalName();
+        return \config('orbit.paths.content') . DIRECTORY_SEPARATOR . static::getOrbitalName();
     }
 }
