@@ -3,7 +3,6 @@
 namespace Orbit;
 
 use Exception;
-use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Orbit\Contracts\Driver;

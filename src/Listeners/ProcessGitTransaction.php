@@ -2,12 +2,10 @@
 
 namespace Orbit\Listeners;
 
-use Exception;
 use Orbit\Events\OrbitalCreated;
 use Orbit\Events\OrbitalDeleted;
 use Orbit\Events\OrbitalUpdated;
 use Orbit\Facades\Orbit;
-use Symplify\GitWrapper\Exception\GitException;
 use Symplify\GitWrapper\GitWrapper;
 
 class ProcessGitTransaction
