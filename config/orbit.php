@@ -7,6 +7,7 @@ return [
     'drivers' => [
         'md' => \Orbit\Drivers\Markdown::class,
         'json' => \Orbit\Drivers\Json::class,
+        'yaml' => \Orbit\Drivers\Yaml::class,
     ],
 
     'paths' => [
