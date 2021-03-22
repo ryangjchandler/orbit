@@ -9,6 +9,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ColumnDefinition;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Eloquent\SoftDeletes as EloquentSoftDeletes;
+use Orbit\Events\OrbitalForceDeleted;
 use Orbit\Events\OrbitalUpdated;
 
 trait SoftDeletes
@@ -49,7 +50,7 @@ trait SoftDeletes
                 static::getOrbitalPath()
             );
 
-            OrbitalDeleted::dispatch($model);
+            OrbitalForceDeleted::dispatch($model);
 
             return $status;
         });
