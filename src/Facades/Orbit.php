@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static string getGitName()
  * @method static string getGitEmail()
  * @method static string getGitRoot()
+ * @method static string getGitBinary()
  *
  * @see \Orbit\OrbitManager
  */
