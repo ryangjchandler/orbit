@@ -40,7 +40,7 @@ trait SoftDeletes
         });
 
         static::forceDeleted(function (Model $model) {
-            if ($model->callTraitMethod('shouldDelete', $model) === false) {
+            if ($model->callTraitMethod('shouldForceDelete', $model) === false) {
                 return;
             }
 
