@@ -4,23 +4,24 @@ namespace Orbit\Drivers;
 
 use Illuminate\Database\Eloquent\Model;
 use SplFileInfo;
+use Symfony\Component\Yaml\Yaml as SymfonyYaml;
 
-class Json extends FileDriver
+class Yaml extends FileDriver
 {
     protected function dumpContent(Model $model): string
     {
         $data = array_filter($model->getAttributes());
 
-        return json_encode($data, JSON_PRETTY_PRINT);
+        return SymfonyYaml::dump($data);
     }
 
     protected function parseContent(SplFileInfo $file): array
     {
-        return json_decode(file_get_contents($file->getPathname()), true);
+        return SymfonyYaml::parseFile($file->getPathname());
     }
 
     protected function extension(): string
     {
-        return 'json';
+        return 'yml';
     }
 }
