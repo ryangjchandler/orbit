@@ -3,6 +3,7 @@
 namespace Orbit\Drivers;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
 use Spatie\YamlFrontMatter\YamlFrontMatter;
 use SplFileInfo;
 use Symfony\Component\Yaml\Yaml;
@@ -38,5 +39,12 @@ class Markdown extends FileDriver
     protected function extension(): string
     {
         return 'md';
+    }
+
+    public function schema(Blueprint $table)
+    {
+        if (! $table->hasColumn('content')) {
+            $table->text('content')->nullable();
+        }
     }
 }
