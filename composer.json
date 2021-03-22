@@ -12,6 +12,7 @@
     ],
     "require": {
         "php": "^7.4 || ^8.0",
+        "ext-json": "*",
         "illuminate/database": "^8.0",
         "illuminate/events": "^8.0",
         "illuminate/support": "^8.0",
