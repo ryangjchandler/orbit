@@ -8,6 +8,7 @@ use Illuminate\Support\ServiceProvider;
 use Orbit\Contracts\Driver;
 use Orbit\Events\OrbitalCreated;
 use Orbit\Events\OrbitalDeleted;
+use Orbit\Events\OrbitalForceDeleted;
 use Orbit\Events\OrbitalUpdated;
 use Orbit\Listeners\ProcessGitTransaction;
 
@@ -46,6 +47,7 @@ class OrbitServiceProvider extends ServiceProvider
             Event::listen(OrbitalCreated::class, [ProcessGitTransaction::class, 'created']);
             Event::listen(OrbitalUpdated::class, [ProcessGitTransaction::class, 'updated']);
             Event::listen(OrbitalDeleted::class, [ProcessGitTransaction::class, 'deleted']);
+            Event::listen(OrbitalForceDeleted::class, [ProcessGitTransaction::class, 'deleted']);
         }
     }
 }

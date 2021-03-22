@@ -4,6 +4,7 @@ namespace Orbit\Listeners;
 
 use Orbit\Events\OrbitalCreated;
 use Orbit\Events\OrbitalDeleted;
+use Orbit\Events\OrbitalForceDeleted;
 use Orbit\Events\OrbitalUpdated;
 use Orbit\Facades\Orbit;
 use Symplify\GitWrapper\GitWrapper;
@@ -24,9 +25,13 @@ class ProcessGitTransaction
         $this->commit($message);
     }
 
-    public function deleted(OrbitalDeleted $event)
+    public function deleted($event)
     {
-        $message = 'orbit: deleted ' . class_basename($event->model) . ' ' . $event->model->getKey();
+        if ($event instanceof OrbitalForceDeleted) {
+            $message = 'orbit: force deleted ' . class_basename($event->model) . ' ' . $event->model->getKey();
+        } else {
+            $message = 'orbit: deleted ' . class_basename($event->model) . ' ' . $event->model->getKey();
+        }
 
         $this->commit($message);
     }
