@@ -7,6 +7,11 @@ use Orbit\Tests\Fixtures\Emptiness;
 
 class OrbitalTest extends TestCase
 {
+    public function tearDown(): void
+    {
+        Post::all()->each->delete();
+    }
+
     public function test_it_will_return_an_empty_collection_when_no_content_present()
     {
         $this->assertTrue(Emptiness::all()->isEmpty());
@@ -34,7 +39,9 @@ class OrbitalTest extends TestCase
 
     public function test_it_will_write_to_existing_file()
     {
-        $post = Post::first();
+        $post = Post::create([
+            'title' => 'Example',
+        ]);
 
         $post->update([
             'title' => 'Amazing',
@@ -47,7 +54,9 @@ class OrbitalTest extends TestCase
 
     public function test_it_will_delete_existing_files()
     {
-        $post = Post::first();
+        $post = Post::create([
+            'title' => 'Delete',
+        ]);
 
         $post->delete();
 

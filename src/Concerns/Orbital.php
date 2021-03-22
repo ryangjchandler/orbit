@@ -29,6 +29,7 @@ trait Orbital
         $modelFile = (new ReflectionClass(static::class))->getFileName();
 
         if (
+            Orbit::isTesting() ||
             filemtime($modelFile) > filemtime(Orbit::getDatabasePath()) ||
             $driver->shouldRestoreCache(static::getOrbitalPath()) ||
             ! static::resolveConnection()->getSchemaBuilder()->hasTable((new static)->getTable())
@@ -153,7 +154,7 @@ trait Orbital
 
         $database = Orbit::getDatabasePath();
 
-        if (! $fs->exists($database)) {
+        if (! $fs->exists($database) && $database !== ':memory:') {
             $fs->put($database, '');
         }
     }

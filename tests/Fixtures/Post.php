@@ -16,5 +16,6 @@ class Post extends Model
     {
         $table->id();
         $table->string('title');
+        $table->text('content')->nullable();
     }
 }
