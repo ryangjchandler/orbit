@@ -83,6 +83,14 @@ Standard Orbit drivers will respect the new key name and use that when creating,
 
 > 🚨 Changing the key for a model after records already exist can cause damage. Be sure to rename your files afterwards so that Orbit doesn't create duplicate content.
 
+### Soft Deletes
+
+Since Orbit needs to update files on disk when your model is updated, the standard Eloquent `SoftDeletes` trait doesn't quite work. If you want to add soft delete support to your Orbit model, you can instead use the `Orbit\Concerns\SoftDeletes` trait.
+
+This trait uses the Eloquent one under-the-hood, so you can still access all of your normal `SoftDeletes` methods, including `isForceDeleting()` and `forceDelete()`. 
+
+The Orbit version adds in the necessary hooks to perform file system operations as well as ensure you don't completely delete your content.
+
 ## Drivers
 
 Orbit is a driver-based package, making it very easy to change the storage format of your data.
