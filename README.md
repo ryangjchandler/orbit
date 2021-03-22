@@ -98,6 +98,7 @@ Orbit is a driver-based package, making it very easy to change the storage forma
 Out of the box, Orbit provides the following drivers:
 
 * `md` -> `Orbit\Drivers\Markdown`
+* `json` => `Orbit\Drivers\Json`
 
 ### Registering drivers
 
