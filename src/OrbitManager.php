@@ -3,7 +3,6 @@
 namespace Orbit;
 
 use Closure;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Manager;
 
 class OrbitManager extends Manager

@@ -4,13 +4,10 @@ namespace Orbit\Drivers;
 
 use FilesystemIterator;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
-use Illuminate\Support\LazyCollection;
 use Orbit\Contracts\Driver;
 use Orbit\Facades\Orbit;
 use Spatie\YamlFrontMatter\YamlFrontMatter;
-use SplFileInfo;
 use Symfony\Component\Yaml\Yaml;
 
 class Markdown implements Driver

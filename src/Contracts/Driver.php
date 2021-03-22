@@ -3,7 +3,6 @@
 namespace Orbit\Contracts;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
 
 interface Driver

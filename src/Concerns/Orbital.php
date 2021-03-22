@@ -2,7 +2,6 @@
 
 namespace Orbit\Concerns;
 
-use Facade\FlareClient\Stacktrace\File;
 use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
