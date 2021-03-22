@@ -10,6 +10,8 @@ use Symfony\Component\Yaml\Yaml;
 
 class Markdown extends FileDriver
 {
+    protected static $contentColumn = 'content';
+
     protected function dumpContent(Model $model): string
     {
         $matter = array_filter($model->attributesToArray(), function ($value, $key) {
@@ -43,8 +45,18 @@ class Markdown extends FileDriver
 
     public function schema(Blueprint $table)
     {
-        if (! $table->hasColumn('content')) {
-            $table->text('content')->nullable();
+        if (! $table->hasColumn(static::getContentColumn())) {
+            $table->text(static::getContentColumn())->nullable();
         }
+    }
+
+    public static function contentColumn(string $name = 'content')
+    {
+        static::$contentColumn = $name;
+    }
+
+    public static function getContentColumn()
+    {
+        return static::$contentColumn;
     }
 }
