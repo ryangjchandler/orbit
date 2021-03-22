@@ -6,6 +6,11 @@ use Orbit\Tests\Fixtures\SoftDeletedPost;
 
 class SoftDeletesTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        SoftDeletedPost::all()->each->forceDelete();
+    }
+
     public function test_it_will_update_deleted_at_when_deleting()
     {
         $post = SoftDeletedPost::create([
