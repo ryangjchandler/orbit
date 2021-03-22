@@ -10,6 +10,7 @@ use Orbit\Events\OrbitalCreated;
 use Orbit\Events\OrbitalDeleted;
 use Orbit\Events\OrbitalForceDeleted;
 use Orbit\Events\OrbitalUpdated;
+use Orbit\Facades\Orbit;
 use Orbit\Listeners\ProcessGitTransaction;
 
 class OrbitServiceProvider extends ServiceProvider
@@ -33,6 +34,14 @@ class OrbitServiceProvider extends ServiceProvider
 
             return $manager;
         });
+
+        $config = $this->app['config'];
+
+        $config->set('database.connections.orbit', [
+            'driver' => 'sqlite',
+            'database' => Orbit::getDatabasePath(),
+            'foreign_key_constraints' => false,
+        ]);
     }
 
     public function boot()
