@@ -113,7 +113,15 @@ trait Orbital
 
         $driver = Orbit::driver(static::getOrbitalDriver());
 
-        $driver->all(static::getOrbitalPath())->each(fn ($row) => static::insert($row));
+        $driver->all(static::getOrbitalPath())->each(function ($row) {
+            foreach ($row as $key => $value) {
+                $this->setAttribute($key, $value);
+
+                $row[$key] = $this->attributes[$key];
+            }
+
+            static::insert($row);
+        });
     }
 
     protected static function getOrbitalDriver()

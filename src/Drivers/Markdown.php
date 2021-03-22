@@ -34,7 +34,7 @@ class Markdown implements Driver
         }
 
         if (! file_exists($path = $directory . DIRECTORY_SEPARATOR . $key . '.md')) {
-            touch($path);
+            file_put_contents($path, '');
         }
 
         $matter = array_filter($model->getAttributes(), function ($value, $key) {
