@@ -157,7 +157,7 @@ class Post extends Model
 
 ### Markdown driver
 
-The Markdown driver is special as it requires a `content` column which holds the Markdown's body. If you don't add a `content` column you will get a SQL exception when the cache is refreshed from disk data.
+The Markdown driver is special as it requires a `content` column which holds the Markdown's body. If the column is missing, you will get a QueryException when the cache is refreshed from disk data.
 
 ## Git Integration (experimental)
 
