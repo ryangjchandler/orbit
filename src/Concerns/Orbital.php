@@ -35,6 +35,10 @@ trait Orbital
         }
 
         static::created(function (Model $model) {
+            if ($model->callTraitMethod('shouldCreate', $model) === false) {
+                return;
+            }
+
             $status = Orbit::driver(static::getOrbitalDriver())->save(
                 $model,
                 static::getOrbitalPath()
@@ -46,6 +50,10 @@ trait Orbital
         });
 
         static::updated(function (Model $model) {
+            if ($model->callTraitMethod('shouldUpdate', $model) === false) {
+                return;
+            }
+
             $status = Orbit::driver(static::getOrbitalDriver())->save(
                 $model,
                 static::getOrbitalPath()
@@ -57,6 +65,10 @@ trait Orbital
         });
 
         static::deleted(function (Model $model) {
+            if ($model->callTraitMethod('shouldDelete', $model) === false) {
+                return;
+            }
+
             $status = Orbit::driver(static::getOrbitalDriver())->delete(
                 $model,
                 static::getOrbitalPath()
@@ -92,13 +104,7 @@ trait Orbital
         static::resolveConnection()->getSchemaBuilder()->create($table, function (Blueprint $table) {
             static::schema($table);
 
-            foreach (class_uses_recursive(static::class) as $trait) {
-                $method = 'schema' . Str::of($trait)->classBasename();
-
-                if (method_exists($this, $method)) {
-                    $this->{$method}($table);
-                }
-            }
+            $this->callTraitMethod('schema', $table);
 
             if ($this->usesTimestamps()) {
                 $table->timestamps();
@@ -150,5 +156,20 @@ trait Orbital
     public static function getOrbitalPath()
     {
         return \config('orbit.paths.content') . DIRECTORY_SEPARATOR . static::getOrbitalName();
+    }
+
+    public function callTraitMethod(string $method, ...$args)
+    {
+        $result = null;
+
+        foreach (class_uses_recursive(static::class) as $trait) {
+            $methodToCall = $method . Str::of($trait)->classBasename();
+
+            if (method_exists($this, $methodToCall)) {
+                $result = $this->{$methodToCall}(...$args);
+            }
+        }
+
+        return $result;
     }
 }
