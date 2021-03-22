@@ -29,6 +29,15 @@ class OrbitManagerTest extends TestCase
         $this->assertInstanceOf(Markdown::class, Orbit::driver());
     }
 
+    public function test_it_can_register_custom_drivers()
+    {
+        $class = new class {};
+
+        Orbit::extend('example', fn () => $class);
+
+        $this->assertEquals($class, Orbit::driver('example'));
+    }
+
     public function test_it_can_return_a_custom_git_name()
     {
         Orbit::resolveGitNameUsing(fn () => 'Ryan');
