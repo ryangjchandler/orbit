@@ -21,7 +21,6 @@ trait Orbital
     public static function bootOrbital()
     {
         static::ensureOrbitDirectoriesExist();
-        static::setSqliteConnection();
 
         $driver = Orbit::driver(static::getOrbitalDriver());
         $modelFile = (new ReflectionClass(static::class))->getFileName();
@@ -88,7 +87,12 @@ trait Orbital
 
     public static function resolveConnection($connection = null)
     {
-        return static::$orbit;
+        return static::$resolver->connection('orbit');
+    }
+
+    public function getConnectionName()
+    {
+        return 'orbit';
     }
 
     public function migrate()
@@ -128,14 +132,6 @@ trait Orbital
     protected static function getOrbitalDriver()
     {
         return property_exists(static::class, 'driver') ? static::$driver : null;
-    }
-
-    protected static function setSqliteConnection()
-    {
-        static::$orbit = app(ConnectionFactory::class)->make([
-            'driver' => 'sqlite',
-            'database' => Orbit::getDatabasePath(),
-        ]);
     }
 
     protected static function ensureOrbitDirectoriesExist()
