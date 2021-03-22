@@ -19,7 +19,7 @@ class AdvancedOrbitalTest extends TestCase
             'name' => 'Ryan',
         ]);
 
-        $this->assertFileExists(__DIR__.'/content/customkeys/'.$custom->name.'.md');
+        $this->assertFileExists(__DIR__.'/content/custom_keys/'.$custom->name.'.md');
     }
 
     public function test_it_can_update_files_using_custom_primary_key()
@@ -28,14 +28,14 @@ class AdvancedOrbitalTest extends TestCase
             'name' => 'Ryan',
         ]);
 
-        $this->assertFileExists(__DIR__.'/content/customkeys/'.$custom->name.'.md');
+        $this->assertFileExists(__DIR__.'/content/custom_keys/'.$custom->name.'.md');
 
         $custom->update([
             'name' => 'John',
         ]);
 
-        $this->assertFileDoesNotExist(__DIR__.'/content/customkeys/Ryan.md');
-        $this->assertFileExists(__DIR__.'/content/customkeys/'.$custom->name.'.md');
+        $this->assertFileDoesNotExist(__DIR__.'/content/custom_keys/Ryan.md');
+        $this->assertFileExists(__DIR__.'/content/custom_keys/'.$custom->name.'.md');
     }
 
     public function test_it_can_use_a_custom_driver()
@@ -44,6 +44,6 @@ class AdvancedOrbitalTest extends TestCase
             'name' => 'Ryan',
         ]);
 
-        $this->assertFileExists(__DIR__.'/content/jsonmodels/'.$json->getKey().'.json');
+        $this->assertFileExists(__DIR__.'/content/json_models/'.$json->getKey().'.json');
     }
 }

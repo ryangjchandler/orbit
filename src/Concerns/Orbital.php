@@ -161,7 +161,7 @@ trait Orbital
 
     public static function getOrbitalName()
     {
-        return (string) Str::of(class_basename(static::class))->lower()->snake()->plural();
+        return (string) Str::of(class_basename(static::class))->snake()->lower()->plural();
     }
 
     public static function getOrbitalPath()

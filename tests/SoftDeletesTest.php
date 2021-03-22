@@ -16,7 +16,7 @@ class SoftDeletesTest extends TestCase
 
         $this->assertNotEmpty($post->deleted_at);
 
-        $file = file_get_contents(__DIR__.'/content/softdeletedposts/'.$post->id.'.md');
+        $file = file_get_contents(__DIR__.'/content/soft_deleted_posts/'.$post->id.'.md');
 
         $this->assertStringContainsString(sprintf('deleted_at: \'%s\'', $post->deleted_at), $file);
     }
@@ -31,13 +31,13 @@ class SoftDeletesTest extends TestCase
 
         $this->assertNotEmpty($post->deleted_at);
 
-        $file = file_get_contents(__DIR__.'/content/softdeletedposts/'.$post->id.'.md');
+        $file = file_get_contents(__DIR__.'/content/soft_deleted_posts/'.$post->id.'.md');
 
         $this->assertStringContainsString(sprintf('deleted_at: \'%s\'', $post->deleted_at), $file);
 
         $post->forceDelete();
 
-        $this->assertFileDoesNotExist(__DIR__.'/content/softdeletedposts/'.$post->id.'.md');
+        $this->assertFileDoesNotExist(__DIR__.'/content/soft_deleted_posts/'.$post->id.'.md');
     }
 
     public function test_it_will_remove_deleted_at_when_restoring_file()
@@ -50,13 +50,13 @@ class SoftDeletesTest extends TestCase
 
         $this->assertNotEmpty($post->deleted_at);
 
-        $file = file_get_contents(__DIR__.'/content/softdeletedposts/'.$post->id.'.md');
+        $file = file_get_contents(__DIR__.'/content/soft_deleted_posts/'.$post->id.'.md');
 
         $this->assertStringContainsString(sprintf('deleted_at: \'%s\'', $post->deleted_at), $file);
 
         $post->restore();
 
-        $file = file_get_contents(__DIR__.'/content/softdeletedposts/'.$post->id.'.md');
+        $file = file_get_contents(__DIR__.'/content/soft_deleted_posts/'.$post->id.'.md');
 
         $this->assertStringNotContainsString('deleted_at', $file);
     }
