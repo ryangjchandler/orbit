@@ -82,10 +82,23 @@ trait Orbital
     {
         $table = $this->getTable();
 
-        static::resolveConnection()->getSchemaBuilder()->drop($table);
+        /** @var \Illuminate\Database\Schema\Builder $schema */
+        $schema = static::resolveConnection()->getSchemaBuilder();
+
+        if ($schema->hasTable($table)) {
+            $schema->drop($table);
+        }
 
         static::resolveConnection()->getSchemaBuilder()->create($table, function (Blueprint $table) {
             static::schema($table);
+
+            foreach (class_uses_recursive(static::class) as $trait) {
+                $method = 'schema' . Str::of($trait)->classBasename();
+
+                if (method_exists($this, $method)) {
+                    $this->{$method}($table);
+                }
+            }
 
             if ($this->usesTimestamps()) {
                 $table->timestamps();
