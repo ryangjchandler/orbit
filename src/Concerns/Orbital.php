@@ -35,7 +35,7 @@ trait Orbital
         }
 
         static::created(function (Model $model) {
-            if ($this->callTraitMethod('shouldCreate') === false) {
+            if ($model->callTraitMethod('shouldCreate', $model) === false) {
                 return;
             }
 
@@ -50,7 +50,7 @@ trait Orbital
         });
 
         static::updated(function (Model $model) {
-            if ($this->callTraitMethod('shouldUpdate') === false) {
+            if ($model->callTraitMethod('shouldUpdate', $model) === false) {
                 return;
             }
 
@@ -65,7 +65,7 @@ trait Orbital
         });
 
         static::deleted(function (Model $model) {
-            if ($this->callTraitMethod('shouldDelete') === false) {
+            if ($model->callTraitMethod('shouldDelete', $model) === false) {
                 return;
             }
 
