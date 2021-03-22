@@ -12,6 +12,8 @@ class JsonModel extends Model
 
     protected $guarded = [];
 
+    protected static $driver = 'json';
+
     public static function schema(Blueprint $table)
     {
         $table->string('name');
@@ -25,10 +27,5 @@ class JsonModel extends Model
     public function getIncrementing()
     {
         return false;
-    }
-
-    protected static function getOrbitalDriver()
-    {
-        return 'json';
     }
 }
