@@ -37,7 +37,7 @@ class Markdown implements Driver
             file_put_contents($path, '');
         }
 
-        $matter = array_filter($model->getAttributes(), function ($value, $key) {
+        $matter = array_filter($model->attributesToArray(), function ($value, $key) {
             return $key !== 'content' && $value !== null;
         }, ARRAY_FILTER_USE_BOTH);
 
