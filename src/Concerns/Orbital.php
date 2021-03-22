@@ -8,6 +8,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Orbit\Facades\Orbit;
 use Illuminate\Support\Str;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Schema;
 use Orbit\Events\OrbitalCreated;
 use Orbit\Events\OrbitalDeleted;
 use Orbit\Events\OrbitalUpdated;
@@ -29,7 +30,8 @@ trait Orbital
 
         if (
             filemtime($modelFile) > filemtime(Orbit::getDatabasePath()) ||
-            $driver->shouldRestoreCache(static::getOrbitalPath())
+            $driver->shouldRestoreCache(static::getOrbitalPath()) ||
+            ! static::resolveConnection()->getSchemaBuilder()->hasTable((new static)->getTable())
         ) {
             (new static)->migrate();
         }
