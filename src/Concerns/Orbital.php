@@ -111,6 +111,12 @@ trait Orbital
 
             $this->callTraitMethod('schema', $table);
 
+            $driver = Orbit::driver(static::getOrbitalDriver());
+
+            if (method_exists($driver, 'schema')) {
+                $driver->schema($table);
+            }
+
             if ($this->usesTimestamps()) {
                 $table->timestamps();
             }

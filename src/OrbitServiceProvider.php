@@ -3,6 +3,8 @@
 namespace Orbit;
 
 use Exception;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\ColumnDefinition;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Orbit\Contracts\Driver;
@@ -58,5 +60,12 @@ class OrbitServiceProvider extends ServiceProvider
             Event::listen(OrbitalDeleted::class, [ProcessGitTransaction::class, 'deleted']);
             Event::listen(OrbitalForceDeleted::class, [ProcessGitTransaction::class, 'deleted']);
         }
+
+        Blueprint::macro('hasColumn', function (string $name): bool {
+            /** @var \Illuminate\Database\Schema\Blueprint $this */
+            return collect($this->getColumns())->contains(
+                fn (ColumnDefinition $column) => $column->get('name') === $name
+            );
+        });
     }
 }
