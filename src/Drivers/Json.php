@@ -35,7 +35,7 @@ class Json implements Driver
             file_put_contents($path, '');
         }
 
-        $data = array_filter($model->getAttributes());
+        $data = array_filter($model->attributesToArray());
 
         $json = json_encode($data, JSON_PRETTY_PRINT);
 
