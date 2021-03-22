@@ -99,6 +99,7 @@ Out of the box, Orbit provides the following drivers:
 
 * `md` -> `Orbit\Drivers\Markdown`
 * `json` => `Orbit\Drivers\Json`
+* `yaml` => `Orbit\Drivers\Yaml`
 
 ### Registering drivers
 
