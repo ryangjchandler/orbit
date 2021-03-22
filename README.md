@@ -155,6 +155,10 @@ class Post extends Model
 
 > Driver names are determined when they are registered with Orbit. You should always use the string name of the driver instead of the fully-qualified class name.
 
+### Markdown driver
+
+The Markdown driver is special as it requires a `content` column which holds the Markdown's body. If you don't add a `content` column you will get a SQL exception when the cache is refreshed from disk data.
+
 ## Git Integration (experimental)
 
 Orbit comes with convenient Git integration out of the box. This means that any changes made to your content can be automatically persisted back to your Git repository, keeping everything up-to-date.
