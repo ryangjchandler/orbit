@@ -8,6 +8,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Orbit\Facades\Orbit;
 use Illuminate\Support\Str;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Schema;
 use Orbit\Events\OrbitalCreated;
 use Orbit\Events\OrbitalDeleted;
 use Orbit\Events\OrbitalUpdated;
@@ -16,8 +17,6 @@ use ReflectionClass;
 trait Orbital
 {
     protected static $orbit;
-
-    protected static $driver = null;
 
     public static function bootOrbital()
     {
@@ -28,8 +27,10 @@ trait Orbital
         $modelFile = (new ReflectionClass(static::class))->getFileName();
 
         if (
+            Orbit::isTesting() ||
             filemtime($modelFile) > filemtime(Orbit::getDatabasePath()) ||
-            $driver->shouldRestoreCache(static::getOrbitalPath())
+            $driver->shouldRestoreCache(static::getOrbitalPath()) ||
+            ! static::resolveConnection()->getSchemaBuilder()->hasTable((new static)->getTable())
         ) {
             (new static)->migrate();
         }
@@ -113,12 +114,20 @@ trait Orbital
 
         $driver = Orbit::driver(static::getOrbitalDriver());
 
-        $driver->all(static::getOrbitalPath())->each(fn ($row) => static::insert($row));
+        $driver->all(static::getOrbitalPath())->each(function ($row) {
+            foreach ($row as $key => $value) {
+                $this->setAttribute($key, $value);
+
+                $row[$key] = $this->attributes[$key];
+            }
+
+            static::insert($row);
+        });
     }
 
     protected static function getOrbitalDriver()
     {
-        return static::$driver;
+        return property_exists(static::class, 'driver') ? static::$driver : null;
     }
 
     protected static function setSqliteConnection()
@@ -143,14 +152,14 @@ trait Orbital
 
         $database = Orbit::getDatabasePath();
 
-        if (! $fs->exists($database)) {
+        if (! $fs->exists($database) && $database !== ':memory:') {
             $fs->put($database, '');
         }
     }
 
     public static function getOrbitalName()
     {
-        return (string) Str::of(class_basename(static::class))->lower()->snake()->plural();
+        return (string) Str::of(class_basename(static::class))->snake()->lower()->plural();
     }
 
     public static function getOrbitalPath()

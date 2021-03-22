@@ -7,9 +7,23 @@ use Illuminate\Support\Manager;
 
 class OrbitManager extends Manager
 {
+    protected $testing = false;
+
     protected Closure $resolveGitName;
 
     protected Closure $resolveGitEmail;
+
+    public function test()
+    {
+        $this->testing = true;
+
+        return $this;
+    }
+
+    public function isTesting()
+    {
+        return $this->testing === true;
+    }
 
     public function getDefaultDriver()
     {
@@ -18,6 +32,10 @@ class OrbitManager extends Manager
 
     public function getDatabasePath()
     {
+        if ($this->testing) {
+            return ':memory:';
+        }
+
         return config('orbit.paths.cache') . DIRECTORY_SEPARATOR . 'orbit.sqlite';
     }
 

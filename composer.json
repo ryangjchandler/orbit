@@ -27,10 +27,12 @@
         "illuminate/database": "^8.0",
         "spatie/yaml-front-matter": "^2.0",
         "symplify/git-wrapper": "^9.2",
-        "illuminate/events": "^8.0"
+        "illuminate/events": "^8.0",
+        "phpunit/phpunit": "^9.5"
     },
     "require-dev": {
-        "vimeo/psalm": "^4.6"
+        "vimeo/psalm": "^4.6",
+        "orchestra/testbench": "^6.15"
     },
     "extra": {
         "laravel": {
@@ -38,5 +40,9 @@
                 "Orbit\\OrbitServiceProvider"
             ]
         }
+    },
+    "scripts": {
+        "psalm": "vendor/bin/psalm",
+        "test": "vendor/bin/phpunit --colors=always"
     }
 }
