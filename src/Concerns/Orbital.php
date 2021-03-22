@@ -18,8 +18,6 @@ trait Orbital
 {
     protected static $orbit;
 
-    protected static $driver = null;
-
     public static function bootOrbital()
     {
         static::ensureOrbitDirectoriesExist();
@@ -129,7 +127,7 @@ trait Orbital
 
     protected static function getOrbitalDriver()
     {
-        return static::$driver;
+        return property_exists(static::class, 'driver') ? static::$driver : null;
     }
 
     protected static function setSqliteConnection()
