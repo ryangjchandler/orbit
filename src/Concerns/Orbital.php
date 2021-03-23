@@ -8,6 +8,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Orbit\Facades\Orbit;
 use Illuminate\Support\Str;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
 use Orbit\Events\OrbitalCreated;
 use Orbit\Events\OrbitalDeleted;
@@ -125,20 +126,19 @@ trait Orbital
         $driver = Orbit::driver(static::getOrbitalDriver());
         $columns = $schema->getColumnListing($table);
 
-        $driver->all(static::getOrbitalPath())->each(function ($row) use ($columns) {
-            $row = collect($row)
-                ->filter(function ($_, $key) use ($columns) {
-                    return in_array($key, $columns);
-                })
-                ->map(function ($value, $key) {
-                    $this->setAttribute($key, $value);
+        $driver->all(static::getOrbitalPath())
+            ->map(function ($row) use ($columns) {
+                return collect($row)
+                    ->filter(fn ($_, $key) => in_array($key, $columns))
+                    ->map(function ($value, $key) {
+                        $this->setAttribute($key, $value);
 
-                    return $this->attributes[$key];
-                })
-                ->toArray();
-
-            static::insert($row);
-        });
+                        return $this->attributes[$key];
+                    })
+                    ->toArray();
+            })
+            ->chunk(100)
+            ->each(fn (Collection $chunk) => static::insert($chunk->toArray()));
     }
 
     protected static function getOrbitalDriver()
