@@ -76,8 +76,15 @@ class Post extends Model
     {
         return 'slug';
     }
+    
+    public function getIncrementing()
+    {
+        return false;
+    }
 }
 ```
+
+> If your model's primary key (the key you defined in `getKeyName`) doesn't need to automatically increment, you should either define `public $incrementing = false` on the model or overwrite the `getIncrementing` method.
 
 Standard Orbit drivers will respect the new key name and use that when creating, updating and deleting files on disk, e.g. a `Post` with the slug `hello-world` will write to the `content/posts/hello-world.md` file.
 
