@@ -4,6 +4,7 @@ namespace Orbit;
 
 use Closure;
 use Illuminate\Support\Manager;
+use Illuminate\Support\Facades\App;
 
 class OrbitManager extends Manager
 {
@@ -22,7 +23,7 @@ class OrbitManager extends Manager
 
     public function isTesting()
     {
-        return $this->testing === true;
+        return $this->testing === true || App::environment('testing');
     }
 
     public function getDefaultDriver()
@@ -32,7 +33,7 @@ class OrbitManager extends Manager
 
     public function getDatabasePath()
     {
-        if ($this->testing) {
+        if ($this->isTesting()) {
             return ':memory:';
         }
 
