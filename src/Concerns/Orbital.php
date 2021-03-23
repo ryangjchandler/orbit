@@ -123,13 +123,19 @@ trait Orbital
         });
 
         $driver = Orbit::driver(static::getOrbitalDriver());
+        $columns = $schema->getColumnListing($table);
 
-        $driver->all(static::getOrbitalPath())->each(function ($row) {
-            foreach ($row as $key => $value) {
-                $this->setAttribute($key, $value);
+        $driver->all(static::getOrbitalPath())->each(function ($row) use ($columns) {
+            $row = collect($row)
+                ->filter(function ($_, $key) use ($columns) {
+                    return in_array($key, $columns);
+                })
+                ->map(function ($value, $key) {
+                    $this->setAttribute($key, $value);
 
-                $row[$key] = $this->attributes[$key];
-            }
+                    return $this->attributes[$key];
+                })
+                ->toArray();
 
             static::insert($row);
         });
