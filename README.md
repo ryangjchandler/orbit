@@ -98,6 +98,32 @@ This trait uses the Eloquent one under-the-hood, so you can still access all of 
 
 The Orbit version adds in the necessary hooks to perform file system operations as well as ensure you don't completely delete your content.
 
+### Validation Rules
+
+When dealing with [validation rules](https://laravel.com/docs/8.x/validation#available-validation-rules) that check against a database like [`exists`](https://laravel.com/docs/8.x/validation#rule-exists) and [`unique`](https://laravel.com/docs/8.x/validation#rule-unique), you should use the **fully-qualified namespace (FQN) of the model** instead of the table name.
+
+This is because Orbit runs on a separate database connection - using the FQN will allow Laravel to correctly resolve the qualified table name.
+
+```php
+class StorePostRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        return [
+            'slug' => 'required|alpha_dash|unique:App\Post,id',
+            // 'slug' => ['required', 'alpha_dash', Rule::unique(Post::class)],
+            'title' => 'required',
+            'description' => 'required',
+        ];
+    }
+  }
+```
+
 ## Drivers
 
 Orbit is a driver-based package, making it very easy to change the storage format of your data.
