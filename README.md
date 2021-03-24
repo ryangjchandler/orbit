@@ -98,6 +98,31 @@ This trait uses the Eloquent one under-the-hood, so you can still access all of 
 
 The Orbit version adds in the necessary hooks to perform file system operations as well as ensure you don't completely delete your content.
 
+### Form Requests
+
+When dealing with [Form Requests](https://laravel.com/docs/8.x/validation#form-request-validation) using [validation rules](https://laravel.com/docs/8.x/validation#available-validation-rules) to check against a database like [`exists`](https://laravel.com/docs/8.x/validation#rule-exists) and [`unique`](https://laravel.com/docs/8.x/validation#rule-unique), use the Eloquent Model format.
+
+```php
+class StorePostRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        return [
+            'slug' => 'required|alpha_dasg|unique:App\Post,id',
+            'title' => 'required',
+            'description' => 'required',
+        ];
+    }
+  }
+```
+
+> 🚨 When using the shorter format, i.e. `'slug' => 'required|alpha_dasg|unique:post',`, Laravel will try to load up a real database connection which may not exist and cause your app to crash.
+
 ## Drivers
 
 Orbit is a driver-based package, making it very easy to change the storage format of your data.
