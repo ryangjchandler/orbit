@@ -124,8 +124,6 @@ class StorePostRequest extends FormRequest
   }
 ```
 
-> 🚨 When using the shorter format, i.e. `'slug' => 'required|alpha_dasg|unique:post',`, Laravel will try to load up a real database connection which may not exist and cause your app to crash.
-
 ## Drivers
 
 Orbit is a driver-based package, making it very easy to change the storage format of your data.
