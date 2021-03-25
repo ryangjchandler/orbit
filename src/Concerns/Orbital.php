@@ -180,7 +180,7 @@ trait Orbital
         $result = null;
 
         foreach (class_uses_recursive(static::class) as $trait) {
-            $methodToCall = $method . Str::of($trait)->classBasename();
+            $methodToCall = $method . class_basename($trait);
 
             if (method_exists($this, $methodToCall)) {
                 $result = $this->{$methodToCall}(...$args);
