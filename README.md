@@ -133,6 +133,31 @@ Out of the box, Orbit provides the following drivers:
 * `md` -> `Orbit\Drivers\Markdown`
 * `json` => `Orbit\Drivers\Json`
 * `yaml` => `Orbit\Drivers\Yaml`
+* `md_json` => `Orbit\Drivers\MarkdownJson`
+
+### `md`
+
+This is a Markdown that is capable of parsing Markdown files, as well as YAML front-matter.
+
+When Orbit loads files using this driver, it will map each front-matter key into a column in your models `schema`.
+
+By default, the Markdown driver will also add a `TEXT content` column to your schema. This is used to store the Markdown body from the file.
+
+> 💡 If you wish to customise the name of the `content` column, you can use the `Markdown::contentColumn()` method and provide a new column name. This is applied to all models that use the `Markdown` driver.
+
+### `json`
+
+This is a JSON driver that is capable of parsing `.json` files. Each key in the file is mapped to a column in your schema.
+
+### `yaml`
+
+This is a YAML driver that is capable of parsing `.yml` drivers. Each key in the file is mapped to a column in your schema.
+
+### `md_json`
+
+This driver is very similar to the `Markdown` / `md` driver, but it supports JSON-based front-matter as opposed to the default YAML format.
+
+> 💡 If you wish to customise the name of the `content` column, you can use the `MarkdownJson::contentColumn()` method and provide a new column name. This is applied to all models that use the `MarkdownJson` driver.
 
 ### Registering drivers
 
