@@ -169,7 +169,7 @@ You can register custom Orbit drivers by using the `Orbit::extend` method. You s
 })
 ```
 
-All drivers must implement the `Orbit\Contracts\Driver` contract. This enforces drivers to have at least 4 methods:
+All drivers must implement the `Orbit\Contracts\Driver` contract, or extend the `Orbit\Drivers\FileDriver` class. This enforces drivers to have at least 4 methods:
 
 ```php
 interface Driver
@@ -184,12 +184,20 @@ interface Driver
 }
 ```
 
-Here is what each of the methods are for:
+Here is what each method is used for:
 
 * `shouldRestoreCache` - used to determine if the file cache should be updated. 
 * `save` - used to persist model changes to a file on disk, or create a new file.
 * `delete` - used to delete an existing file on disk
 * `all` - used to retrieve all records from disk and cache.
+
+### Extending `FileDriver`
+
+Extending the `Orbit\Drivers\FileDriver` class is useful when you want some of the heavy lifting done for you. To work with this base class, you should do the following:
+
+1. Implement an `extension(): string` method that returns the file extension as a string, i.e. `return 'md'` for `Markdown`.
+2. Implement a `dumpContent(Model $model): string` method. This method should return the updated content for the file.
+3. Implement a `parseContent(SplFileInfo $file): array` method. This method should return an array of `key => value` pairs, where each `key` is a column in the `schema`.
 
 ### Changing drivers
 
