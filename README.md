@@ -133,6 +133,31 @@ Out of the box, Orbit provides the following drivers:
 * `md` -> `Orbit\Drivers\Markdown`
 * `json` => `Orbit\Drivers\Json`
 * `yaml` => `Orbit\Drivers\Yaml`
+* `md_json` => `Orbit\Drivers\MarkdownJson`
+
+### `md`
+
+This is a Markdown that is capable of parsing Markdown files, as well as YAML front-matter.
+
+When Orbit loads files using this driver, it will map each front-matter key into a column in your models `schema`.
+
+By default, the Markdown driver will also add a `TEXT content` column to your schema. This is used to store the Markdown body from the file.
+
+> 💡 If you wish to customise the name of the `content` column, you can use the `Markdown::contentColumn()` method and provide a new column name. This is applied to all models that use the `Markdown` driver.
+
+### `json`
+
+This is a JSON driver that is capable of parsing `.json` files. Each key in the file is mapped to a column in your schema.
+
+### `yaml`
+
+This is a YAML driver that is capable of parsing `.yml` drivers. Each key in the file is mapped to a column in your schema.
+
+### `md_json`
+
+This driver is very similar to the `Markdown` / `md` driver, but it supports JSON-based front-matter as opposed to the default YAML format.
+
+> 💡 If you wish to customise the name of the `content` column, you can use the `MarkdownJson::contentColumn()` method and provide a new column name. This is applied to all models that use the `MarkdownJson` driver.
 
 ### Registering drivers
 
@@ -144,7 +169,7 @@ You can register custom Orbit drivers by using the `Orbit::extend` method. You s
 })
 ```
 
-All drivers must implement the `Orbit\Contracts\Driver` contract. This enforces drivers to have at least 4 methods:
+All drivers must implement the `Orbit\Contracts\Driver` contract, or extend the `Orbit\Drivers\FileDriver` class. This enforces drivers to have at least 4 methods:
 
 ```php
 interface Driver
@@ -159,12 +184,20 @@ interface Driver
 }
 ```
 
-Here is what each of the methods are for:
+Here is what each method is used for:
 
 * `shouldRestoreCache` - used to determine if the file cache should be updated. 
 * `save` - used to persist model changes to a file on disk, or create a new file.
 * `delete` - used to delete an existing file on disk
 * `all` - used to retrieve all records from disk and cache.
+
+### Extending `FileDriver`
+
+Extending the `Orbit\Drivers\FileDriver` class is useful when you want some of the heavy lifting done for you. To work with this base class, you should do the following:
+
+1. Implement an `extension(): string` method that returns the file extension as a string, i.e. `return 'md'` for `Markdown`.
+2. Implement a `dumpContent(Model $model): string` method. This method should return the updated content for the file.
+3. Implement a `parseContent(SplFileInfo $file): array` method. This method should return an array of `key => value` pairs, where each `key` is a column in the `schema`.
 
 ### Changing drivers
 

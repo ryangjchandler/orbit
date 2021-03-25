@@ -4,6 +4,7 @@ namespace Orbit\Tests;
 
 use Orbit\Tests\Fixtures\CustomKey;
 use Orbit\Tests\Fixtures\JsonModel;
+use Orbit\Tests\Fixtures\MarkdownJsonModel;
 use Orbit\Tests\Fixtures\YamlModel;
 
 class AdvancedOrbitalTest extends TestCase
@@ -56,5 +57,14 @@ class AdvancedOrbitalTest extends TestCase
         ]);
 
         $this->assertFileExists(__DIR__.'/content/yaml_models/'.$yaml->getKey().'.yml');
+    }
+
+    public function test_it_can_use_markdown_json_driver()
+    {
+        $md = MarkdownJsonModel::create([
+            'name' => 'Ryan',
+        ]);
+
+        $this->assertFileExists(__DIR__.'/content/markdown_json_models/'.$md->getKey().'.md');
     }
 }

@@ -5,7 +5,7 @@ namespace Orbit\Tests;
 use Orbit\Tests\Fixtures\Post;
 use Orbit\Tests\Fixtures\Emptiness;
 
-class OrbitalTest extends TestCase
+class BasicOrbitalTest extends TestCase
 {
     public function tearDown(): void
     {
