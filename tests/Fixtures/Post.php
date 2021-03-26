@@ -12,10 +12,15 @@ class Post extends Model
 
     protected $guarded = [];
 
+    protected $hidden = [
+        'slug',
+    ];
+
     public static function schema(Blueprint $table)
     {
         $table->id();
         $table->string('title');
+        $table->string('slug')->nullable();
         $table->text('content')->nullable();
     }
 }
