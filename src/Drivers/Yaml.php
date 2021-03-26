@@ -10,7 +10,7 @@ class Yaml extends FileDriver
 {
     protected function dumpContent(Model $model): string
     {
-        $data = array_filter($model->getAttributes());
+        $data = array_filter($this->getModelAttributes($model));
 
         return SymfonyYaml::dump($data);
     }

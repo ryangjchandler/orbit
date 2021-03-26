@@ -67,6 +67,13 @@ abstract class FileDriver implements DriverContract
         return $directory . DIRECTORY_SEPARATOR . $key . '.' . $this->extension();
     }
 
+    protected function getModelAttributes(Model $model)
+    {
+        return collect($model->getAttributes())
+            ->map(fn ($_, $key) => $model->{$key})
+            ->toArray();
+    }
+
     abstract protected function extension(): string;
 
     abstract protected function dumpContent(Model $model): string;

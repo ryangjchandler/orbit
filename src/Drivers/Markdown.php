@@ -14,7 +14,7 @@ class Markdown extends FileDriver
 
     protected function dumpContent(Model $model): string
     {
-        $matter = array_filter($model->attributesToArray(), function ($value, $key) {
+        $matter = array_filter($this->getModelAttributes($model), function ($value, $key) {
             return $key !== 'content' && $value !== null;
         }, ARRAY_FILTER_USE_BOTH);
 

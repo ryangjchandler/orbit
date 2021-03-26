@@ -2,6 +2,7 @@
 
 namespace Orbit\Tests;
 
+use Orbit\Tests\Fixtures\Post;
 use Orbit\Tests\Fixtures\CustomKey;
 use Orbit\Tests\Fixtures\JsonModel;
 use Orbit\Tests\Fixtures\MarkdownJsonModel;
@@ -14,6 +15,7 @@ class AdvancedOrbitalTest extends TestCase
         CustomKey::all()->each->delete();
         JsonModel::all()->each->delete();
         YamlModel::all()->each->delete();
+        Post::all()->each->delete();
     }
 
     public function test_it_can_create_files_using_custom_primary_key()
@@ -66,5 +68,19 @@ class AdvancedOrbitalTest extends TestCase
         ]);
 
         $this->assertFileExists(__DIR__.'/content/markdown_json_models/'.$md->getKey().'.md');
+    }
+
+    public function test_it_writes_hidden_columns()
+    {
+        $post = Post::create([
+            'title' => 'Ryan',
+            'slug' => 'ryan',
+        ]);
+
+        $this->assertFileExists($path = __DIR__.'/content/posts/'.$post->getKey().'.md');
+
+        $contents = file_get_contents($path);
+
+        $this->assertStringContainsString('slug', $contents);
     }
 }

@@ -127,6 +127,7 @@ trait Orbital
         $columns = $schema->getColumnListing($table);
 
         $driver->all(static::getOrbitalPath())
+            ->filter()
             ->map(function ($row) use ($columns) {
                 return collect($row)
                     ->filter(fn ($_, $key) => in_array($key, $columns))

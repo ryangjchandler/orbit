@@ -23,7 +23,7 @@ class SoftDeletesTest extends TestCase
 
         $file = file_get_contents(__DIR__.'/content/soft_deleted_posts/'.$post->id.'.md');
 
-        $this->assertStringContainsString(sprintf('deleted_at: \'%s\'', $post->deleted_at->toIsoString()), $file);
+        $this->assertStringContainsString(sprintf('deleted_at: %s', $post->deleted_at->toIso8601String()), $file);
     }
 
     public function test_it_will_delete_file_when_force_deleting()
@@ -38,7 +38,7 @@ class SoftDeletesTest extends TestCase
 
         $file = file_get_contents(__DIR__.'/content/soft_deleted_posts/'.$post->id.'.md');
 
-        $this->assertStringContainsString(sprintf('deleted_at: \'%s\'', $post->deleted_at->toIsoString()), $file);
+        $this->assertStringContainsString(sprintf('deleted_at: %s', $post->deleted_at->toIso8601String()), $file);
 
         $post->forceDelete();
 
@@ -57,7 +57,7 @@ class SoftDeletesTest extends TestCase
 
         $file = file_get_contents(__DIR__.'/content/soft_deleted_posts/'.$post->id.'.md');
 
-        $this->assertStringContainsString(sprintf('deleted_at: \'%s\'', $post->deleted_at->toIsoString()), $file);
+        $this->assertStringContainsString(sprintf('deleted_at: %s', $post->deleted_at->toIso8601String()), $file);
 
         $post->restore();
 
