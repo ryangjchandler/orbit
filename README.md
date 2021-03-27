@@ -124,6 +124,19 @@ class StorePostRequest extends FormRequest
   }
 ```
 
+### Testing
+
+As previously mentioned in the [Validation Rules](#validation-rules) section, Orbit operates on a custom connection called `orbit`. This means that Laravel's database testing utilities will work, as long as you specify the connection name.
+
+```php
+$this->assertDatabaseCount('posts', 5, 'orbit');
+
+$this->assertDatabaseHas('posts', [
+    'title' => 'Hello, world',
+    'slug' => 'hello-world',
+], 'orbit');
+```
+
 ## Drivers
 
 Orbit is a driver-based package, making it very easy to change the storage format of your data.
