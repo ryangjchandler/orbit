@@ -13,6 +13,10 @@ class ClearCommand extends Command
 
     public function handle()
     {
+        if (Orbit::isTesting()) {
+            return 0;
+        }
+
         $path = Orbit::getDatabasePath();
 
         if (! file_exists($path)) {
