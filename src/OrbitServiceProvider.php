@@ -49,6 +49,10 @@ class OrbitServiceProvider extends ServiceProvider
     public function boot()
     {
         if ($this->app->runningInConsole()) {
+            $this->commands([
+                Commands\ClearCommand::class,
+            ]);
+
             $this->publishes([
                 __DIR__.'/../config/orbit.php' => config_path('orbit.php'),
             ], 'orbit:config');
