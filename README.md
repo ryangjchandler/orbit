@@ -22,7 +22,7 @@ To begin using Orbit, create a Laravel model and use the `Orbit\Concerns\Orbital
 ```php
 class Post extends Model
 {
-    use Orbit\Concerns\Orbital;
+    use \Orbit\Concerns\Orbital;
 }
 ```
 
@@ -39,7 +39,7 @@ use Illuminate\Database\Schema\Blueprint;
 
 class Post extends Model
 {
-    use Orbit\Concerns\Orbital;
+    use \Orbit\Concerns\Orbital;
 
     public static function schema(Blueprint $table)
     {
