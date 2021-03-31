@@ -45,7 +45,6 @@ class Post extends Model
     {
         $table->string('title');
         $table->string('slug');
-        $table->text('content')->nullable();
         $table->timestamp('published_at');
     }
 }
