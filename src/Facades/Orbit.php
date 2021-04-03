@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static array getDrivers()
  * @method static string getDefaultDriver()
  * @method static string getDatabasePath()
+ * @method static string getContentPath()
  * @method static string getGitName()
  * @method static string getGitEmail()
  * @method static string getGitRoot()

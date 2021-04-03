@@ -51,6 +51,7 @@ class OrbitServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 Commands\ClearCommand::class,
+                Commands\FreshCommand::class,
             ]);
 
             $this->publishes([
