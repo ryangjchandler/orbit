@@ -40,6 +40,11 @@ class OrbitManager extends Manager
         return config('orbit.paths.cache') . DIRECTORY_SEPARATOR . 'orbit.sqlite';
     }
 
+    public function getContentPath()
+    {
+        return config('orbit.paths.content');
+    }
+
     public function resolveGitNameUsing(Closure $callback)
     {
         $this->resolveGitName = $callback;
