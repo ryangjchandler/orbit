@@ -129,7 +129,7 @@ trait Orbital
         $driver->all(static::getOrbitalPath())
             ->filter()
             ->map(function ($row) use ($columns) {
-                return collect($row)
+                $row = collect($row)
                     ->filter(fn ($_, $key) => in_array($key, $columns))
                     ->map(function ($value, $key) {
                         $this->setAttribute($key, $value);
@@ -137,6 +137,14 @@ trait Orbital
                         return $this->attributes[$key];
                     })
                     ->toArray();
+
+                foreach ($columns as $column) {
+                    if (! array_key_exists($column, $row)) {
+                        $row[$column] = null;
+                    }
+                }
+
+                return $row;
             })
             ->chunk(100)
             ->each(fn (Collection $chunk) => static::insert($chunk->toArray()));
