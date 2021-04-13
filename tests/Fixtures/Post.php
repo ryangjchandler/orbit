@@ -23,4 +23,14 @@ class Post extends Model
         $table->string('slug')->nullable();
         $table->text('content')->nullable();
     }
+
+    public function getExampleAttribute()
+    {
+        return $this->slug;
+    }
+
+    public function setExampleAttribute($example)
+    {
+        $this->slug = $example;
+    }
 }

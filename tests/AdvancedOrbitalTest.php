@@ -83,4 +83,18 @@ class AdvancedOrbitalTest extends TestCase
 
         $this->assertStringContainsString('slug', $contents);
     }
+
+    public function test_mutators_and_accessors()
+    {
+        $post = Post::create([
+            'title' => 'Accessors',
+            'slug' => 'accessors',
+        ]);
+
+        $this->assertEquals($post->slug, $post->example);
+
+        $post->example = 'cool';
+
+        $this->assertEquals('cool', $post->example);
+    }
 }
