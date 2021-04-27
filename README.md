@@ -163,7 +163,7 @@ This is a JSON driver that is capable of parsing `.json` files. Each key in the 
 
 ### `yaml`
 
-This is a YAML driver that is capable of parsing `.yml` drivers. Each key in the file is mapped to a column in your schema.
+This is a YAML driver that is capable of parsing `.yml` files. Each key in the file is mapped to a column in your schema.
 
 ### `md_json`
 
