@@ -19,8 +19,7 @@
         "illuminate/support": "^8.0",
         "ryangjchandler/git": "^0.0.4",
         "spatie/yaml-front-matter": "^2.0",
-        "symfony/yaml": "^3.0 || ^4.0 || ^5.0",
-        "symplify/git-wrapper": "^9.2"
+        "symfony/yaml": "^3.0 || ^4.0 || ^5.0"
     },
     "require-dev": {
         "orchestra/testbench": "^6.15",
