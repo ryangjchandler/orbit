@@ -53,6 +53,7 @@ class OrbitServiceProvider extends ServiceProvider
                 Commands\ClearCommand::class,
                 Commands\FreshCommand::class,
                 Commands\PullCommand::class,
+                Commands\CommitCommand::class,
             ]);
 
             $this->publishes([
