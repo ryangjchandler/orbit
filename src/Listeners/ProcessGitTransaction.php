@@ -7,42 +7,42 @@ use Orbit\Events\OrbitalDeleted;
 use Orbit\Events\OrbitalForceDeleted;
 use Orbit\Events\OrbitalUpdated;
 use Orbit\Facades\Orbit;
+use RyanChandler\Git\Git;
 use Symplify\GitWrapper\GitWrapper;
 
 class ProcessGitTransaction
 {
     public function created(OrbitalCreated $event)
     {
-        $message = 'orbit: created ' . class_basename($event->model) . ' ' . $event->model->getKey();
-
-        $this->commit($message);
+        $this->commit([
+            'event' => 'created',
+            'model' => class_basename($event->model),
+            'primary_key' => $event->model->getKey(),
+        ]);
     }
 
     public function updated(OrbitalUpdated $event)
     {
-        $message = 'orbit: updated ' . class_basename($event->model) . ' ' . $event->model->getKey();
-
-        $this->commit($message);
+        $this->commit([
+            'event' => 'updated',
+            'model' => class_basename($event->model),
+            'primary_key' => $event->model->getKey(),
+        ]);
     }
 
     public function deleted($event)
     {
-        if ($event instanceof OrbitalForceDeleted) {
-            $message = 'orbit: force deleted ' . class_basename($event->model) . ' ' . $event->model->getKey();
-        } else {
-            $message = 'orbit: deleted ' . class_basename($event->model) . ' ' . $event->model->getKey();
-        }
-
-        $this->commit($message);
+        $this->commit([
+            'event' => $event instanceof OrbitalForceDeleted ? 'force deleted' : 'deleted',
+            'model' => class_basename($event->model),
+            'primary_key' => $event->model->getKey(),
+        ]);
     }
 
-    protected function commit(string $message)
+    protected function commit(array $keys)
     {
-        $wrapper = new GitWrapper(
-            Orbit::getGitBinary()
-        );
-
-        $git = $wrapper->workingCopy(
+        /** @var \RyanChandler\Git\Git $git */
+        $git = Git::open(
             Orbit::getGitRoot()
         );
 
@@ -51,8 +51,14 @@ class ProcessGitTransaction
         }
 
         $git->add(
-            config('orbit.paths.content') . DIRECTORY_SEPARATOR . '*'
+            config('orbit.paths.content')
         );
+
+        $message = config('orbit.git.message_template');
+
+        foreach ($keys as $search => $replacement) {
+            $message = str_replace("{{$search}}", $replacement, $message);
+        }
 
         $git->commit($message);
 
