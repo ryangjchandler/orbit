@@ -16,7 +16,7 @@ class CommitCommand extends Command
 
     public function handle()
     {
-        if (Orbit::isTesting() || ! config('orbit.git.enabled')) {
+        if (Orbit::isTesting()) {
             return 0;
         }
 
