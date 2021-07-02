@@ -17,8 +17,16 @@ class GenerateCommand extends Command
     public function handle()
     {
         $model = $this->qualifyModelClass();
-        $data = $this->getColumnsFromModel($model)->mapWithKeys(function (string $name): array {
+        $data = $this->getColumnsFromModel($model)->mapWithKeys(function (ColumnDefinition $column, string $name): array {
             $value = $this->ask(Str::title($name));
+
+            if ($column->get('nullable', false) && ($value === '' || $value === 'null')) {
+                $value = null;
+            } elseif ($value === 'true' && $column->get('type') === 'boolean') {
+                $value = true;
+            } elseif ($value === 'false' && $column->get('type') === 'boolean') {
+                $value = false;
+            }
 
             return [$name => $value];
         })->all();
@@ -40,8 +48,10 @@ class GenerateCommand extends Command
          */
         $modelClass::schema($blueprint);
 
-        return collect($blueprint->getColumns())->map(function (ColumnDefinition $column): string {
-            return $column->getAttributes()['name'];
+        return collect($blueprint->getColumns())->mapWithKeys(function (ColumnDefinition $column): array {
+            return [
+                $column->getAttributes()['name'] => $column
+            ];
         });
     }
 
