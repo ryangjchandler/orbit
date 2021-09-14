@@ -41,7 +41,6 @@ class ProcessGitTransaction
 
     protected function commit(array $keys)
     {
-        return;
         /** @var \RyanChandler\Git\Git $git */
         $git = Git::open(
             Orbit::getGitRoot()
