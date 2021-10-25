@@ -21,6 +21,10 @@ trait Orbital
 
     public static function bootOrbital()
     {
+        if (!static::orbitEnabled()) {
+            return;
+        }
+
         static::ensureOrbitDirectoriesExist();
 
         $driver = Orbit::driver(static::getOrbitalDriver());
@@ -88,12 +92,20 @@ trait Orbital
 
     public static function resolveConnection($connection = null)
     {
-        return static::$resolver->connection('orbit');
+        if (static::orbitEnabled()) {
+            return static::$resolver->connection('orbit');
+        }
+
+        return parent::resolveConnection($connection);
     }
 
     public function getConnectionName()
     {
-        return 'orbit';
+        if (static::orbitEnabled()) {
+            return 'orbit';
+        }
+
+        return parent::getConnectionName();
     }
 
     public function migrate()
@@ -197,5 +209,10 @@ trait Orbital
         }
 
         return $result;
+    }
+
+    public static function orbitEnabled(): bool
+    {
+        return true;
     }
 }
