@@ -13,17 +13,16 @@
     "require": {
         "php": "^7.4 || ^8.0",
         "ext-json": "*",
-        "illuminate/console": "^8.0",
-        "illuminate/database": "^8.0",
-        "illuminate/events": "^8.0",
-        "illuminate/support": "^8.0",
-        "ryangjchandler/git": "^0.0.4",
+        "illuminate/console": "^9.0",
+        "illuminate/database": "^9.0",
+        "illuminate/events": "^9.0",
+        "illuminate/support": "^9.0",
         "spatie/yaml-front-matter": "^2.0",
-        "symfony/yaml": "^3.0 || ^4.0 || ^5.0"
+        "symfony/yaml": "^6.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^6.15",
-        "phpunit/phpunit": "9.4.*",
+        "orchestra/testbench": "^7.0",
+        "phpunit/phpunit": "^9.0",
         "vimeo/psalm": "^4.6"
     },
     "extra": {
