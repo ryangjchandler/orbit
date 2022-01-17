@@ -25,7 +25,7 @@ trait SoftDeletes
                 $model, static::getOrbitalPath()
             );
 
-            dispatch(new OrbitalDeleted($model));
+            event(new OrbitalDeleted($model));
 
             return $status;
         });
@@ -35,7 +35,7 @@ trait SoftDeletes
                 $model, static::getOrbitalPath()
             );
 
-            dispatch(new OrbitalUpdated($model));
+            event(new OrbitalUpdated($model));
 
             return $status;
         });
@@ -50,7 +50,7 @@ trait SoftDeletes
                 static::getOrbitalPath()
             );
 
-            dispatch(new OrbitalForceDeleted($model));
+            event(new OrbitalForceDeleted($model));
 
             return $status;
         });
