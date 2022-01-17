@@ -2,10 +2,9 @@
 
 namespace Orbit\Tests;
 
-use Orbit\Tests\Fixtures\Post;
 use Orbit\Tests\Fixtures\CustomKey;
 use Orbit\Tests\Fixtures\JsonModel;
-use Orbit\Tests\Fixtures\MarkdownJsonModel;
+use Orbit\Tests\Fixtures\Post;
 use Orbit\Tests\Fixtures\YamlModel;
 
 class AdvancedOrbitalTest extends TestCase

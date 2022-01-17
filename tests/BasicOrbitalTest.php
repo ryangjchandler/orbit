@@ -2,8 +2,8 @@
 
 namespace Orbit\Tests;
 
-use Orbit\Tests\Fixtures\Post;
 use Orbit\Tests\Fixtures\Emptiness;
+use Orbit\Tests\Fixtures\Post;
 
 class BasicOrbitalTest extends TestCase
 {

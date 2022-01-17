@@ -2,9 +2,8 @@
 
 namespace Orbit;
 
-use Closure;
-use Illuminate\Support\Manager;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Manager;
 
 class OrbitManager extends Manager
 {

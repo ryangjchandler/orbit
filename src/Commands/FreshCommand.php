@@ -18,10 +18,11 @@ class FreshCommand extends Command
 
         if (! $confirm) {
             $this->warn('Cancelling...');
+
             return 0;
         }
 
-        (new Filesystem)->deleteDirectory(
+        (new Filesystem())->deleteDirectory(
             Orbit::getContentPath()
         );
 

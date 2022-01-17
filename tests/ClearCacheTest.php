@@ -4,7 +4,6 @@ namespace Orbit\Tests;
 
 use Illuminate\Database\Events\DatabaseRefreshed;
 use Illuminate\Support\Facades\Event;
-use Mockery\MockInterface;
 use Orbit\Actions\ClearCache;
 
 class ClearCacheTest extends TestCase

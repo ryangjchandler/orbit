@@ -2,17 +2,15 @@
 
 namespace Orbit\Concerns;
 
-use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
-use Orbit\Facades\Orbit;
-use Illuminate\Support\Str;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Orbit\Events\OrbitalCreated;
 use Orbit\Events\OrbitalDeleted;
 use Orbit\Events\OrbitalUpdated;
+use Orbit\Facades\Orbit;
 use ReflectionClass;
 
 trait Orbital
@@ -30,9 +28,9 @@ trait Orbital
             Orbit::isTesting() ||
             filemtime($modelFile) > filemtime(Orbit::getDatabasePath()) ||
             $driver->shouldRestoreCache(static::getOrbitalPath()) ||
-            ! static::resolveConnection()->getSchemaBuilder()->hasTable((new static)->getTable())
+            ! static::resolveConnection()->getSchemaBuilder()->hasTable((new static())->getTable())
         ) {
-            (new static)->migrate();
+            (new static())->migrate();
         }
 
         static::created(function (Model $model) {
@@ -157,7 +155,7 @@ trait Orbital
 
     protected static function ensureOrbitDirectoriesExist()
     {
-        $fs = new Filesystem;
+        $fs = new Filesystem();
 
         $fs->ensureDirectoryExists(
             static::getOrbitalPath()

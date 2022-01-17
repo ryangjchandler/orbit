@@ -2,8 +2,8 @@
 
 namespace Orbit\Tests;
 
-use Orbit\Drivers\Markdown;
 use Orbit\Drivers\Json;
+use Orbit\Drivers\Markdown;
 use Orbit\Facades\Orbit;
 use Orbit\OrbitManager;
 
@@ -31,7 +31,7 @@ class OrbitManagerTest extends TestCase
 
     public function test_it_can_register_custom_drivers()
     {
-        $class = new class {};
+        $class = new class () {};
 
         Orbit::extend('example', fn () => $class);
 

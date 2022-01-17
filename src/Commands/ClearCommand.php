@@ -22,10 +22,11 @@ class ClearCommand extends Command
 
         if (! $confirm) {
             $this->warn('Cancelling...');
+
             return 0;
         }
 
-        (new ClearCache)();
+        (new ClearCache())();
 
         $this->info('Succesfully cleared the Orbit cache.');
 

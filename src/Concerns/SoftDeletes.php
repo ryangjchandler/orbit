@@ -2,15 +2,15 @@
 
 namespace Orbit\Concerns;
 
-use Orbit\Facades\Orbit;
-use Orbit\Events\OrbitalDeleted;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes as EloquentSoftDeletes;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ColumnDefinition;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Database\Eloquent\SoftDeletes as EloquentSoftDeletes;
+use Orbit\Events\OrbitalDeleted;
 use Orbit\Events\OrbitalForceDeleted;
 use Orbit\Events\OrbitalUpdated;
+use Orbit\Facades\Orbit;
 
 trait SoftDeletes
 {
@@ -18,11 +18,12 @@ trait SoftDeletes
 
     public static function bootSoftDeletes()
     {
-        static::addGlobalScope(new SoftDeletingScope);
+        static::addGlobalScope(new SoftDeletingScope());
 
         static::deleted(function (Model $model) {
             $status = Orbit::driver(static::getOrbitalDriver())->save(
-                $model, static::getOrbitalPath()
+                $model,
+                static::getOrbitalPath()
             );
 
             event(new OrbitalDeleted($model));
@@ -32,7 +33,8 @@ trait SoftDeletes
 
         static::restored(function (Model $model) {
             $status = Orbit::driver(static::getOrbitalDriver())->save(
-                $model, static::getOrbitalPath()
+                $model,
+                static::getOrbitalPath()
             );
 
             event(new OrbitalUpdated($model));
