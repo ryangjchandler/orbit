@@ -45,7 +45,7 @@ trait Orbital
                 static::getOrbitalPath()
             );
 
-            OrbitalCreated::dispatch($model);
+            dispatch(new OrbitalCreated($model));
 
             return $status;
         });
@@ -60,7 +60,7 @@ trait Orbital
                 static::getOrbitalPath()
             );
 
-            OrbitalUpdated::dispatch($model);
+            dispatch(new OrbitalUpdated($model));
 
             return $status;
         });
@@ -75,7 +75,7 @@ trait Orbital
                 static::getOrbitalPath()
             );
 
-            OrbitalDeleted::dispatch($model);
+            dispatch(new OrbitalDeleted($model));
 
             return $status;
         });
