@@ -3,17 +3,14 @@
 namespace Orbit;
 
 use Exception;
+use Illuminate\Database\Events\DatabaseRefreshed;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ColumnDefinition;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
+use Orbit\Actions\ClearCache;
 use Orbit\Contracts\Driver;
-use Orbit\Events\OrbitalCreated;
-use Orbit\Events\OrbitalDeleted;
-use Orbit\Events\OrbitalForceDeleted;
-use Orbit\Events\OrbitalUpdated;
 use Orbit\Facades\Orbit;
-use Orbit\Listeners\ProcessGitTransaction;
 
 class OrbitServiceProvider extends ServiceProvider
 {
@@ -21,7 +18,7 @@ class OrbitServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../config/orbit.php', 'orbit');
 
-        $this->app->singleton('orbit', function ($app) {
+        $this->app->scoped(OrbitManager::class, function ($app) {
             $manager = new OrbitManager($app);
 
             foreach ($this->app['config']->get('orbit.drivers') as $key => $driver) {
@@ -52,8 +49,6 @@ class OrbitServiceProvider extends ServiceProvider
             $this->commands([
                 Commands\ClearCommand::class,
                 Commands\FreshCommand::class,
-                Commands\PullCommand::class,
-                Commands\CommitCommand::class,
                 Commands\GenerateCommand::class,
             ]);
 
@@ -62,12 +57,7 @@ class OrbitServiceProvider extends ServiceProvider
             ], 'orbit:config');
         }
 
-        if ($this->app['config']->get('orbit.git.enabled')) {
-            Event::listen(OrbitalCreated::class, [ProcessGitTransaction::class, 'created']);
-            Event::listen(OrbitalUpdated::class, [ProcessGitTransaction::class, 'updated']);
-            Event::listen(OrbitalDeleted::class, [ProcessGitTransaction::class, 'deleted']);
-            Event::listen(OrbitalForceDeleted::class, [ProcessGitTransaction::class, 'deleted']);
-        }
+        Event::listen(DatabaseRefreshed::class, ClearCache::class);
 
         Blueprint::macro('hasColumn', function (string $name): bool {
             /** @var \Illuminate\Database\Schema\Blueprint $this */

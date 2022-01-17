@@ -5,8 +5,8 @@ namespace Orbit\Drivers;
 use FilesystemIterator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Orbit\Facades\Orbit;
 use Orbit\Contracts\Driver as DriverContract;
+use Orbit\Facades\Orbit;
 use SplFileInfo;
 
 abstract class FileDriver implements DriverContract
@@ -54,7 +54,9 @@ abstract class FileDriver implements DriverContract
         $files = new FilesystemIterator($directory);
 
         foreach ($files as $file) {
-            if ($file->getExtension() !== $this->extension()) continue;
+            if ($file->getExtension() !== $this->extension()) {
+                continue;
+            }
 
             $collection->push($this->parseContent($file));
         }

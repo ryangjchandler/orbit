@@ -145,7 +145,6 @@ Out of the box, Orbit provides the following drivers:
 * `md` -> `Orbit\Drivers\Markdown`
 * `json` => `Orbit\Drivers\Json`
 * `yaml` => `Orbit\Drivers\Yaml`
-* `md_json` => `Orbit\Drivers\MarkdownJson`
 
 ### `md`
 
@@ -164,12 +163,6 @@ This is a JSON driver that is capable of parsing `.json` files. Each key in the 
 ### `yaml`
 
 This is a YAML driver that is capable of parsing `.yml` files. Each key in the file is mapped to a column in your schema.
-
-### `md_json`
-
-This driver is very similar to the `Markdown` / `md` driver, but it supports JSON-based front-matter as opposed to the default YAML format.
-
-> 💡 If you wish to customise the name of the `content` column, you can use the `MarkdownJson::contentColumn()` method and provide a new column name. This is applied to all models that use the `MarkdownJson` driver.
 
 ### Registering drivers
 
@@ -225,42 +218,3 @@ class Post extends Model
 ```
 
 > Driver names are determined when they are registered with Orbit. You should always use the string name of the driver instead of the fully-qualified class name.
-
-## Git Integration (experimental)
-
-Orbit comes with convenient Git integration out of the box. This means that any changes made to your content can be automatically persisted back to your Git repository, keeping everything up-to-date.
-
-To enable Git integration, define a new `ORBIT_GIT_ENABLED` environment variable in your `.env` file and set the value to `true`.
-
-### Events
-
-When Git integration is enabled, Orbit will add event listeners to the `OrbitalCreated`, `OrbitalUpdated` and `OrbitalDeleted` events and commit any changed files back to your repository.
-
-This is extremely powerful and can greatly improve your local - production workflows.
-
-### Customising the repository root
-
-By default, Orbit uses the `base_path` as your repositories root directory. If this is not applicable to your application, you can change the path by defining an `ORBIT_GIT_ROOT` environment variable and setting it's value to the root of your Git repository.
-
-### Customising the author name and email
-
-By default, Orbit will use the system's name and email address when making commits to your repository. If you wish to change the name, use the `ORBIT_GIT_NAME` and `ORBIT_GIT_EMAIL` environment variables.
-
-If you would like to use a more dynamic name and email address, you can use the `Orbit::resolveGitNameUsing` and `Orbit::resolveGitEmailUsing` methods instead:
-
-```php
-public function boot()
-{
-    Orbit::resolveGitNameUsing(function () {
-        return Auth::user()->name;
-    });
-
-    Orbit::resolveGitEmailUsing(function () {
-        return Auth::user()->email;
-    });
-}
-```
-
-### Customising the Git binary
-
-If your Git binary is not found in the usual place (`/usr/bin/git` on most UNIX machines), you can customise the location using the `ORBIT_GIT_BINARY` environment variable.

@@ -2,11 +2,11 @@
 
 namespace Orbit\Commands;
 
-use Illuminate\Support\Str;
 use Illuminate\Console\Command;
-use Illuminate\Support\Collection;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ColumnDefinition;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class GenerateCommand extends Command
 {
@@ -50,7 +50,7 @@ class GenerateCommand extends Command
 
         return collect($blueprint->getColumns())->mapWithKeys(function (ColumnDefinition $column): array {
             return [
-                $column->getAttributes()['name'] => $column
+                $column->getAttributes()['name'] => $column,
             ];
         });
     }

@@ -3,6 +3,7 @@
 namespace Orbit\Commands;
 
 use Illuminate\Console\Command;
+use Orbit\Actions\ClearCache;
 use Orbit\Facades\Orbit;
 
 class ClearCommand extends Command
@@ -17,13 +18,15 @@ class ClearCommand extends Command
             return 0;
         }
 
-        $path = Orbit::getDatabasePath();
+        $confirm = $this->confirm('Are you sure you want to delete Orbit\'s cache file?');
 
-        if (! file_exists($path)) {
+        if (! $confirm) {
+            $this->warn('Cancelling...');
+
             return 0;
         }
 
-        unlink($path);
+        (new ClearCache())();
 
         $this->info('Succesfully cleared the Orbit cache.');
 

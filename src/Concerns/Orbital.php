@@ -2,17 +2,15 @@
 
 namespace Orbit\Concerns;
 
-use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
-use Orbit\Facades\Orbit;
-use Illuminate\Support\Str;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Orbit\Events\OrbitalCreated;
 use Orbit\Events\OrbitalDeleted;
 use Orbit\Events\OrbitalUpdated;
+use Orbit\Facades\Orbit;
 use ReflectionClass;
 
 trait Orbital
@@ -30,9 +28,9 @@ trait Orbital
             Orbit::isTesting() ||
             filemtime($modelFile) > filemtime(Orbit::getDatabasePath()) ||
             $driver->shouldRestoreCache(static::getOrbitalPath()) ||
-            ! static::resolveConnection()->getSchemaBuilder()->hasTable((new static)->getTable())
+            ! static::resolveConnection()->getSchemaBuilder()->hasTable((new static())->getTable())
         ) {
-            (new static)->migrate();
+            (new static())->migrate();
         }
 
         static::created(function (Model $model) {
@@ -40,12 +38,16 @@ trait Orbital
                 return;
             }
 
+            // We need to refresh the model so that we can get all of the columns
+            // and default values from the SQLite cache.
+            $model->refresh();
+
             $status = Orbit::driver(static::getOrbitalDriver())->save(
                 $model,
                 static::getOrbitalPath()
             );
 
-            OrbitalCreated::dispatch($model);
+            event(new OrbitalCreated($model));
 
             return $status;
         });
@@ -60,7 +62,7 @@ trait Orbital
                 static::getOrbitalPath()
             );
 
-            OrbitalUpdated::dispatch($model);
+            event(new OrbitalUpdated($model));
 
             return $status;
         });
@@ -75,7 +77,7 @@ trait Orbital
                 static::getOrbitalPath()
             );
 
-            OrbitalDeleted::dispatch($model);
+            event(new OrbitalDeleted($model));
 
             return $status;
         });
@@ -157,7 +159,7 @@ trait Orbital
 
     protected static function ensureOrbitDirectoriesExist()
     {
-        $fs = new Filesystem;
+        $fs = new Filesystem();
 
         $fs->ensureDirectoryExists(
             static::getOrbitalPath()
