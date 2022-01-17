@@ -61,15 +61,6 @@ class AdvancedOrbitalTest extends TestCase
         $this->assertFileExists(__DIR__.'/content/yaml_models/'.$yaml->getKey().'.yml');
     }
 
-    public function test_it_can_use_markdown_json_driver()
-    {
-        $md = MarkdownJsonModel::create([
-            'name' => 'Ryan',
-        ]);
-
-        $this->assertFileExists(__DIR__.'/content/markdown_json_models/'.$md->getKey().'.md');
-    }
-
     public function test_it_writes_hidden_columns()
     {
         $post = Post::create([
