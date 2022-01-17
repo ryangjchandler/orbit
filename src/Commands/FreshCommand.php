@@ -14,6 +14,13 @@ class FreshCommand extends Command
 
     public function handle()
     {
+        $confirm = $this->confirm('Are you sure you want to remove all existing Orbit data?');
+
+        if (! $confirm) {
+            $this->warn('Cancelling...');
+            return 0;
+        }
+
         (new Filesystem)->deleteDirectory(
             Orbit::getContentPath()
         );
