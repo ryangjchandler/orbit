@@ -9,7 +9,7 @@ class Json extends FileDriver
 {
     protected function dumpContent(Model $model): string
     {
-        $data = array_filter($this->getModelAttributes($model));
+        $data = array_filter($this->getModelAttributes($model), fn ($value) => $value !== null);
 
         return json_encode($data, JSON_PRETTY_PRINT);
     }
