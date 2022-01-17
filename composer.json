@@ -17,13 +17,16 @@
         "illuminate/database": "^9.0",
         "illuminate/events": "^9.0",
         "illuminate/support": "^9.0",
+        "nunomaduro/larastan": "^1.0",
+        "phpstan/extension-installer": "^1.1",
+        "phpstan/phpstan-deprecation-rules": "^1.0",
+        "phpstan/phpstan-phpunit": "^1.0",
         "spatie/yaml-front-matter": "^2.0",
         "symfony/yaml": "^6.0"
     },
     "require-dev": {
         "orchestra/testbench": "^7.0",
-        "phpunit/phpunit": "^9.0",
-        "vimeo/psalm": "^4.6"
+        "phpunit/phpunit": "^9.0"
     },
     "extra": {
         "laravel": {
@@ -45,7 +48,7 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "scripts": {
-        "psalm": "vendor/bin/psalm",
+        "lint": "vendor/bin/phpstan analyse",
         "test": "vendor/bin/phpunit --colors=always"
     },
     "config": {
