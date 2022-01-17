@@ -37,32 +37,4 @@ class OrbitManagerTest extends TestCase
 
         $this->assertEquals($class, Orbit::driver('example'));
     }
-
-    public function test_it_can_return_a_custom_git_name()
-    {
-        Orbit::resolveGitNameUsing(fn () => 'Ryan');
-
-        $this->assertEquals('Ryan', Orbit::getGitName());
-    }
-
-    public function test_it_can_return_a_custom_git_email()
-    {
-        Orbit::resolveGitEmailUsing(fn () => 'ryan@test.com');
-
-        $this->assertEquals('ryan@test.com', Orbit::getGitEmail());
-    }
-
-    public function test_it_can_return_a_custom_git_root()
-    {
-        config(['orbit.git.root' => '/my/folder']);
-
-        $this->assertEquals('/my/folder', Orbit::getGitRoot());
-    }
-
-    public function test_it_can_return_a_custom_git_binary()
-    {
-        config(['orbit.git.binary' => '/usr/local/bin/git']);
-
-        $this->assertEquals('/usr/local/bin/git', Orbit::getGitBinary());
-    }
 }
