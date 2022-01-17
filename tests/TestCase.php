@@ -17,6 +17,8 @@ abstract class TestCase extends BaseTestCase
 
     public function getEnvironmentSetUp($app)
     {
+        $app['config']->set('database.default', 'sqlite');
+        $app['config']->set('database.connections.sqlite.database', ':memory:');
         $app['config']->set('orbit.paths.content', __DIR__.'/content');
 
         Orbit::test();

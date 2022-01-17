@@ -3,9 +3,12 @@
 namespace Orbit;
 
 use Exception;
+use Illuminate\Database\Events\DatabaseRefreshed;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ColumnDefinition;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
+use Orbit\Actions\ClearCache;
 use Orbit\Contracts\Driver;
 use Orbit\Facades\Orbit;
 
@@ -53,6 +56,8 @@ class OrbitServiceProvider extends ServiceProvider
                 __DIR__.'/../config/orbit.php' => config_path('orbit.php'),
             ], 'orbit:config');
         }
+
+        Event::listen(DatabaseRefreshed::class, ClearCache::class);
 
         Blueprint::macro('hasColumn', function (string $name): bool {
             /** @var \Illuminate\Database\Schema\Blueprint $this */

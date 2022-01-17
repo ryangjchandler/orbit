@@ -7,14 +7,14 @@ namespace Orbit\Actions;
 use Orbit\Facades\Orbit;
 
 /** @internal */
-final class ClearCache
+class ClearCache
 {
-    public function execute()
+    public function __invoke(): void
     {
         $path = Orbit::getDatabasePath();
 
         if (! file_exists($path)) {
-            return 0;
+            return;
         }
 
         unlink($path);
