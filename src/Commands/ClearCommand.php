@@ -17,6 +17,13 @@ class ClearCommand extends Command
             return 0;
         }
 
+        $confirm = $this->confirm('Are you sure you want to delete Orbit\'s cache file?');
+
+        if (! $confirm) {
+            $this->warn('Cancelling...');
+            return 0;
+        }
+
         $path = Orbit::getDatabasePath();
 
         if (! file_exists($path)) {
