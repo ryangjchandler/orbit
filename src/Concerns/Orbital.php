@@ -57,10 +57,6 @@ trait Orbital
                 return;
             }
 
-            // We need to refresh the model so that we can get all of the columns
-            // and default values from the SQLite cache.
-            $model->refresh();
-
             $status = Orbit::driver(static::getOrbitalDriver())->save(
                 $model,
                 static::getOrbitalPath()
