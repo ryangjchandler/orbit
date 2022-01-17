@@ -5,15 +5,9 @@ namespace Orbit;
 use Exception;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ColumnDefinition;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Orbit\Contracts\Driver;
-use Orbit\Events\OrbitalCreated;
-use Orbit\Events\OrbitalDeleted;
-use Orbit\Events\OrbitalForceDeleted;
-use Orbit\Events\OrbitalUpdated;
 use Orbit\Facades\Orbit;
-use Orbit\Listeners\ProcessGitTransaction;
 
 class OrbitServiceProvider extends ServiceProvider
 {
@@ -60,13 +54,6 @@ class OrbitServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../config/orbit.php' => config_path('orbit.php'),
             ], 'orbit:config');
-        }
-
-        if ($this->app['config']->get('orbit.git.enabled')) {
-            Event::listen(OrbitalCreated::class, [ProcessGitTransaction::class, 'created']);
-            Event::listen(OrbitalUpdated::class, [ProcessGitTransaction::class, 'updated']);
-            Event::listen(OrbitalDeleted::class, [ProcessGitTransaction::class, 'deleted']);
-            Event::listen(OrbitalForceDeleted::class, [ProcessGitTransaction::class, 'deleted']);
         }
 
         Blueprint::macro('hasColumn', function (string $name): bool {
