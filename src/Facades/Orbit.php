@@ -3,6 +3,7 @@
 namespace Orbit\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use Orbit\OrbitManager;
 
 /**
  * @method static \Orbit\Contracts\Driver driver(string|null $driver)
@@ -20,6 +21,6 @@ class Orbit extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return 'orbit';
+        return OrbitManager::class;
     }
 }

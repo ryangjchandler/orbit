@@ -18,7 +18,7 @@ class OrbitServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../config/orbit.php', 'orbit');
 
-        $this->app->singleton('orbit', function ($app) {
+        $this->app->singleton(OrbitManager::class, function ($app) {
             $manager = new OrbitManager($app);
 
             foreach ($this->app['config']->get('orbit.drivers') as $key => $driver) {
