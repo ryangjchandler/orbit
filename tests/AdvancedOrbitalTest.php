@@ -2,6 +2,10 @@
 
 namespace Orbit\Tests;
 
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+use Orbit\Concerns\Orbital;
 use Orbit\Tests\Fixtures\CustomKey;
 use Orbit\Tests\Fixtures\JsonModel;
 use Orbit\Tests\Fixtures\Post;
@@ -86,5 +90,27 @@ class AdvancedOrbitalTest extends TestCase
         $post->example = 'cool';
 
         $this->assertEquals('cool', $post->example);
+    }
+
+    public function test_orbit_can_be_conditionally_disabled()
+    {
+        Schema::dropIfExists('conditionally_disableds');
+        Schema::create('conditionally_disableds', function (Blueprint $table) {
+            $table->bigIncrements('id');
+        });
+
+        $conditionallyDisabled = ConditionallyDisabled::first();
+
+        $this->assertNull($conditionallyDisabled);
+    }
+}
+
+class ConditionallyDisabled extends Model
+{
+    use Orbital;
+
+    public static function enableOrbit(): bool
+    {
+        return false;
     }
 }

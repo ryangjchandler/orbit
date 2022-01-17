@@ -19,6 +19,10 @@ trait Orbital
 
     public static function bootOrbital()
     {
+        if (! static::enableOrbit()) {
+            return;
+        }
+
         static::ensureOrbitDirectoriesExist();
 
         $driver = Orbit::driver(static::getOrbitalDriver());
@@ -90,11 +94,19 @@ trait Orbital
 
     public static function resolveConnection($connection = null)
     {
+        if (! static::enableOrbit()) {
+            return parent::resolveConnection($connection);
+        }
+
         return static::$resolver->connection('orbit');
     }
 
     public function getConnectionName()
     {
+        if (! static::enableOrbit()) {
+            return parent::getConnectionName();
+        }
+
         return 'orbit';
     }
 
@@ -159,6 +171,10 @@ trait Orbital
 
     protected static function ensureOrbitDirectoriesExist()
     {
+        if (! static::enableOrbit()) {
+            return;
+        }
+
         $fs = new Filesystem();
 
         $fs->ensureDirectoryExists(
@@ -174,6 +190,11 @@ trait Orbital
         if (! $fs->exists($database) && $database !== ':memory:') {
             $fs->put($database, '');
         }
+    }
+
+    public static function enableOrbit(): bool
+    {
+        return true;
     }
 
     public static function getOrbitalName()
