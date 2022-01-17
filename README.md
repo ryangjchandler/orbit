@@ -218,3 +218,19 @@ class Post extends Model
 ```
 
 > Driver names are determined when they are registered with Orbit. You should always use the string name of the driver instead of the fully-qualified class name.
+
+### Disabling Orbit
+
+If you have a model that uses the `Orbital` trait and would like to temporarily disable Orbit's functionality, you can override the `enableOrbit(): bool` method on your model:
+
+```php
+class Post extends Model
+{
+    use Orbital;
+
+    public static function enableOrbit(): bool
+    {
+        return false;
+    }
+}
+```
