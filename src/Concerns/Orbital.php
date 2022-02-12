@@ -222,7 +222,7 @@ trait Orbital
         $pattern = static::getOrbitalPathPattern();
         $path = static::getOrbitalPath() . DIRECTORY_SEPARATOR . Support::buildPathForPattern($pattern, $model);
 
-        (new Filesystem)->ensureDirectoryExists($path);
+        (new Filesystem())->ensureDirectoryExists($path);
 
         return $path;
     }

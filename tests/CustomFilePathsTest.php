@@ -3,12 +3,11 @@
 namespace Orbit\Tests;
 
 use Carbon\Carbon;
-use Faker\Core\File;
-use Illuminate\Support\Str;
-use Orbit\Concerns\Orbital;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Str;
+use Orbit\Concerns\Orbital;
 
 class CustomFilePathModel extends Model
 {
@@ -48,7 +47,7 @@ class CustomFilePathsTest extends TestCase
     {
         parent::setUp();
 
-        (new Filesystem)->deleteDirectory(__DIR__ . '/content/custom_file_path_models');
+        (new Filesystem())->deleteDirectory(__DIR__ . '/content/custom_file_path_models');
     }
 
     /** @test */
@@ -65,9 +64,9 @@ class CustomFilePathsTest extends TestCase
     /** @test */
     public function it_can_read_files_stored_in_a_custom_path()
     {
-        (new Filesystem)->ensureDirectoryExists(__DIR__ . '/content/custom_file_path_models/2022-04-01');
+        (new Filesystem())->ensureDirectoryExists(__DIR__ . '/content/custom_file_path_models/2022-04-01');
 
-        (new Filesystem)->put(
+        (new Filesystem())->put(
             __DIR__ . '/content/custom_file_path_models/2022-04-01/rick-roll.md',
             <<<md
             ---

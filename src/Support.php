@@ -4,7 +4,6 @@ namespace Orbit;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Arr;
 
 /** @internal */
 final class Support
