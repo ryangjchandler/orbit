@@ -11,6 +11,7 @@ use Orbit\Events\OrbitalCreated;
 use Orbit\Events\OrbitalDeleted;
 use Orbit\Events\OrbitalUpdated;
 use Orbit\Facades\Orbit;
+use Orbit\Support;
 use ReflectionClass;
 
 trait Orbital
@@ -217,6 +218,13 @@ trait Orbital
         if (static::getOrbitalPathPattern() === null) {
             return static::getOrbitalPath();
         }
+
+        $pattern = static::getOrbitalPathPattern();
+        $path = static::getOrbitalPath() . DIRECTORY_SEPARATOR . Support::buildPathForPattern($pattern, $model);
+
+        (new Filesystem)->ensureDirectoryExists($path);
+
+        return $path;
     }
 
     public function callTraitMethod(string $method, ...$args)
