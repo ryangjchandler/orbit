@@ -89,7 +89,7 @@ trait Orbital
                 $meta = OrbitMeta::forOrbital($model);
 
                 if ($meta->file_path_read_from !== $path) {
-                    (new Filesystem)->delete($meta->file_path_read_from);
+                    (new Filesystem())->delete($meta->file_path_read_from);
 
                     $meta->update([
                         'file_path_read_from' => $path,

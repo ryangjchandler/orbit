@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Orbit\Contracts\Driver as DriverContract;
 use Orbit\Facades\Orbit;
-use Orbit\Models\OrbitMeta;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
