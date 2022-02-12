@@ -17,16 +17,16 @@
         "illuminate/database": "^9.0",
         "illuminate/events": "^9.0",
         "illuminate/support": "^9.0",
-        "nunomaduro/larastan": "^2.0",
-        "phpstan/extension-installer": "^1.1",
-        "phpstan/phpstan-deprecation-rules": "^1.0",
-        "phpstan/phpstan-phpunit": "^1.0",
         "spatie/yaml-front-matter": "^2.0",
         "symfony/yaml": "^6.0"
     },
     "require-dev": {
+        "nunomaduro/larastan": "^2.0",
         "orchestra/testbench": "^7.0",
-        "phpunit/phpunit": "^9.0"
+        "phpunit/phpunit": "^9.0",
+        "phpstan/extension-installer": "^1.1",
+        "phpstan/phpstan-deprecation-rules": "^1.0",
+        "phpstan/phpstan-phpunit": "^1.0"
     },
     "extra": {
         "laravel": {
