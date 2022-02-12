@@ -48,7 +48,7 @@ trait Orbital
 
             $status = Orbit::driver(static::getOrbitalDriver())->save(
                 $model,
-                static::getOrbitalPath()
+                static::generateOrbitalFilePathForModel($model)
             );
 
             event(new OrbitalCreated($model));
@@ -63,7 +63,7 @@ trait Orbital
 
             $status = Orbit::driver(static::getOrbitalDriver())->save(
                 $model,
-                static::getOrbitalPath()
+                static::generateOrbitalFilePathForModel($model)
             );
 
             event(new OrbitalUpdated($model));
@@ -78,7 +78,7 @@ trait Orbital
 
             $status = Orbit::driver(static::getOrbitalDriver())->delete(
                 $model,
-                static::getOrbitalPath()
+                static::generateOrbitalFilePathForModel($model)
             );
 
             event(new OrbitalDeleted($model));
@@ -205,6 +205,18 @@ trait Orbital
     public static function getOrbitalPath()
     {
         return \config('orbit.paths.content') . DIRECTORY_SEPARATOR . static::getOrbitalName();
+    }
+
+    public static function getOrbitalPathPattern(): ?string
+    {
+        return null;
+    }
+
+    public static function generateOrbitalFilePathForModel(Model $model)
+    {
+        if (static::getOrbitalPathPattern() === null) {
+            return static::getOrbitalPath();
+        }
     }
 
     public function callTraitMethod(string $method, ...$args)
