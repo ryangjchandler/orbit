@@ -7,10 +7,12 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Orbit\Drivers\FileDriver;
 use Orbit\Events\OrbitalCreated;
 use Orbit\Events\OrbitalDeleted;
 use Orbit\Events\OrbitalUpdated;
 use Orbit\Facades\Orbit;
+use Orbit\Models\OrbitMeta;
 use Orbit\Support;
 use ReflectionClass;
 
@@ -47,10 +49,23 @@ trait Orbital
             // and default values from the SQLite cache.
             $model->refresh();
 
-            $status = Orbit::driver(static::getOrbitalDriver())->save(
+            $driver = Orbit::driver(static::getOrbitalDriver());
+
+            $status = $driver->save(
                 $model,
-                static::generateOrbitalFilePathForModel($model)
+                $directory = static::generateOrbitalFilePathForModel($model)
             );
+
+            if (static::getOrbitalPathPattern() !== null && $driver instanceof FileDriver) {
+                $path = $driver->filepath($directory, $model->getKey());
+
+                OrbitMeta::query()->updateOrCreate([
+                    'orbital_type' => $model::class,
+                    'orbital_key' => $model->getKey(),
+                ], [
+                    'file_path_read_from' => $path,
+                ]);
+            }
 
             event(new OrbitalCreated($model));
 
@@ -62,10 +77,25 @@ trait Orbital
                 return;
             }
 
-            $status = Orbit::driver(static::getOrbitalDriver())->save(
+            $driver = Orbit::driver(static::getOrbitalDriver());
+
+            $status = $driver->save(
                 $model,
-                static::generateOrbitalFilePathForModel($model)
+                $directory = static::generateOrbitalFilePathForModel($model)
             );
+
+            if (static::getOrbitalPathPattern() !== null && $driver instanceof FileDriver) {
+                $path = $driver->filepath($directory, $model->getKey());
+                $meta = OrbitMeta::forOrbital($model);
+
+                if ($meta->file_path_read_from !== $path) {
+                    (new Filesystem)->delete($meta->file_path_read_from);
+
+                    $meta->update([
+                        'file_path_read_from' => $path,
+                    ]);
+                }
+            }
 
             event(new OrbitalUpdated($model));
 
@@ -144,7 +174,7 @@ trait Orbital
         $driver->all(static::getOrbitalPath())
             ->filter()
             ->map(function ($row) use ($columns) {
-                $row = collect($row)
+                $newRow = collect($row)
                     ->filter(fn ($_, $key) => in_array($key, $columns))
                     ->map(function ($value, $key) {
                         $this->setAttribute($key, $value);
@@ -153,13 +183,22 @@ trait Orbital
                     })
                     ->toArray();
 
+                if (array_key_exists('file_path_read_from', $row) && static::getOrbitalPathPattern() !== null) {
+                    OrbitMeta::query()->updateOrCreate([
+                        'orbital_type' => $this::class,
+                        'orbital_key' => $this->getKey(),
+                    ], [
+                        'file_path_read_from' => $row['file_path_read_from'],
+                    ]);
+                }
+
                 foreach ($columns as $column) {
-                    if (! array_key_exists($column, $row)) {
-                        $row[$column] = null;
+                    if (! array_key_exists($column, $newRow)) {
+                        $newRow[$column] = null;
                     }
                 }
 
-                return $row;
+                return $newRow;
             })
             ->chunk(100)
             ->each(fn (Collection $chunk) => static::insert($chunk->toArray()));

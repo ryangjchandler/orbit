@@ -55,7 +55,7 @@ class CustomFilePathsTest extends TestCase
     {
         CustomFilePathModel::create([
             'slug' => Str::slug('foo bar'),
-            'published_at' => now(),
+            'published_at' => Carbon::parse('2022-02-12'),
         ]);
 
         $this->assertFileExists(__DIR__ . '/content/custom_file_path_models/2022-02-12/foo-bar.md');
@@ -85,5 +85,23 @@ class CustomFilePathsTest extends TestCase
         $this->assertEquals('rick-roll', $record->slug);
         $this->assertInstanceOf(Carbon::class, $record->published_at);
         $this->assertEquals('2022-04-01', $record->published_at->format('Y-m-d'));
+    }
+
+    /** @test */
+    public function it_removes_old_custom_file_paths_for_stale_data()
+    {
+        $record = CustomFilePathModel::create([
+            'slug' => 'bob-baz',
+            'published_at' => Carbon::parse('2022-06-12'),
+        ]);
+
+        $this->assertFileExists(__DIR__ . '/content/custom_file_path_models/2022-06-12/bob-baz.md');
+
+        $record->update([
+            'published_at' => Carbon::parse('2022-08-12'),
+        ]);
+
+        $this->assertFileExists(__DIR__ . '/content/custom_file_path_models/2022-08-12/bob-baz.md');
+        $this->assertFileDoesNotExist(__DIR__ . '/content/custom_file_path_models/2022-06-12/bob-baz.md');
     }
 }

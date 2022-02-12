@@ -7,10 +7,12 @@ use Illuminate\Database\Events\DatabaseRefreshed;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ColumnDefinition;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use Orbit\Actions\ClearCache;
 use Orbit\Contracts\Driver;
 use Orbit\Facades\Orbit;
+use Orbit\Models\OrbitMeta;
 
 class OrbitServiceProvider extends ServiceProvider
 {
@@ -55,6 +57,17 @@ class OrbitServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../config/orbit.php' => config_path('orbit.php'),
             ], 'orbit:config');
+        }
+
+        if (! Schema::connection('orbit')->hasTable('_orbit_meta')) {
+            Schema::connection('orbit')->create('_orbit_meta', function (Blueprint $table) {
+                $table->id();
+                $table->string('orbital_type')->index();
+                $table->string('orbital_key')->index();
+                $table->string('file_path_read_from')->nullable();
+            });
+        } else {
+            OrbitMeta::truncate();
         }
 
         Event::listen(DatabaseRefreshed::class, ClearCache::class);

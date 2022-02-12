@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Orbit\Contracts\Driver as DriverContract;
 use Orbit\Facades\Orbit;
+use Orbit\Models\OrbitMeta;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
@@ -26,6 +27,7 @@ abstract class FileDriver implements DriverContract
         return $highest > filemtime(Orbit::getDatabasePath());
     }
 
+    /** @param Model&\Orbit\Concerns\Orbital $model */
     public function save(Model $model, string $directory): bool
     {
         if ($model->wasChanged($model->getKeyName())) {
@@ -69,13 +71,15 @@ abstract class FileDriver implements DriverContract
                 continue;
             }
 
-            $collection->push($this->parseContent($file));
+            $collection->push(array_merge($this->parseContent($file), [
+                'file_path_read_from' => $file->getRealPath(),
+            ]));
         }
 
         return $collection;
     }
 
-    protected function filepath(string $directory, string $key): string
+    public function filepath(string $directory, string $key): string
     {
         return $directory . DIRECTORY_SEPARATOR . $key . '.' . $this->extension();
     }
