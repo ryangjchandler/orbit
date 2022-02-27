@@ -23,7 +23,7 @@ trait SoftDeletes
         static::deleted(function (Model $model) {
             $status = Orbit::driver(static::getOrbitalDriver())->save(
                 $model,
-                static::getOrbitalPath()
+                static::generateOrbitalFilePathForModel($model)
             );
 
             event(new OrbitalDeleted($model));
@@ -34,7 +34,7 @@ trait SoftDeletes
         static::restored(function (Model $model) {
             $status = Orbit::driver(static::getOrbitalDriver())->save(
                 $model,
-                static::getOrbitalPath()
+                static::generateOrbitalFilePathForModel($model)
             );
 
             event(new OrbitalUpdated($model));
@@ -49,7 +49,7 @@ trait SoftDeletes
 
             $status = Orbit::driver(static::getOrbitalDriver())->delete(
                 $model,
-                static::getOrbitalPath()
+                static::generateOrbitalFilePathForModel($model)
             );
 
             event(new OrbitalForceDeleted($model));
