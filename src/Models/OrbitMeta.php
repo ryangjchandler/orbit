@@ -9,7 +9,7 @@ final class OrbitMeta extends Model
 {
     protected $table = '_orbit_meta';
 
-    protected $connection = 'orbit';
+    protected $connection = 'orbit_meta';
 
     protected $guarded = [];
 

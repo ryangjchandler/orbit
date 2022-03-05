@@ -35,6 +35,11 @@ class OrbitManager extends Manager
         return config('orbit.paths.cache') . DIRECTORY_SEPARATOR . 'orbit.sqlite';
     }
 
+    public function getMetaDatabasePath()
+    {
+        return storage_path('framework/cache/orbit/orbit_meta.sqlite');
+    }
+
     public function getContentPath()
     {
         return config('orbit.paths.content');
