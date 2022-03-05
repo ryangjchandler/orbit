@@ -4,7 +4,10 @@ namespace Orbit\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-/** @test */
+/**
+ * @property string $orbital_type
+ * @property string|int $orbital_key
+ */
 final class OrbitMeta extends Model
 {
     protected $table = '_orbit_meta';

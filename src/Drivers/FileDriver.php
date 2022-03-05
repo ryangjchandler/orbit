@@ -26,7 +26,6 @@ abstract class FileDriver implements DriverContract
         return $highest > filemtime(Orbit::getDatabasePath());
     }
 
-    /** @param Model&\Orbit\Concerns\Orbital $model */
     public function save(Model $model, string $directory): bool
     {
         if ($model->wasChanged($model->getKeyName())) {
