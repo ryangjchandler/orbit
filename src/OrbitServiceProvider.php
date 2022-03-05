@@ -66,9 +66,9 @@ class OrbitServiceProvider extends ServiceProvider
             ], 'orbit:config');
         }
 
-        if (! (new Filesystem)->exists($metaPath = Orbit::getMetaDatabasePath())) {
-            (new Filesystem)->ensureDirectoryExists(dirname($metaPath), 0755, true);
-            (new Filesystem)->put($metaPath, '');
+        if (! (new Filesystem())->exists($metaPath = Orbit::getMetaDatabasePath())) {
+            (new Filesystem())->ensureDirectoryExists(dirname($metaPath), 0755, true);
+            (new Filesystem())->put($metaPath, '');
         }
 
         if (! Schema::connection('orbit_meta')->hasTable('_orbit_meta')) {
