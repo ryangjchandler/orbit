@@ -3,17 +3,17 @@
 namespace Orbit;
 
 use Exception;
-use Orbit\Facades\Orbit;
-use Orbit\Contracts\Driver;
-use Orbit\Models\OrbitMeta;
-use Orbit\Actions\ClearCache;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Database\Events\DatabaseRefreshed;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ColumnDefinition;
-use Illuminate\Database\Events\DatabaseRefreshed;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\ServiceProvider;
+use Orbit\Actions\ClearCache;
+use Orbit\Contracts\Driver;
+use Orbit\Facades\Orbit;
+use Orbit\Models\OrbitMeta;
 
 class OrbitServiceProvider extends ServiceProvider
 {
