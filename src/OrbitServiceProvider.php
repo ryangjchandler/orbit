@@ -7,6 +7,7 @@ use Illuminate\Database\Events\DatabaseRefreshed;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ColumnDefinition;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use Orbit\Actions\ClearCache;
@@ -43,6 +44,12 @@ class OrbitServiceProvider extends ServiceProvider
             'database' => Orbit::getDatabasePath(),
             'foreign_key_constraints' => false,
         ]);
+
+        $config->set('database.connections.orbit_meta', [
+            'driver' => 'sqlite',
+            'database' => Orbit::getMetaDatabasePath(),
+            'foreign_key_constraints' => false,
+        ]);
     }
 
     public function boot()
@@ -59,8 +66,13 @@ class OrbitServiceProvider extends ServiceProvider
             ], 'orbit:config');
         }
 
-        if (! Schema::connection('orbit')->hasTable('_orbit_meta')) {
-            Schema::connection('orbit')->create('_orbit_meta', function (Blueprint $table) {
+        if (! File::exists($metaPath = Orbit::getMetaDatabasePath())) {
+            File::ensureDirectoryExists(dirname($metaPath), 0755, true);
+            File::put($metaPath, '');
+        }
+
+        if (! Schema::connection('orbit_meta')->hasTable('_orbit_meta')) {
+            Schema::connection('orbit_meta')->create('_orbit_meta', function (Blueprint $table) {
                 $table->id();
                 $table->string('orbital_type')->index();
                 $table->string('orbital_key')->index();
