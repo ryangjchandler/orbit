@@ -3,17 +3,17 @@
 namespace Orbit;
 
 use Exception;
-use Illuminate\Database\Events\DatabaseRefreshed;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Schema\ColumnDefinition;
-use Illuminate\Filesystem\Filesystem;
+use Orbit\Facades\Orbit;
+use Orbit\Contracts\Driver;
+use Orbit\Models\OrbitMeta;
+use Orbit\Actions\ClearCache;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
-use Orbit\Actions\ClearCache;
-use Orbit\Contracts\Driver;
-use Orbit\Facades\Orbit;
-use Orbit\Models\OrbitMeta;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\ColumnDefinition;
+use Illuminate\Database\Events\DatabaseRefreshed;
 
 class OrbitServiceProvider extends ServiceProvider
 {
@@ -66,9 +66,9 @@ class OrbitServiceProvider extends ServiceProvider
             ], 'orbit:config');
         }
 
-        if (! (new Filesystem())->exists($metaPath = Orbit::getMetaDatabasePath())) {
-            (new Filesystem())->ensureDirectoryExists(dirname($metaPath), 0755, true);
-            (new Filesystem())->put($metaPath, '');
+        if (! File::exists($metaPath = Orbit::getMetaDatabasePath())) {
+            File::ensureDirectoryExists(dirname($metaPath), 0755, true);
+            File::put($metaPath, '');
         }
 
         if (! Schema::connection('orbit_meta')->hasTable('_orbit_meta')) {
