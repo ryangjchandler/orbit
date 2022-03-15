@@ -58,7 +58,6 @@ class CacheCommand extends Command
                 }
 
                 $reflection = new ReflectionClass($class);
-                // Only include non-abstract Model classes that use the Oribtal trait
                 return $reflection->isSubclassOf(Model::class) &&
                     ! $reflection->isAbstract() &&
                     isset(class_uses_recursive($class)[Orbital::class]);
