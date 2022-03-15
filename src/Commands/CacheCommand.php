@@ -58,6 +58,7 @@ class CacheCommand extends Command
                 }
 
                 $reflection = new ReflectionClass($class);
+
                 return $reflection->isSubclassOf(Model::class) &&
                     ! $reflection->isAbstract() &&
                     isset(class_uses_recursive($class)[Orbital::class]);
