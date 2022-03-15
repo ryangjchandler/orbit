@@ -21,8 +21,9 @@ class CacheCommandTest extends TestCase
         $this->setAppNamespace('Orbit\\Tests\\Fixtures\\Cache');
     
         $this->artisan('orbit:cache')
-            ->expectsOutputToContain('Cached the following Orbit models:')
-            ->expectsOutputToContain('Orbit\\Tests\\Fixtures\\Cache\\CachePost');
+            ->expectsOutput("Cached the following Orbit models:")
+            ->expectsOutput("• \Orbit\Tests\Fixtures\Cache\CachePost");
+        ;
 
         $this->assertCount(1, DB::connection('orbit')->table('cache_posts')->get());
     }
@@ -33,7 +34,7 @@ class CacheCommandTest extends TestCase
         $this->setAppNamespace('Foo\\');
 
         $this->artisan('orbit:cache')
-            ->expectsOutputToContain('Could not find any Orbit models.');
+            ->expectsOutput('Could not find any Orbit models.');
     }
 
     private function setAppNamespace(string $namespace): void
