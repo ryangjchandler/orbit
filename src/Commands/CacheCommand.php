@@ -2,8 +2,8 @@
 
 namespace Orbit\Commands;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Orbit\Concerns\Orbital;
@@ -19,13 +19,14 @@ class CacheCommand extends Command
     {
         $models = $this->findOrbitModels();
 
-        if ($models->count() === 0) {
+        if ($models->isEmpty()) {
             $this->warn('Could not find any Orbit models.');
+
             return 0;
         }
 
-        $models->each(function (string $modelName): void {
-            (new $modelName())->migrate();
+        $models->each(function (string $model): void {
+            (new $model())->migrate();
         });
 
         $this->info('Cached the following Orbit models:');
@@ -52,15 +53,15 @@ class CacheCommand extends Command
                 return $class;
             })
             ->filter(function ($class) {
-                if (class_exists($class)) {
-                    $reflection = new ReflectionClass($class);
-                    // Only include non-abstract Model classes that use the Oribtal trait
-                    return $reflection->isSubclassOf(Model::class) &&
-                        !$reflection->isAbstract() &&
-                        isset(class_uses_recursive($class)[Orbital::class]);
+                if (! class_exists($class)) {
+                    return false;
                 }
 
-                return false;
+                $reflection = new ReflectionClass($class);
+                // Only include non-abstract Model classes that use the Oribtal trait
+                return $reflection->isSubclassOf(Model::class) &&
+                    ! $reflection->isAbstract() &&
+                    isset(class_uses_recursive($class)[Orbital::class]);
             });
     }
 }
