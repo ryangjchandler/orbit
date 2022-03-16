@@ -38,7 +38,7 @@ class CacheCommand extends Command
 
     protected function findOrbitModels(): Collection
     {
-        $laravel = $this->getApplication()->getLaravel();
+        $laravel = $this->getLaravel();
 
         return collect(File::allFiles($laravel->path()))
             ->map(function ($item) use ($laravel) {
