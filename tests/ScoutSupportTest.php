@@ -4,11 +4,9 @@ namespace Orbit\Tests;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
-use Laravel\Scout\Scout;
 use Laravel\Scout\ScoutServiceProvider;
 use Laravel\Scout\Searchable;
 use Orbit\Concerns\Orbital;
-use Orbit\Tests\Fixtures\Post;
 
 class ScoutSupportTest extends TestCase
 {
