@@ -21,12 +21,13 @@
         "symfony/yaml": "^6.0"
     },
     "require-dev": {
+        "laravel/scout": "^9.4",
         "nunomaduro/larastan": "^2.0",
         "orchestra/testbench": "^7.0",
-        "phpunit/phpunit": "^9.0",
         "phpstan/extension-installer": "^1.1",
         "phpstan/phpstan-deprecation-rules": "^1.0",
-        "phpstan/phpstan-phpunit": "^1.0"
+        "phpstan/phpstan-phpunit": "^1.0",
+        "phpunit/phpunit": "^9.0"
     },
     "extra": {
         "laravel": {
