@@ -17,6 +17,7 @@
         "illuminate/database": "^9.0",
         "illuminate/events": "^9.0",
         "illuminate/support": "^9.0",
+        "spatie/laravel-package-tools": "^1.11",
         "spatie/yaml-front-matter": "^2.0",
         "symfony/yaml": "^6.0"
     },
@@ -24,6 +25,8 @@
         "laravel/scout": "^9.4",
         "nunomaduro/larastan": "^2.0",
         "orchestra/testbench": "^7.0",
+        "pestphp/pest": "^1.21",
+        "pestphp/pest-plugin-laravel": "^1.2",
         "phpstan/extension-installer": "^1.1",
         "phpstan/phpstan-deprecation-rules": "^1.0",
         "phpstan/phpstan-phpunit": "^1.0",
@@ -50,7 +53,7 @@
     "prefer-stable": true,
     "scripts": {
         "lint": "vendor/bin/phpstan analyse",
-        "test": "vendor/bin/phpunit --colors=always"
+        "test": "pest"
     },
     "config": {
         "sort-packages": true
