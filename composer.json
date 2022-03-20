@@ -17,9 +17,7 @@
         "illuminate/database": "^9.0",
         "illuminate/events": "^9.0",
         "illuminate/support": "^9.0",
-        "spatie/laravel-package-tools": "^1.11",
-        "spatie/yaml-front-matter": "^2.0",
-        "symfony/yaml": "^6.0"
+        "spatie/laravel-package-tools": "^1.11"
     },
     "require-dev": {
         "laravel/scout": "^9.4",
