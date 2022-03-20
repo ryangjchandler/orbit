@@ -8,6 +8,7 @@ use Orbit\Drivers\Markdown;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Traits\Macroable;
+use Orbit\Contracts\Driver;
 
 final class OrbitOptions
 {
@@ -46,8 +47,7 @@ final class OrbitOptions
             ->driver(Markdown::class);
     }
 
-    // TODO: Add Driver return type here.
-    public function getDriver()
+    public function getDriver(): Driver
     {
         return app($this->driver);
     }

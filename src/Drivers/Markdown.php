@@ -2,7 +2,9 @@
 
 namespace Orbit\Drivers;
 
-class Markdown
+use Orbit\Contracts\Driver;
+
+class Markdown implements Driver
 {
 
 }
