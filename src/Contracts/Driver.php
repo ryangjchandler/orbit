@@ -9,4 +9,7 @@ interface Driver
 
     /** Convert an array of model attributes into a valid string format. */
     public function toFile(array $attributes): string;
+
+    /** The file extension(s) that this driver supports and recognises. */
+    public function extension(): string|array;
 }

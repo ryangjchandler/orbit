@@ -18,6 +18,11 @@ class Markdown implements Driver, ModifiesSchema
         return '';
     }
 
+    public function extension(): string|array
+    {
+        return ['md', 'markdown'];
+    }
+
     public function schema(Blueprint $table): void
     {
         $table->longText('content')->nullable();
