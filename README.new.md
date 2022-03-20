@@ -65,13 +65,10 @@ public static function getOrbitOptions(): OrbitOptions
         // Change the directory that content should be loaded from,
         // default is a kebab-case version of the model name.
         ->source('my-posts')
-        // This option will prevent Orbit from generating a filename for you 
-        // and will instead use the original filename on disk.
-        ->useOriginalFilename()
         // The callback provided to this function will allow you to specify
         // a custom route-like pattern, used by Orbit to generate the filename
         // for new records, as well as existing records being updated.
-        // Default is simply `{keyName}`.
+        // Default is simply `{getKeyName}`.
         ->generateFilenameUsing(function (): string {
             return '{created_at:Y}/{created_at:m}/{created_at:d}/{slug}';
         });
