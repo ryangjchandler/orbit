@@ -234,3 +234,7 @@ class Post extends Model
     }
 }
 ```
+
+## Git Integration
+
+Since `v1.0.0` this package no longer supports the git integration. Instead you can use [jubeki/orbit-git](https://Jubeki/orbit-git) as replacement.
