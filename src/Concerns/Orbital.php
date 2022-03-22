@@ -200,7 +200,7 @@ trait Orbital
                 foreach ($columns as $column) {
                     $definition = $blueprint->orbitGetColumn($column);
 
-                    if (! array_key_exists($column, $newRow) && !! $definition['nullable']) {
+                    if (! array_key_exists($column, $newRow) && ! ! $definition['nullable']) {
                         $newRow[$column] = null;
                     }
                 }

@@ -4,7 +4,6 @@ namespace Orbit\Tests;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Orbit\Concerns\Orbital;
 
 class DefaultValues extends Model
