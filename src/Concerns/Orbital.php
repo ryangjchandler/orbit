@@ -204,7 +204,11 @@ trait Orbital
 
                     $definition = $blueprint->orbitGetColumn($column);
 
-                    $newRow[$column] = $definition->nullable ? null : $definition->default;
+                    if ($definition->default) {
+                        $newRow[$column] = $definition->default;
+                    } elseif ($definition->nullable) {
+                        $newRow[$column] = null;
+                    }
                 }
 
                 return $newRow;
