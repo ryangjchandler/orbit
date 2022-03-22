@@ -4,6 +4,7 @@ namespace Orbit\Tests;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Orbit\Concerns\Orbital;
 
 class DefaultValues extends Model
@@ -17,6 +18,19 @@ class DefaultValues extends Model
         $table->bigIncrements('id');
         $table->string('name');
         $table->string('email')->default('foo@test.com');
+    }
+}
+
+class MissingRow extends Model
+{
+    use Orbital;
+
+    protected $guarded = [];
+
+    public static function schema(Blueprint $table)
+    {
+        $table->bigIncrements('id');
+        $table->string('country')->default('United Kingdom');
     }
 }
 
@@ -38,5 +52,19 @@ class DefaultDatabaseValuesTest extends TestCase
         $contents = file_get_contents(__DIR__.'/content/default_values/'.$model->id.'.md');
 
         $this->assertStringContainsString('email: foo@test.com', $contents);
+    }
+
+    public function test_missing_values_use_default_in_database()
+    {
+        file_put_contents(__DIR__ . '/content/missing_rows/1.md', <<<'md'
+        ---
+        id: 1
+        ---
+        md);
+
+        $this->assertCount(1, MissingRow::all());
+        $this->assertEquals(1, MissingRow::first()->getKey());
+
+        MissingRow::all()->each->delete();
     }
 }

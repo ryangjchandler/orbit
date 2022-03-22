@@ -91,5 +91,10 @@ class OrbitServiceProvider extends ServiceProvider
                 fn (ColumnDefinition $column) => $column->get('name') === $name
             );
         });
+
+        Blueprint::macro('orbitGetColumn', function (string $name): ?ColumnDefinition {
+            /** @var \Illuminate\Database\Schema\Blueprint $this */
+            return collect($this->getColumns())->firstWhere('name', $name);
+        });
     }
 }

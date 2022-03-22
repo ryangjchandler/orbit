@@ -152,7 +152,10 @@ trait Orbital
             $schema->drop($table);
         }
 
-        static::resolveConnection()->getSchemaBuilder()->create($table, function (Blueprint $table) {
+        /** @var \Illuminate\Database\Schema\Blueprint|null $blueprint */
+        $blueprint = null;
+
+        static::resolveConnection()->getSchemaBuilder()->create($table, function (Blueprint $table) use (&$blueprint) {
             static::schema($table);
 
             $this->callTraitMethod('schema', $table);
@@ -166,6 +169,8 @@ trait Orbital
             if ($this->usesTimestamps()) {
                 $table->timestamps();
             }
+
+            $blueprint = $table;
         });
 
         $driver = Orbit::driver(static::getOrbitalDriver());
@@ -173,7 +178,7 @@ trait Orbital
 
         $driver->all(static::getOrbitalPath())
             ->filter()
-            ->map(function ($row) use ($columns) {
+            ->map(function ($row) use ($columns, $blueprint) {
                 $newRow = collect($row)
                     ->filter(fn ($_, $key) => in_array($key, $columns))
                     ->map(function ($value, $key) {
@@ -193,7 +198,9 @@ trait Orbital
                 }
 
                 foreach ($columns as $column) {
-                    if (! array_key_exists($column, $newRow)) {
+                    $definition = $blueprint->orbitGetColumn($column);
+
+                    if (! array_key_exists($column, $newRow) && !! $definition['nullable']) {
                         $newRow[$column] = null;
                     }
                 }
