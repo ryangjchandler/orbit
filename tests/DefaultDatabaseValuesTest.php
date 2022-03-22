@@ -61,8 +61,16 @@ class DefaultDatabaseValuesTest extends TestCase
         ---
         md);
 
-        $this->assertCount(1, MissingRow::all());
+        file_put_contents(__DIR__ . '/content/missing_rows/2.md', <<<'md'
+        ---
+        id: 2
+        country: Spain
+        ---
+        md);
+
+        $this->assertCount(2, MissingRow::all());
         $this->assertEquals(1, MissingRow::first()->getKey());
+        $this->assertEquals(2, MissingRow::find(2)->getKey());
 
         MissingRow::all()->each->delete();
     }

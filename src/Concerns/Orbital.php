@@ -198,11 +198,13 @@ trait Orbital
                 }
 
                 foreach ($columns as $column) {
+                    if (array_key_exists($column, $newRow)) {
+                        continue;
+                    }
+
                     $definition = $blueprint->orbitGetColumn($column);
 
-                    if (! array_key_exists($column, $newRow) && ! ! $definition['nullable']) {
-                        $newRow[$column] = null;
-                    }
+                    $newRow[$column] = $definition->nullable ? null : $definition->default;
                 }
 
                 return $newRow;
