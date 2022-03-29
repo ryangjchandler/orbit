@@ -36,6 +36,17 @@ class OrbitalObserver
         File::put($source . DIRECTORY_SEPARATOR . $filename, $serialised);
     }
 
+    /** @param Model&Orbital $model */
+    public function deleted(Model $model): void
+    {
+        $options = $model->getOrbitOptions();
+        $source = $options->getSource($model);
+        $driver = $options->getDriver();
+        $filename = "{$model->getKey()}.{$this->getPrimaryExtensionForDriver($driver)}";
+
+        File::delete($source . DIRECTORY_SEPARATOR . $filename);
+    }
+
     private function getPrimaryExtensionForDriver(Driver $driver): string
     {
         return Arr::wrap($driver->extension())[0];
