@@ -37,6 +37,28 @@ class OrbitalObserver
     }
 
     /** @param Model&Orbital $model */
+    public function updated(Model $model): void
+    {
+        $options = $model->getOrbitOptions();
+        $source = $options->getSource($model);
+        $driver = $options->getDriver();
+        $filename = "{$model->getKey()}.{$this->getPrimaryExtensionForDriver($driver)}";
+
+        // 1. In some cases, the primary key of a record might change during a save.
+        //    If that does happen, we need to clean things up and remove the old file.
+        if ($model->wasChanged($model->getKeyName())) {
+            $oldFilename = "{$model->getOriginal($model->getKeyName())}.{$this->getPrimaryExtensionForDriver($driver)}";
+
+            File::delete($source . DIRECTORY_SEPARATOR . $oldFilename);
+        }
+
+        // 2. We can then write to the new file, storing the updated contents of the model.
+        $serialised = $driver->toFile($this->getModelAttributes($model));
+
+        File::put($source . DIRECTORY_SEPARATOR . $filename, $serialised);
+    }
+
+    /** @param Model&Orbital $model */
     public function deleted(Model $model): void
     {
         $options = $model->getOrbitOptions();
@@ -44,6 +66,7 @@ class OrbitalObserver
         $driver = $options->getDriver();
         $filename = "{$model->getKey()}.{$this->getPrimaryExtensionForDriver($driver)}";
 
+        // 1. We just need to delete the file here. Nothing special at all.
         File::delete($source . DIRECTORY_SEPARATOR . $filename);
     }
 

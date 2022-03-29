@@ -25,6 +25,20 @@ test('simple > deleting a model deletes the file', function () {
     assertFileDoesNotExist(__DIR__ . '/content/1.md');
 });
 
+test('simple > updating a model updates the file', function () {
+    $s = Simple::create([
+        'title' => 'Orbit!',
+    ]);
+
+    assertFileContains(__DIR__ . '/content/1.md', $s->title);
+
+    $s->update([
+        'title' => 'Another orbit!',
+    ]);
+
+    assertFileContains(__DIR__ . '/content/1.md', $s->title);
+});
+
 afterEach(function () {
     Simple::all()->each->delete();
 });
