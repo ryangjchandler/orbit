@@ -2,10 +2,10 @@
 
 namespace Orbit\Observers;
 
-use Orbit\Concerns\Orbital;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
+use Orbit\Concerns\Orbital;
 use Orbit\Contracts\Driver;
 
 class OrbitalObserver

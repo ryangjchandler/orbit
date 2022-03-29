@@ -22,7 +22,7 @@ final class Support
             return true;
         }
 
-        $table = (new $modelClass)->getTable();
+        $table = (new $modelClass())->getTable();
 
         if (! $modelClass::resolveConnection()->getSchemaBuilder()->hasTable($table)) {
             return true;

@@ -2,8 +2,6 @@
 
 namespace Orbit;
 
-use Illuminate\Support\Facades\Config;
-
 final class Orbit
 {
     public function getCachePath(): string
