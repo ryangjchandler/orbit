@@ -3,18 +3,19 @@
 namespace Orbit;
 
 use Closure;
+use Orbit\Facades\Orbit;
 use Illuminate\Support\Str;
-use Orbit\Drivers\Markdown;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Application;
-use Illuminate\Support\Traits\Macroable;
 use Orbit\Contracts\Driver;
+use Orbit\Drivers\Markdown;
+use Illuminate\Foundation\Application;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Traits\Macroable;
 
 final class OrbitOptions
 {
     use Macroable;
 
-    private ?string $driver = null;
+    private string $driver = Markdown::class;
 
     private ?string $source = null;
 
@@ -54,7 +55,13 @@ final class OrbitOptions
 
     public function getSource(Model $model): string
     {
-        return $this->source ?? Str::of($model::class)->classBasename()->kebab();
+        $source = $this->source ?? Str::of($model::class)->classBasename()->kebab();
+
+        if (is_dir($source)) {
+            return $source;
+        }
+
+        return Orbit::getContentPath() . DIRECTORY_SEPARATOR . $source;
     }
 
     public function getFilenameGenerator(): ?Closure

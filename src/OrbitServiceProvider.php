@@ -19,5 +19,14 @@ class OrbitServiceProvider extends PackageServiceProvider
         $this->app->singleton(Orbit::class, function () {
             return new Orbit;
         });
+
+        /** @var Orbit $orbit */
+        $orbit = $this->app[Orbit::class];
+
+        $this->app['config']->set('database.connections.orbit', [
+            'driver' => 'sqlite',
+            'database' => $orbit->getCachePath(),
+            'foreign_key_constraints' => false,
+        ]);
     }
 }

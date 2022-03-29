@@ -2,11 +2,14 @@
 
 namespace Orbit\Tests;
 
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Orbit\OrbitServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
-abstract class TestCase extends BaseTestCase
+class TestCase extends BaseTestCase
 {
+    use LazilyRefreshDatabase;
+
     protected function getPackageProviders($app)
     {
         return [
@@ -16,6 +19,7 @@ abstract class TestCase extends BaseTestCase
 
     public function getEnvironmentSetUp($app)
     {
-
+        $app['config']->set('database.connections.sqlite.database', ':memory:');
+        $app['config']->set('database.connections.orbit.database', ':memory:');
     }
 }
