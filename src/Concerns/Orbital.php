@@ -213,8 +213,7 @@ trait Orbital
 
                 return $newRow;
             })
-            ->chunk(100)
-            ->each(fn (Collection $chunk) => static::insert($chunk->toArray()));
+            ->map(fn ($row) => static::insert($row));
     }
 
     protected static function getOrbitalDriver()
