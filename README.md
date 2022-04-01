@@ -136,6 +136,10 @@ $this->assertDatabaseHas('posts', [
 ], 'orbit');
 ```
 
+### Many To Many relationships
+
+Many to many relationships can be used with Orbit, but to do so you must make use of a [custom pivot model](https://laravel.com/docs/9.x/eloquent-relationships#defining-custom-intermediate-table-models).
+
 ## Drivers
 
 Orbit is a driver-based package, making it very easy to change the storage format of your data.
