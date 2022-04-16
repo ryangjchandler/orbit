@@ -158,7 +158,7 @@ trait Orbital
         static::resolveConnection()->getSchemaBuilder()->create($table, function (Blueprint $table) use (&$blueprint) {
             static::schema($table);
 
-            foreach (Orbit::dynamicSchemaCallback($table->getTable()) as $schmeCallback) {
+            foreach (Orbit::dynamicSchemaCallbacks($table->getTable()) as $schmeCallback) {
                 $schmeCallback($table);
             }
 
