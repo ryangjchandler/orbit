@@ -158,6 +158,10 @@ trait Orbital
         static::resolveConnection()->getSchemaBuilder()->create($table, function (Blueprint $table) use (&$blueprint) {
             static::schema($table);
 
+            foreach (Orbit::dynamicSchemaCallback($table->getTable()) as $schmeCallback) {
+                $schmeCallback($table);
+            }
+
             $this->callTraitMethod('schema', $table);
 
             $driver = Orbit::driver(static::getOrbitalDriver());

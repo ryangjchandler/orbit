@@ -9,6 +9,8 @@ class OrbitManager extends Manager
 {
     protected $testing = false;
 
+    protected array $dynamicSchemaCallbacks = [];
+
     public function test()
     {
         $this->testing = true;
@@ -43,5 +45,18 @@ class OrbitManager extends Manager
     public function getContentPath()
     {
         return config('orbit.paths.content');
+    }
+
+    public function registerDynamicSchema(string $table, \Closure $schemaCallback): void
+    {
+        $this->dynamicSchemaCallbacks[$table] = array_merge(
+            $this->dynamicSchemaCallbacks[$table] ?? [],
+            [$schemaCallback]
+        );
+    }
+
+    public function dynamicSchemaCallbacks(string $table): array
+    {
+        return $this->dynamicSchemaCallbacks[$table] ?? [];
     }
 }
