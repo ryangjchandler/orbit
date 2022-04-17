@@ -52,6 +52,8 @@ trait Orbital
                 $driver->schema($table);
             }
 
+            Support::callTraitMethods($model, 'schema', ['table' => $table]);
+
             if ($model->usesTimestamps()) {
                 $table->timestamps();
             }
