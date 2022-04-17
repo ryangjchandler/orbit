@@ -15,7 +15,7 @@ class Markdown implements Driver, ModifiesSchema
         $document = YamlFrontMatter::parseFile($path);
 
         return [
-            'content' => $document->body(),
+            'content' => trim($document->body()),
             ...$document->matter(),
         ];
     }

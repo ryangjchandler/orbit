@@ -30,6 +30,7 @@ trait Orbital
             static::migrate($options);
         }
 
+        static::seedData($options);
         static::observe(OrbitalObserver::class);
     }
 
@@ -65,8 +66,15 @@ trait Orbital
 
         // 3b. Laravel's excellent Filesystem API can make this simple.
         File::ensureDirectoryExists($source);
+    }
 
-        // 4. Now that know all of the correct things are in place, we can start seeding data.
+    protected static function seedData(OrbitOptions $options): void
+    {
+        $model = new static();
+        $driver = $options->getDriver();
+        $source = $options->getSource($model);
+
+        // 1. Now that know all of the correct things are in place, we can start seeding data.
         //    The first step is finding all files in the source directory.
         $files = Finder::create()
             ->in($source)
@@ -74,7 +82,7 @@ trait Orbital
             ->name("*.{$driver->extension()}")
             ->sortByModifiedTime();
 
-        // 4a. For each of the files in that directory, we need to insert a record into the
+        // 1a. For each of the files in that directory, we need to insert a record into the
         //     the SQLite database cache.
         foreach ($files as $file) {
             $path = $file->getPathname();
@@ -85,7 +93,7 @@ trait Orbital
 
             $record = new static($driver->fromFile($file->getPathname()));
 
-            // 4b. We want to updateOrCreate so that we don't need to wipe out
+            // 1b. We want to updateOrCreate so that we don't need to wipe out
             //     the entire cache. This should be a performance boost on larger project.
             static::query()->updateOrCreate([
                 $record->getKeyName() => $record->getKey(),
