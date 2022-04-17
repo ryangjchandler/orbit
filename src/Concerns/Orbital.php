@@ -2,14 +2,13 @@
 
 namespace Orbit\Concerns;
 
-use Orbit\Support;
-use Orbit\OrbitOptions;
-use Orbit\Facades\Orbit;
-use Orbit\Contracts\ModifiesSchema;
-use Illuminate\Support\Facades\File;
-use Orbit\Observers\OrbitalObserver;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\File;
+use Orbit\Contracts\ModifiesSchema;
+use Orbit\Observers\OrbitalObserver;
+use Orbit\OrbitOptions;
+use Orbit\Support;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -37,7 +36,7 @@ trait Orbital
     /** @internal */
     protected static function migrate(OrbitOptions $options): void
     {
-        $model = new static;
+        $model = new static();
         $schema = static::resolveConnection()->getSchemaBuilder();
         $table = $model->getTable();
         $driver = $options->getDriver();

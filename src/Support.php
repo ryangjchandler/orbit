@@ -3,10 +3,9 @@
 namespace Orbit;
 
 use Illuminate\Database\Eloquent\Model;
-use ReflectionClass;
-use Orbit\Facades\Orbit;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\App;
+use Orbit\Facades\Orbit;
+use ReflectionClass;
 
 /** @internal */
 final class Support
@@ -45,7 +44,7 @@ final class Support
             return true;
         }
 
-        $table = (new $modelClass)->getTable();
+        $table = (new $modelClass())->getTable();
 
         if (! $modelClass::resolveConnection()->getSchemaBuilder()->hasTable($table)) {
             return true;

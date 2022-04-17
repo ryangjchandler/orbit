@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Database\Eloquent\Model;
 use Orbit\Tests\TestCase;
 
 use function PHPUnit\Framework\assertStringContainsString;

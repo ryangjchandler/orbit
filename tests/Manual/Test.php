@@ -1,9 +1,8 @@
 <?php
 
-use Orbit\Tests\Manual;
 
-use function PHPUnit\Framework\assertFileExists;
 use Orbit\Tests\Manual\Manual as Model;
+use function PHPUnit\Framework\assertFileExists;
 
 test('manual > creating a file manually adds it to the cache', function () {
     file_put_contents(__DIR__ . '/content/1.md', <<<'md'

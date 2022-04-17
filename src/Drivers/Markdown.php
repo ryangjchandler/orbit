@@ -3,7 +3,6 @@
 namespace Orbit\Drivers;
 
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\File;
 use Orbit\Contracts\Driver;
 use Orbit\Contracts\ModifiesSchema;
 use Spatie\YamlFrontMatter\YamlFrontMatter;

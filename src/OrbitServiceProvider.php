@@ -17,7 +17,7 @@ class OrbitServiceProvider extends PackageServiceProvider
     public function packageRegistered()
     {
         $this->app->singleton(Orbit::class, function () {
-            return new Orbit;
+            return new Orbit();
         });
 
         /** @var Orbit $orbit */
