@@ -9,6 +9,7 @@ use Orbit\Contracts\ModifiesSchema;
 use Illuminate\Support\Facades\File;
 use Orbit\Observers\OrbitalObserver;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Arr;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -71,17 +72,23 @@ trait Orbital
         $files = Finder::create()
             ->in($source)
             ->files()
-            ->name("*.{$driver->extension()}");
+            ->name("*.{$driver->extension()}")
+            ->sortByModifiedTime();
 
         // 4a. For each of the files in that directory, we need to insert a record into the
         //     the SQLite database cache.
         foreach ($files as $file) {
-            // TODO: We should check if the file actually needs to be seeded here.
-            //       If the filemtime is less than the database or model, then it
-            //       doesn't need to be touched.
-            $attributes = $driver->fromFile($file->getPathname());
+            $path = $file->getPathname();
 
-            static::create($attributes);
+            if (! Support::fileNeedsToBeSeeded($path, static::class)) {
+                continue;
+            }
+
+            $record = new static($driver->fromFile($file->getPathname()));
+
+            static::query()->updateOrCreate([
+                $record->getKeyName() => $record->getKey(),
+            ], Arr::except($record->getAttributes(), $record->getKeyName()));
         }
     }
 }

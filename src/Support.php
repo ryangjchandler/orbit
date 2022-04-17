@@ -24,6 +24,14 @@ final class Support
         }
     }
 
+    public static function fileNeedsToBeSeeded(string $path, string $modelClass): bool
+    {
+        $changedTime = filemtime($path);
+        $modelFile = (new ReflectionClass($modelClass))->getFileName();
+
+        return $changedTime > filemtime($modelFile) || $changedTime > filemtime(Orbit::getCachePath());
+    }
+
     /** @param class-string<\Illuminate\Database\Eloquent\Model> $modelClass */
     public static function modelNeedsMigration(string $modelClass): bool
     {
