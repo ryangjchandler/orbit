@@ -9,6 +9,7 @@ use Orbit\Contracts\ModifiesSchema;
 use Illuminate\Support\Facades\File;
 use Orbit\Observers\OrbitalObserver;
 use Illuminate\Database\Schema\Blueprint;
+use Symfony\Component\Finder\Finder;
 
 /**
  * @mixin \Illuminate\Database\Eloquent\Model
@@ -62,5 +63,23 @@ trait Orbital
 
         // 3b. Laravel's excellent Filesystem API can make this simple.
         File::ensureDirectoryExists($source);
+
+        // 4. Now that know all of the correct things are in place, we can start seeding data.
+        //    The first step is finding all files in the source directory.
+        $files = Finder::create()
+            ->in($source)
+            ->files()
+            ->name("*.{$driver->extension()}");
+
+        // 4a. For each of the files in that directory, we need to insert a record into the
+        //     the SQLite database cache.
+        foreach ($files as $file) {
+            // TODO: We should check if the file actually needs to be seeded here.
+            //       If the filemtime is less than the database or model, then it
+            //       doesn't need to be touched.
+            $attributes = $driver->fromFile($file->getPathname());
+
+            static::create($attributes);
+        }
     }
 }

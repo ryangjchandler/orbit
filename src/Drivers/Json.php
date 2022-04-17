@@ -16,8 +16,8 @@ class Json implements Driver
         return '';
     }
 
-    public function extension(): string|array
+    public function extension(): string
     {
-        return ['json'];
+        return 'json';
     }
 }
