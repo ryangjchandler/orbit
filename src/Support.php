@@ -2,6 +2,7 @@
 
 namespace Orbit;
 
+use Illuminate\Database\Eloquent\Model;
 use ReflectionClass;
 use Orbit\Facades\Orbit;
 use Illuminate\Support\Str;
@@ -10,7 +11,7 @@ use Illuminate\Support\Facades\App;
 /** @internal */
 final class Support
 {
-    public static function callTraitMethods(mixed $object, string $prefix, array $args = []): void
+    public static function callTraitMethods(Model $object, string $prefix, array $args = []): void
     {
         foreach (class_uses_recursive($object) as $trait) {
             $method = $prefix . class_basename($trait);
