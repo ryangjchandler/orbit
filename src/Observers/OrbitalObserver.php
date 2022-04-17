@@ -78,6 +78,8 @@ class OrbitalObserver
     private function getModelAttributes(Model $model)
     {
         // TODO: Do we need to do anything special here for casted values?
-        return $model->getAttributes();
+        return collect($model->getAttributes())
+            ->map(fn ($_, string $key) => $model->{$key})
+            ->toArray();
     }
 }

@@ -39,6 +39,14 @@ test('simple > updating a model updates the file', function () {
     assertFileContains(__DIR__ . '/content/1.md', $s->title);
 });
 
+test('simple > default column values are persisted to disk', function () {
+    Simple::create([
+        'title' => 'Foobar',
+    ]);
+
+    assertFileContains(__DIR__ . '/content/1.md', 'published: false');
+});
+
 afterEach(function () {
     Simple::all()->each->delete();
 });

@@ -13,10 +13,15 @@ class Simple extends Model
 
     protected $guarded = [];
 
+    protected $casts = [
+        'published' => 'bool',
+    ];
+
     public static function schema(Blueprint $table): void
     {
         $table->id();
         $table->string('title');
+        $table->boolean('published')->default(false);
     }
 
     public static function getOrbitOptions(): OrbitOptions
