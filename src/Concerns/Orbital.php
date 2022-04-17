@@ -85,6 +85,8 @@ trait Orbital
 
             $record = new static($driver->fromFile($file->getPathname()));
 
+            // 4b. We want to updateOrCreate so that we don't need to wipe out
+            //     the entire cache. This should be a performance boost on larger project.
             static::query()->updateOrCreate([
                 $record->getKeyName() => $record->getKey(),
             ], Arr::except($record->getAttributes(), $record->getKeyName()));
