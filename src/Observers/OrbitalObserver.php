@@ -39,7 +39,7 @@ class OrbitalObserver
     /** @param Model&Orbital $model */
     public function updated(Model $model): void
     {
-        $options = $model->getOrbitOptions();
+        $options = $model::getOrbitOptions();
         $source = $options->getSource($model);
         $driver = $options->getDriver();
         $filename = "{$model->getKey()}.{$this->getPrimaryExtensionForDriver($driver)}";
@@ -61,7 +61,7 @@ class OrbitalObserver
     /** @param Model&Orbital $model */
     public function deleted(Model $model): void
     {
-        $options = $model->getOrbitOptions();
+        $options = $model::getOrbitOptions();
         $source = $options->getSource($model);
         $driver = $options->getDriver();
         $filename = "{$model->getKey()}.{$this->getPrimaryExtensionForDriver($driver)}";
