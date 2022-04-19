@@ -2,12 +2,12 @@
 
 namespace Orbit;
 
-use ReflectionClass;
-use Orbit\Facades\Orbit;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\App;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Str;
 use Orbit\Contracts\Driver;
+use Orbit\Facades\Orbit;
+use ReflectionClass;
 
 /** @internal */
 final class Support

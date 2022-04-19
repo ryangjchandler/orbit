@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Database\Eloquent\Model;
 use Orbit\Tests\DefaultColumnValues\DefaultColumnValues;
 
 use function PHPUnit\Framework\assertFileExists;
