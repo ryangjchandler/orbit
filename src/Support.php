@@ -20,11 +20,13 @@ final class Support
 
         return Str::of($pattern)
             ->explode('/')
-            ->map(static function (string $part): string {
-                return trim($part, '{}');
-            })
             ->map(static function (string $part) use ($object): string {
+                if (! Str::startsWith($part, '{') && ! Str::endsWith($part, '}')) {
+                    return $part;
+                }
+
                 [$source, $arg] = Str::of($part)
+                    ->trim('{}')
                     ->whenContains(':',
                         fn ($str) => $str->explode(':', 2),
                         fn ($str) => [$str->toString(), null],
