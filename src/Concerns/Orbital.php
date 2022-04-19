@@ -3,7 +3,6 @@
 namespace Orbit\Concerns;
 
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
 use Orbit\Contracts\ModifiesSchema;
 use Orbit\Facades\Orbit;
