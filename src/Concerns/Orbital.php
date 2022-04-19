@@ -37,9 +37,11 @@ trait Orbital
 
         if (Support::modelNeedsMigration(static::class)) {
             static::migrate($options);
+            static::seedData($options, force: true);
+        } else {
+            static::seedData($options);
         }
 
-        static::seedData($options);
         static::observe(OrbitalObserver::class);
     }
 
@@ -77,7 +79,7 @@ trait Orbital
         File::ensureDirectoryExists($source);
     }
 
-    protected static function seedData(OrbitOptions $options): void
+    protected static function seedData(OrbitOptions $options, bool $force = false): void
     {
         $model = new static();
         $driver = $options->getDriver();
@@ -96,7 +98,7 @@ trait Orbital
         foreach ($files as $file) {
             $path = $file->getPathname();
 
-            if (! Support::fileNeedsToBeSeeded($path, static::class)) {
+            if (! Support::fileNeedsToBeSeeded($path, static::class) && ! $force) {
                 continue;
             }
 
