@@ -2,6 +2,8 @@
 
 namespace Orbit;
 
+use Carbon\Carbon;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
@@ -22,9 +24,23 @@ final class Support
                 return trim($part, '{}');
             })
             ->map(static function (string $part) use ($object): string {
-                if (method_exists($object, $part)) {
-                    return $object->{$part}();
+                [$source, $arg] = Str::of($part)
+                    ->whenContains(':',
+                        fn ($str) => $str->explode(':', 2),
+                        fn ($str) => [$str->toString(), null],
+                    );
+
+                if (method_exists($object, $source)) {
+                    return $object->{$source}();
                 }
+
+                $property = $object->{$source};
+
+                if ($property instanceof DateTimeInterface) {
+                    return $arg ? $property->format($arg) : $property->format($object->getDateFormat());
+                }
+
+                return $property;
             })
             ->implode('/') . '.' . $driver->extension();
     }

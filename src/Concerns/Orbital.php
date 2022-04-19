@@ -2,10 +2,12 @@
 
 namespace Orbit\Concerns;
 
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\File;
 use Orbit\Contracts\ModifiesSchema;
 use Orbit\Facades\Orbit;
+use Orbit\Models\Meta;
 use Orbit\Observers\OrbitalObserver;
 use Orbit\OrbitOptions;
 use Orbit\Support;
@@ -116,5 +118,10 @@ trait Orbital
                 $record->getKeyName() => $record->getKey(),
             ], $attributes);
         }
+    }
+
+    public function orbitMeta(): MorphOne
+    {
+        return $this->morphOne(Meta::class, 'orbital');
     }
 }

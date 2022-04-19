@@ -32,8 +32,9 @@ class OrbitalObserver
 
         // TODO: Add support for custom paths here.
         $source = $options->getSource($model);
-        $filename = "{$model->getKey()}.{$this->getPrimaryExtensionForDriver($driver)}";
+        $filename = Support::generateFilename($model, $options, $driver);
 
+        File::ensureDirectoryExists($source . DIRECTORY_SEPARATOR . dirname($filename));
         File::put($source . DIRECTORY_SEPARATOR . $filename, $serialised);
     }
 
@@ -56,6 +57,7 @@ class OrbitalObserver
         // 2. We can then write to the new file, storing the updated contents of the model.
         $serialised = $driver->toFile($this->getModelAttributes($model));
 
+        File::ensureDirectoryExists(dirname($filename));
         File::put($source . DIRECTORY_SEPARATOR . $filename, $serialised);
     }
 
