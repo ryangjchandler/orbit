@@ -38,7 +38,7 @@ class OrbitalObserver
             'file_path_read_from' => $filename,
         ]);
 
-        File::ensureDirectoryExists($source . DIRECTORY_SEPARATOR . dirname($filename));
+        File::ensureDirectoryExists(dirname($source . DIRECTORY_SEPARATOR . $filename));
         File::put($source . DIRECTORY_SEPARATOR . $filename, $serialised);
     }
 
@@ -59,7 +59,7 @@ class OrbitalObserver
         // 2. We can then write to the new file, storing the updated contents of the model.
         $serialised = $driver->toFile($this->getModelAttributes($model));
 
-        File::ensureDirectoryExists(dirname($filename));
+        File::ensureDirectoryExists(dirname($source . DIRECTORY_SEPARATOR . $filename));
         File::put($source . DIRECTORY_SEPARATOR . $filename, $serialised);
 
         $model->orbitMeta->update([
