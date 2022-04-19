@@ -41,6 +41,6 @@ class OrbitServiceProvider extends PackageServiceProvider
         Blueprint::macro('hasColumn', function (string $name): bool {
             /** @var \Illuminate\Database\Schema\Blueprint $this */
             return collect($this->getColumns())->firstWhere(fn (ColumnDefinition $columnDefinition) => $columnDefinition->get('name') === $name) !== null;
-        })
+        });
     }
 }
