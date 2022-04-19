@@ -4,6 +4,10 @@
 
 The release of v2.x contains quite a few breaking changes. The package itself does the same thing but the configuration language is different.
 
+### PHP 8.1
+
+In the constant pursit of moving forward, Orbit 2.x now only supports PHP versions greater than or equal to 8.1.
+
 ### `schema()` method signature
 
 The `Orbital::schema()` method now has a `void` return type in the method signature. You need to change your own methods to conform to the new signature.
