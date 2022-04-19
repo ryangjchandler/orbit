@@ -6,6 +6,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
 use Orbit\Contracts\ModifiesSchema;
+use Orbit\Facades\Orbit;
 use Orbit\Observers\OrbitalObserver;
 use Orbit\OrbitOptions;
 use Orbit\Support;
@@ -28,6 +29,10 @@ trait Orbital
 
         if (! $options->isEnabled()) {
             return;
+        }
+
+        if (! File::exists(Orbit::getCachePath())) {
+            File::put(Orbit::getCachePath(), '');
         }
 
         if (Support::modelNeedsMigration(static::class)) {
