@@ -103,9 +103,14 @@ trait Orbital
             }
 
             $record = new static($driver->fromFile($file->getPathname()));
-            $attributes = Arr::except($record->getAttributes(), $record->getKeyName());
+            $schema = static::resolveConnection()->getSchemaBuilder()->getColumnListing($record->getTable());
 
-            // 1b. We want to updateOrCreate so that we don't need to wipe out
+            // 1b. We need to drop any values from the file that do not have a valid DB column.
+            $attributes = collect($record->getAttributes())
+                ->except($record->getKeyName())
+                ->only($schema);
+
+            // 1c. We want to updateOrCreate so that we don't need to wipe out
             //     the entire cache. This should be a performance boost on larger projects.
             static::query()->updateOrCreate([
                 $record->getKeyName() => $record->getKey(),
