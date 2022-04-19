@@ -1,0 +1,33 @@
+.nav-menu {
+    @apply .-mt-12;
+    @apply .-mx-8;
+    @apply .bg-gray-200;
+    @apply .mb-8;
+    @apply .pb-4;
+    @apply .pt-8;
+    @apply .px-4;
+    @apply .shadow;
+    @apply .w-auto;
+
+    @screen lg {
+        @apply .-mx-4;
+        @apply .bg-transparent;
+        @apply .block;
+        @apply .border-b-0;
+        @apply .mt-1;
+        @apply .pl-0;
+        @apply .pr-4;
+        @apply .pt-0;
+        @apply .shadow-none;
+        @apply .w-1/4;
+    }
+}
+
+.nav-menu__item {
+    @apply .block;
+    @apply .no-underline;
+    @apply .mb-3;
+    @apply .mt-0;
+    @apply .text-gray-800;
+    @apply .text-sm;
+}
