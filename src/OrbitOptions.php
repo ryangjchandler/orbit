@@ -74,7 +74,7 @@ final class OrbitOptions
 
     public function getFilenameGenerator(): ?Closure
     {
-        return $this->generateFilenameUsing ?? fn () => '{getKeyName}';
+        return $this->generateFilenameUsing ?? fn () => '{getKey}';
     }
 
     public function isEnabled(): bool

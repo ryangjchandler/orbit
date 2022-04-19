@@ -7,6 +7,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
 use Orbit\Concerns\Orbital;
 use Orbit\Contracts\Driver;
+use Orbit\Support;
 
 class OrbitalObserver
 {
@@ -42,7 +43,7 @@ class OrbitalObserver
         $options = $model::getOrbitOptions();
         $source = $options->getSource($model);
         $driver = $options->getDriver();
-        $filename = "{$model->getKey()}.{$this->getPrimaryExtensionForDriver($driver)}";
+        $filename = Support::generateFilename($model, $options, $driver);
 
         // 1. In some cases, the primary key of a record might change during a save.
         //    If that does happen, we need to clean things up and remove the old file.

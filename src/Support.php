@@ -2,14 +2,33 @@
 
 namespace Orbit;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\App;
-use Orbit\Facades\Orbit;
 use ReflectionClass;
+use Orbit\Facades\Orbit;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\App;
+use Illuminate\Database\Eloquent\Model;
+use Orbit\Contracts\Driver;
 
 /** @internal */
 final class Support
 {
+    public static function generateFilename(Model $object, OrbitOptions $options, Driver $driver): string
+    {
+        $pattern = app()->call($options->getFilenameGenerator());
+
+        return Str::of($pattern)
+            ->explode('/')
+            ->map(static function (string $part): string {
+                return trim($part, '{}');
+            })
+            ->map(static function (string $part) use ($object): string {
+                if (method_exists($object, $part)) {
+                    return $object->{$part}();
+                }
+            })
+            ->implode('/') . '.' . $driver->extension();
+    }
+
     public static function callTraitMethods(Model $object, string $prefix, array $args = []): void
     {
         $called = [];
