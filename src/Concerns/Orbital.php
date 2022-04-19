@@ -21,10 +21,6 @@ trait Orbital
 {
     use Internal\HandlesOrbitConnection;
 
-    abstract public static function schema(Blueprint $table): void;
-
-    abstract public static function getOrbitOptions(): OrbitOptions;
-
     public static function bootOrbital(): void
     {
         $options = static::getOrbitOptions();

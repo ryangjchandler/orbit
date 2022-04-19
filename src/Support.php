@@ -8,13 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use Orbit\Contracts\Driver;
+use Orbit\Contracts\IsOrbital;
 use Orbit\Facades\Orbit;
 use ReflectionClass;
 
 /** @internal */
 final class Support
 {
-    public static function generateFilename(Model $object, OrbitOptions $options, Driver $driver): string
+    public static function generateFilename(Model & IsOrbital $object, OrbitOptions $options, Driver $driver): string
     {
         $pattern = app()->call($options->getFilenameGenerator());
 
@@ -46,7 +47,7 @@ final class Support
             ->implode('/') . '.' . $driver->extension();
     }
 
-    public static function callTraitMethods(Model $object, string $prefix, array $args = []): void
+    public static function callTraitMethods(Model & IsOrbital $object, string $prefix, array $args = []): void
     {
         $called = [];
 

@@ -5,9 +5,10 @@ namespace Orbit\Tests\DefaultColumnValues;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Orbit\Concerns\Orbital;
+use Orbit\Contracts\IsOrbital;
 use Orbit\OrbitOptions;
 
-class DefaultColumnValues extends Model
+class DefaultColumnValues extends Model implements IsOrbital
 {
     use Orbital;
 

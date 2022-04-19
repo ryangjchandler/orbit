@@ -5,9 +5,10 @@ namespace Orbit\Tests\CustomFilepath;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Orbit\Concerns\Orbital;
+use Orbit\Contracts\IsOrbital;
 use Orbit\OrbitOptions;
 
-class StaticCustomFilepath extends Model
+class StaticCustomFilepath extends Model implements IsOrbital
 {
     use Orbital;
 

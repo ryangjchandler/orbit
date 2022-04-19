@@ -5,9 +5,10 @@ namespace Orbit\Tests\Simple;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Orbit\Concerns\Orbital;
+use Orbit\Contracts\IsOrbital;
 use Orbit\OrbitOptions;
 
-class Simple extends Model
+class Simple extends Model implements IsOrbital
 {
     use Orbital;
 

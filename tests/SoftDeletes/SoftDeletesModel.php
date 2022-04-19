@@ -6,9 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Orbit\Concerns\Orbital;
 use Orbit\Concerns\SoftDeletes;
+use Orbit\Contracts\IsOrbital;
 use Orbit\OrbitOptions;
 
-class SoftDeletesModel extends Model
+class SoftDeletesModel extends Model implements IsOrbital
 {
     use Orbital;
     use SoftDeletes;

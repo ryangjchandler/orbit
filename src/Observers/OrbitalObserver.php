@@ -8,11 +8,11 @@ use Illuminate\Support\Facades\File;
 use Orbit\Concerns\Orbital;
 use Orbit\Contracts\Driver;
 use Orbit\Support;
+use Orbit\Contracts\IsOrbital;
 
 class OrbitalObserver
 {
-    /** @param Model&Orbital $model */
-    public function created(Model $model): void
+    public function created(Model & IsOrbital $model): void
     {
         $options = $model::getOrbitOptions();
 
@@ -42,8 +42,7 @@ class OrbitalObserver
         File::put($source . DIRECTORY_SEPARATOR . $filename, $serialised);
     }
 
-    /** @param Model&Orbital $model */
-    public function updated(Model $model): void
+    public function updated(Model & IsOrbital $model): void
     {
         $options = $model::getOrbitOptions();
         $source = $options->getSource($model);
@@ -67,8 +66,7 @@ class OrbitalObserver
         ]);
     }
 
-    /** @param Model&Orbital $model */
-    public function deleted(Model $model): void
+    public function deleted(Model & IsOrbital $model): void
     {
         $options = $model::getOrbitOptions();
         $source = $options->getSource($model);
@@ -78,7 +76,7 @@ class OrbitalObserver
         File::delete($source . DIRECTORY_SEPARATOR . $filename);
     }
 
-    private function getModelAttributes(Model $model)
+    private function getModelAttributes(Model & IsOrbital $model)
     {
         // TODO: Do we need to do anything special here for casted values?
         return collect($model->getAttributes())

@@ -8,7 +8,10 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 
-/** @internal */
+/**
+ * @internal
+ * @property string|null $file_path_read_from
+ */
 final class Meta extends Model
 {
     protected $guarded = [];
