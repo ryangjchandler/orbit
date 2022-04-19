@@ -2,6 +2,8 @@
 
 namespace Orbit;
 
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\ColumnDefinition;
 use Orbit\Commands\UpgradeCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -32,5 +34,13 @@ class OrbitServiceProvider extends PackageServiceProvider
             'database' => $orbit->getCachePath(),
             'foreign_key_constraints' => false,
         ]);
+    }
+
+    public function packageBooted()
+    {
+        Blueprint::macro('hasColumn', function (string $name): bool {
+            /** @var \Illuminate\Database\Schema\Blueprint $this */
+            return collect($this->getColumns())->firstWhere(fn (ColumnDefinition $columnDefinition) => $columnDefinition->get('name') === $name) !== null;
+        })
     }
 }

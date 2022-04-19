@@ -41,6 +41,8 @@ class Markdown implements Driver, ModifiesSchema
 
     public function schema(Blueprint $table): void
     {
-        $table->longText('content')->nullable();
+        if (! $table->hasColumn('content')) {
+            $table->longText('content')->nullable();
+        }
     }
 }
