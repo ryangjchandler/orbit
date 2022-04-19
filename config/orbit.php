@@ -1,6 +1,10 @@
 <?php
 
+use Orbit\Drivers\Markdown;
+
 return [
+
+    'driver' => Markdown::class,
 
     'paths' => [
         'content' => base_path('content'),

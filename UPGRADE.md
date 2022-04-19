@@ -46,6 +46,36 @@ class MyModel extends Model
 }
 ```
 
+### Default driver
+
+Orbit 1.x had an `orbit.default` configuration option that would set the default driver for all Orbit-powered models. This has now been changed to `orbit.driver` and expects a fully-qualified class name instead of a string literal.
+
+**Before**
+
+```php
+return [
+    
+    'default' => env('ORBIT_DEFAULT_DRIVER', 'md'),
+
+    // ...
+
+];
+```
+
+**After**
+
+```php
+use Orbit\Drivers\Markdown;
+
+return [
+    
+    'driver' => Markdown::class,
+
+    // ...
+
+];
+```
+
 ## Upgrade from `v0.x` to `v1.x`
 
 The release of v1.x of Orbit contains a couple of breaking changes and incompatibilities with previous versions. Please see the information below:
