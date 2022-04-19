@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\File;
 use Orbit\Models\Meta;
 use Orbit\Tests\CustomFilepath\CustomFilepath;
+use Orbit\Tests\CustomFilepath\StaticCustomFilepath;
 
 use function PHPUnit\Framework\assertFileDoesNotExist;
 use function PHPUnit\Framework\assertFileExists;
@@ -55,6 +56,40 @@ test('custom filepath > correctly removes outdated files when filepath changes',
     assertFileDoesNotExist(__DIR__ . '/content/' . $record->published_at->format('Y-m-d') . '/barbar.md');
 });
 
+test('custom filepath > it can use static data in filepath', function () {
+    StaticCustomFilepath::create([
+        'title' => 'foobar'
+    ]);
+
+    assertFileExists(__DIR__ . '/static-content/static-folder/foobar.md');
+});
+
+test('custom filepath > it can seed data from file with static filepath', function () {
+    if (! is_dir($path = __DIR__ . '/static-content/static-folder')) {
+        File::ensureDirectoryExists($path);
+    }
+
+    file_put_contents($path . '/bahbah.md', <<<'md'
+    ---
+    id: 1
+    title: bahbah
+    ---
+    md);
+
+    $record = StaticCustomFilepath::first();
+
+    expect($record)
+        ->title->toBe('bahbah');
+
+    $record->update([
+        'title' => 'blahblah'
+    ]);
+
+    assertFileExists(__DIR__ . '/static-content/static-folder/blahblah.md');
+    assertFileDoesNotExist(__DIR__ . '/static-content/static-folder/bahbah.md');
+});
+
 afterEach(function () {
     CustomFilepath::all()->each->delete();
+    StaticCustomFilepath::all()->each->delete();
 });
