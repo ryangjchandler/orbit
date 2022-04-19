@@ -20,6 +20,15 @@ final class OrbitOptions
 
     private ?Closure $generateFilenameUsing = null;
 
+    private bool $enabled = true;
+
+    public function disable(): self
+    {
+        $this->enabled = false;
+
+        return $this;
+    }
+
     public function driver(string $driver): self
     {
         $this->driver = $driver;
@@ -66,6 +75,11 @@ final class OrbitOptions
     public function getFilenameGenerator(): ?Closure
     {
         return $this->generateFilenameUsing ?? fn () => '{getKeyName}';
+    }
+
+    public function isEnabled(): bool
+    {
+        return $this->enabled;
     }
 
     public static function make(): self

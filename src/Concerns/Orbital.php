@@ -26,6 +26,10 @@ trait Orbital
     {
         $options = static::getOrbitOptions();
 
+        if (! $options->isEnabled()) {
+            return;
+        }
+
         if (Support::modelNeedsMigration(static::class)) {
             static::migrate($options);
         }
