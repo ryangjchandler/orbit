@@ -2,16 +2,17 @@
 
 namespace Orbit\Concerns;
 
-use Illuminate\Database\Eloquent\Relations\MorphOne;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\File;
-use Orbit\Contracts\ModifiesSchema;
-use Orbit\Facades\Orbit;
-use Orbit\Models\Meta;
-use Orbit\Observers\OrbitalObserver;
-use Orbit\OrbitOptions;
 use Orbit\Support;
+use Orbit\Models\Meta;
+use Orbit\OrbitOptions;
+use Orbit\Facades\Orbit;
+use Illuminate\Support\Str;
+use Orbit\Contracts\ModifiesSchema;
+use Illuminate\Support\Facades\File;
+use Orbit\Observers\OrbitalObserver;
 use Symfony\Component\Finder\Finder;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 /**
  * @mixin \Illuminate\Database\Eloquent\Model
@@ -114,14 +115,19 @@ trait Orbital
 
             // 1c. We want to updateOrCreate so that we don't need to wipe out
             //     the entire cache. This should be a performance boost on larger projects.
-            static::query()->updateOrCreate([
+            $record = static::query()->updateOrCreate([
                 $record->getKeyName() => $record->getKey(),
             ], $attributes);
+
+            $record->orbitMeta()->delete();
+            $record->orbitMeta()->create([
+                'file_path_read_from' => Str::after($path, $options->getSource($record)),
+            ]);
         }
     }
 
     public function orbitMeta(): MorphOne
     {
-        return $this->morphOne(Meta::class, 'orbital');
+        return $this->morphOne(Meta::class, 'orbital', id: 'orbital_key');
     }
 }

@@ -2,10 +2,12 @@
 
 namespace Orbit;
 
+use Orbit\Commands\UpgradeCommand;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Schema;
+use Spatie\LaravelPackageTools\Package;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ColumnDefinition;
-use Orbit\Commands\UpgradeCommand;
-use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 class OrbitServiceProvider extends PackageServiceProvider
@@ -44,6 +46,19 @@ class OrbitServiceProvider extends PackageServiceProvider
 
     public function packageBooted()
     {
+        if (! File::exists($metaPath = storage_path('framework/cache/orbit_meta.sqlite'))) {
+            File::put($metaPath, '');
+        }
+
+        if (! Schema::connection('orbit_meta')->hasTable('metas')) {
+            Schema::connection('orbit_meta')->create('metas', function (Blueprint $table) {
+                $table->id();
+                $table->string('orbital_type')->index();
+                $table->string('orbital_key')->index();
+                $table->string('file_path_read_from')->nullable();
+            });
+        }
+
         Blueprint::macro('hasColumn', function (string $name): bool {
             /** @var \Illuminate\Database\Schema\Blueprint $this */
             return collect($this->getColumns())->firstWhere(fn (ColumnDefinition $columnDefinition) => $columnDefinition->get('name') === $name) !== null;

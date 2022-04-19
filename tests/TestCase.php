@@ -21,5 +21,6 @@ class TestCase extends BaseTestCase
     {
         $app['config']->set('database.connections.sqlite.database', ':memory:');
         $app['config']->set('database.connections.orbit.database', ':memory:');
+        $app['config']->set('database.connections.orbit_meta.database', ':memory:');
     }
 }
