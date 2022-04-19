@@ -4,6 +4,22 @@
 
 The release of v2.x contains quite a few breaking changes. The package itself does the same thing but the configuration language is different.
 
+### `schema()` method signature
+
+The `Orbital::schema()` method now has a `void` return type in the method signature. You need to change your own methods to conform to the new signature.
+
+```php
+class MyModel extends Model
+{
+    use Orbital;
+
+    public static function schema(Blueprint $table): void
+    {
+        // ...
+    }
+}
+```
+
 ### Model configuration
 
 When configuring your models in Orbit 1.x, you would typically create methods such as `getOrbitalDriver`, etc. This has now been minified into a single `getOrbitOptions` method that uses a builder object for configuration.
