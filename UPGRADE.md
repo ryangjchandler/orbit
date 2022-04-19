@@ -8,7 +8,13 @@ The release of v2.x contains quite a few breaking changes. The package itself do
 
 In the constant pursit of moving forward, Orbit 2.x now only supports PHP versions greater than or equal to 8.1.
 
-### `schema()` method signature
+### New `IsOrbital` contract
+
+To improve static analysis in the Orbit project, we've introduced a new `Orbit\Contracts\IsOrbital` interface that needs to be implemented on all Orbit-powered models.
+
+This interface will require you to change some method signatures and implement some new methods.
+
+#### `schema()` method signature
 
 The `Orbital::schema()` method now has a `void` return type in the method signature. You need to change your own methods to conform to the new signature.
 
@@ -24,7 +30,7 @@ class MyModel extends Model
 }
 ```
 
-### Model configuration
+#### Model configuration
 
 When configuring your models in Orbit 1.x, you would typically create methods such as `getOrbitalDriver`, etc. This has now been minified into a single `getOrbitOptions` method that uses a builder object for configuration.
 
