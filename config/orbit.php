@@ -8,7 +8,7 @@ return [
 
     'paths' => [
         'content' => base_path('content'),
-        'cache' => storage_path('framework/cache'),
+        'cache' => storage_path('framework/cache/orbit.sqlite'),
     ],
 
 ];
