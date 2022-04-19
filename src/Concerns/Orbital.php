@@ -108,7 +108,8 @@ trait Orbital
             // 1b. We need to drop any values from the file that do not have a valid DB column.
             $attributes = collect($record->getAttributes())
                 ->except($record->getKeyName())
-                ->only($schema);
+                ->only($schema)
+                ->toArray();
 
             // 1c. We want to updateOrCreate so that we don't need to wipe out
             //     the entire cache. This should be a performance boost on larger projects.
