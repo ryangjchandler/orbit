@@ -25,12 +25,11 @@ final class Support
                     return $part;
                 }
 
-                [$source, $arg] = Str::of($part)
-                    ->trim('{}')
-                    ->whenContains(':',
-                        fn ($str) => $str->explode(':', 2),
-                        fn ($str) => [$str->toString(), null],
-                    );
+                $part = Str::of($part)->trim('{}');
+
+                [$source, $arg] = $part->contains(':') ?
+                    $part->explode(':', 2)->all() :
+                    [$part->toString(), null];
 
                 if (method_exists($object, $source)) {
                     return $object->{$source}();
