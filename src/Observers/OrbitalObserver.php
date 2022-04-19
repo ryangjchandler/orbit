@@ -34,6 +34,10 @@ class OrbitalObserver
         $source = $options->getSource($model);
         $filename = Support::generateFilename($model, $options, $driver);
 
+        $model->orbitMeta()->create([
+            'file_path_read_from' => $filename,
+        ]);
+
         File::ensureDirectoryExists($source . DIRECTORY_SEPARATOR . dirname($filename));
         File::put($source . DIRECTORY_SEPARATOR . $filename, $serialised);
     }
@@ -48,10 +52,8 @@ class OrbitalObserver
 
         // 1. In some cases, the primary key of a record might change during a save.
         //    If that does happen, we need to clean things up and remove the old file.
-        if ($model->wasChanged($model->getKeyName())) {
-            $oldFilename = "{$model->getOriginal($model->getKeyName())}.{$this->getPrimaryExtensionForDriver($driver)}";
-
-            File::delete($source . DIRECTORY_SEPARATOR . $oldFilename);
+        if ($model->orbitMeta->file_path_read_from !== $filename) {
+            File::delete($source . DIRECTORY_SEPARATOR . $model->orbitMeta->file_path_read_from);
         }
 
         // 2. We can then write to the new file, storing the updated contents of the model.
@@ -59,6 +61,10 @@ class OrbitalObserver
 
         File::ensureDirectoryExists(dirname($filename));
         File::put($source . DIRECTORY_SEPARATOR . $filename, $serialised);
+
+        $model->orbitMeta->update([
+            'file_path_read_from' => $filename,
+        ]);
     }
 
     /** @param Model&Orbital $model */
@@ -66,16 +72,10 @@ class OrbitalObserver
     {
         $options = $model::getOrbitOptions();
         $source = $options->getSource($model);
-        $driver = $options->getDriver();
-        $filename = "{$model->getKey()}.{$this->getPrimaryExtensionForDriver($driver)}";
+        $filename = $model->orbitMeta->file_path_read_from;
 
         // 1. We just need to delete the file here. Nothing special at all.
         File::delete($source . DIRECTORY_SEPARATOR . $filename);
-    }
-
-    private function getPrimaryExtensionForDriver(Driver $driver): string
-    {
-        return Arr::wrap($driver->extension())[0];
     }
 
     private function getModelAttributes(Model $model)

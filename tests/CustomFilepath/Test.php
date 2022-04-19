@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\File;
+use Orbit\Models\Meta;
 use Orbit\Tests\CustomFilepath\CustomFilepath;
 
 use function PHPUnit\Framework\assertFileExists;
@@ -27,8 +28,13 @@ test('custom filepath > reads files with custom filepath', function () {
     ---
     md);
 
-    expect(CustomFilepath::first())
+    $record = CustomFilepath::first();
+
+    expect($record)
         ->title->toBe('bar-baz');
+
+    expect($record->orbitMeta)
+        ->file_path_read_from->toBe('2022-01-01/bar-baz.md');
 });
 
 afterEach(function () {

@@ -46,19 +46,6 @@ class OrbitServiceProvider extends PackageServiceProvider
 
     public function packageBooted()
     {
-        if (! File::exists($metaPath = storage_path('framework/cache/orbit_meta.sqlite'))) {
-            File::put($metaPath, '');
-        }
-
-        if (! Schema::connection('orbit_meta')->hasTable('metas')) {
-            Schema::connection('orbit_meta')->create('metas', function (Blueprint $table) {
-                $table->id();
-                $table->string('orbital_type')->index();
-                $table->string('orbital_key')->index();
-                $table->string('file_path_read_from')->nullable();
-            });
-        }
-
         Blueprint::macro('hasColumn', function (string $name): bool {
             /** @var \Illuminate\Database\Schema\Blueprint $this */
             return collect($this->getColumns())->firstWhere(fn (ColumnDefinition $columnDefinition) => $columnDefinition->get('name') === $name) !== null;

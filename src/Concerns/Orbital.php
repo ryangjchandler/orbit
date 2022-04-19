@@ -119,9 +119,13 @@ trait Orbital
                 $record->getKeyName() => $record->getKey(),
             ], $attributes);
 
-            $record->orbitMeta()->delete();
+            Meta::query()
+                ->where('orbital_type', $record->getMorphClass())
+                ->where('orbital_key', $record->getKey())
+                ->delete();
+
             $record->orbitMeta()->create([
-                'file_path_read_from' => Str::after($path, $options->getSource($record)),
+                'file_path_read_from' => ltrim(Str::after($path, $options->getSource($record)), '/'),
             ]);
         }
     }
