@@ -2,6 +2,7 @@
 
 namespace Orbit;
 
+use Orbit\Commands\UpgradeCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -11,6 +12,9 @@ class OrbitServiceProvider extends PackageServiceProvider
     {
         $package
             ->name('orbit')
+            ->hasCommands([
+                UpgradeCommand::class,
+            ])
             ->hasConfigFile();
     }
 
