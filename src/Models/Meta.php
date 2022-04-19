@@ -22,7 +22,7 @@ final class Meta extends Model
 
     public static function booted()
     {
-        $model = new static;
+        $model = new static();
 
         if (! File::exists(storage_path('framework/cache/orbit_meta.sqlite'))) {
             File::put(storage_path('framework/cache/orbit_meta.sqlite'), '');

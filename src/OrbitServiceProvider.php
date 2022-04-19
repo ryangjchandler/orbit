@@ -2,12 +2,10 @@
 
 namespace Orbit;
 
-use Orbit\Commands\UpgradeCommand;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Schema;
-use Spatie\LaravelPackageTools\Package;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ColumnDefinition;
+use Orbit\Commands\UpgradeCommand;
+use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
 class OrbitServiceProvider extends PackageServiceProvider

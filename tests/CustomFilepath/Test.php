@@ -1,13 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\File;
-use Orbit\Models\Meta;
 use Orbit\Tests\CustomFilepath\CustomFilepath;
 use Orbit\Tests\CustomFilepath\StaticCustomFilepath;
 
 use function PHPUnit\Framework\assertFileDoesNotExist;
 use function PHPUnit\Framework\assertFileExists;
-use function PHPUnit\Framework\assertFileNotExists;
 
 test('custom filepath > creates a file with a custom filepath', function () {
     $record = CustomFilepath::create([
@@ -58,7 +56,7 @@ test('custom filepath > correctly removes outdated files when filepath changes',
 
 test('custom filepath > it can use static data in filepath', function () {
     StaticCustomFilepath::create([
-        'title' => 'foobar'
+        'title' => 'foobar',
     ]);
 
     assertFileExists(__DIR__ . '/static-content/static-folder/foobar.md');
@@ -82,7 +80,7 @@ test('custom filepath > it can seed data from file with static filepath', functi
         ->title->toBe('bahbah');
 
     $record->update([
-        'title' => 'blahblah'
+        'title' => 'blahblah',
     ]);
 
     assertFileExists(__DIR__ . '/static-content/static-folder/blahblah.md');
