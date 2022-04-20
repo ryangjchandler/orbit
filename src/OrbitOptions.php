@@ -14,7 +14,7 @@ final class OrbitOptions
 {
     use Macroable;
 
-    private ?string $driver;
+    private ?string $driver = null;
 
     private ?string $source = null;
 
@@ -52,8 +52,7 @@ final class OrbitOptions
 
     public static function default(): self
     {
-        return self::make()
-            ->driver(Markdown::class);
+        return self::make();
     }
 
     public function getDriver(): Driver
