@@ -10,6 +10,10 @@ class Json implements Driver
     {
         $contents = file_get_contents($path);
 
+        if (! $contents) {
+            return [];
+        }
+
         return json_decode($contents, associative: true);
     }
 
