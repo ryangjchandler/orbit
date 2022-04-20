@@ -4,6 +4,29 @@
 
 The release of v2.x contains quite a few breaking changes. The package itself does the same thing but the configuration language is different.
 
+## Config file
+
+If you've published the config file, be sure to update the content of the file to match below:
+
+```php
+<?php
+
+use Orbit\Drivers\Markdown;
+
+return [
+
+    'driver' => Markdown::class,
+
+    'paths' => [
+        'content' => base_path('content'),
+        'cache' => storage_path('framework/cache/orbit.sqlite'),
+    ],
+
+];
+```
+
+Make any of your own changes accordingly.
+
 ### PHP 8.1
 
 In the constant pursit of moving forward, Orbit 2.x now only supports PHP versions greater than or equal to 8.1.
