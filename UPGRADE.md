@@ -58,8 +58,9 @@ class MyModel extends Model
 ```php
 use Orbit\OrbitOptions;
 use Orbit\Drivers\Json;
+use Orbit\Contracts\IsOrbital;
 
-class MyModel extends Model
+class MyModel extends Model implements IsOrbital
 {
     use Orbital;
 
