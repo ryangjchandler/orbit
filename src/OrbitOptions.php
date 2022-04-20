@@ -61,7 +61,7 @@ final class OrbitOptions
 
     public function getSource(Model $model): string
     {
-        $source = $this->source ?? Str::of($model::class)->classBasename()->kebab()->plural();
+        $source = $this->source ?? Str::of($model::class)->classBasename()->snake()->plural();
 
         if (is_dir($source)) {
             return $source;
