@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Orbit\Contracts\Driver;
-use Orbit\Drivers\Markdown;
 use Orbit\Facades\Orbit;
 
 final class OrbitOptions
