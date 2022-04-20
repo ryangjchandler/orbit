@@ -107,7 +107,9 @@ trait Orbital
             $attributes = collect($record->getAttributes())
                 ->except($record->getKeyName())
                 ->only($schema)
-                ->toArray();
+                // 1bb. This is needed to ensure all values are casted correctly before inserting.
+                ->map(fn ($_, $key) => $record->{$key})
+                ->all();
 
             // 1c. We want to updateOrCreate so that we don't need to wipe out
             //     the entire cache. This should be a performance boost on larger projects.
