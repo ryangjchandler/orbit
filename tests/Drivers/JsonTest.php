@@ -1,11 +1,11 @@
 <?php
 
-use Orbit\Drivers\Json;
-use Orbit\OrbitOptions;
-use Orbit\Concerns\Orbital;
-use Orbit\Contracts\IsOrbital;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Orbit\Concerns\Orbital;
+use Orbit\Contracts\IsOrbital;
+use Orbit\Drivers\Json;
+use Orbit\OrbitOptions;
 
 use function PHPUnit\Framework\assertFileExists;
 
@@ -40,7 +40,7 @@ test('json > can write to a file', function () {
         'content' => [
             'foo' => 'bar',
             'test' => [
-                'baz' => 'bob'
+                'baz' => 'bob',
             ],
         ],
     ]);
@@ -56,7 +56,7 @@ test('json > can read from a json file', function () {
                 'bar' => 'baz',
             ],
             'car' => [
-                'baz' => 'bob'
+                'baz' => 'bob',
             ],
         ],
     ], JSON_PRETTY_PRINT));
