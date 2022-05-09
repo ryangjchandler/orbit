@@ -16,7 +16,6 @@ use Orbit\Support;
 use ReflectionClass;
 use Symfony\Component\Finder\Finder;
 
-
 /**
  * @mixin \Illuminate\Database\Eloquent\Model
  */
@@ -91,7 +90,7 @@ trait Orbital
         $orbitCacheFile = Orbit::getCachePath();
         $modelFile = (new ReflectionClass(static::class))->getFileName();
         $oldestFile = filemtime($modelFile) > filemtime($orbitCacheFile) ? $orbitCacheFile : $modelFile;
-        
+
         // 1. Now that know all of the correct things are in place, we can start seeding data.
         //    The first step is finding all files in the source directory.
         $files = Finder::create()
