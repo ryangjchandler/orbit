@@ -2,6 +2,7 @@
 
 namespace Orbit\Concerns;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\File;
@@ -12,7 +13,9 @@ use Orbit\Models\Meta;
 use Orbit\Observers\OrbitalObserver;
 use Orbit\OrbitOptions;
 use Orbit\Support;
+use ReflectionClass;
 use Symfony\Component\Finder\Finder;
+
 
 /**
  * @mixin \Illuminate\Database\Eloquent\Model
@@ -83,12 +86,19 @@ trait Orbital
         $driver = $options->getDriver();
         $source = $options->getSource($model);
 
+        // 0. Find the oldest file out of model class and the orbit cache.
+        //    This allows us to limit which files are returned in the Finder iterator for performance.
+        $orbitCacheFile = Orbit::getCachePath();
+        $modelFile = (new ReflectionClass(static::class))->getFileName();
+        $oldestFile = filemtime($modelFile) > filemtime($orbitCacheFile) ? $orbitCacheFile : $modelFile;
+        
         // 1. Now that know all of the correct things are in place, we can start seeding data.
         //    The first step is finding all files in the source directory.
         $files = Finder::create()
             ->in($source)
             ->files()
             ->name("*.{$driver->extension()}")
+            ->date('> ' . Carbon::createFromTimestamp(filemtime($oldestFile))->toDateTimeString())
             ->sortByModifiedTime();
 
         // 1a. For each of the files in that directory, we need to insert a record into the
