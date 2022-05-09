@@ -97,7 +97,7 @@ trait Orbital
             ->in($source)
             ->files()
             ->name("*.{$driver->extension()}")
-            ->date('> ' . Carbon::createFromTimestamp(filemtime($oldestFile))->toDateTimeString())
+            ->date('> ' . Carbon::createFromTimestamp(filemtime($oldestFile))->format('Y-m-d H:i:s'))
             ->sortByModifiedTime();
 
         // 1a. For each of the files in that directory, we need to insert a record into the
