@@ -105,11 +105,7 @@ trait Orbital
         foreach ($files as $file) {
             $path = $file->getPathname();
 
-            if (! Support::fileNeedsToBeSeeded($path, static::class) && ! $force) {
-                continue;
-            }
-
-            $record = new static($driver->fromFile($file->getPathname()));
+            $record = new static($driver->fromFile($path));
             $schema = static::resolveConnection()->getSchemaBuilder()->getColumnListing($record->getTable());
 
             // 1b. We need to drop any values from the file that do not have a valid DB column.
