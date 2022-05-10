@@ -99,7 +99,7 @@ trait Orbital
             ->name("*.{$driver->extension()}")
             ->sortByModifiedTime();
 
-        if (!$force) {
+        if (! $force) {
             $files = $files->date('> ' . Carbon::createFromTimestamp(filemtime($oldestFile))->format('Y-m-d H:i:s'));
         }
 
