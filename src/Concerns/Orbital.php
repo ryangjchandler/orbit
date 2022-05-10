@@ -155,6 +155,7 @@ trait Orbital
 
         $recordsToUpsert = [];
         $paths = [];
+        $columnExplodeString = '_' . Str::random(12) . '_';
 
         foreach ($files as $file) {
 
@@ -168,7 +169,7 @@ trait Orbital
 
             // ❕ You have to add files to seperate arrays using their attributes as a key, incase of attributes missing.
             // If not, you get `General error: 1 all VALUES must have the same number of terms.`
-            $attributeKeysPresent = collect($attributesForInsert)->keys()->implode('_orbit_column_');
+            $attributeKeysPresent = collect($attributesForInsert)->keys()->implode($columnExplodeString);
 
             // Build array of records for bulk upsert later.
             $recordsToUpsert[$attributeKeysPresent][] = $attributesForInsert;
@@ -186,12 +187,12 @@ trait Orbital
         }
 
         // Upsert the records in bulk
-        collect($recordsToUpsert)->each(function ($chunkedRecords, $schemaString) use ($model) {
-            collect($chunkedRecords)->chunk(200)->each(function ($chunkedRecordsToUpsert) use ($model, $schemaString) {
+        collect($recordsToUpsert)->each(function ($chunkedRecords, $schemaString) use ($model, $columnExplodeString) {
+            collect($chunkedRecords)->chunk(200)->each(function ($chunkedRecordsToUpsert) use ($model, $schemaString, $columnExplodeString) {
                 $model::upsert(
                     values: $chunkedRecordsToUpsert->toArray(),
                     uniqueBy: [$model->getKeyName()],
-                    update: Str::of($schemaString)->explode('_orbit_column_')->toArray()
+                    update: Str::of($schemaString)->explode($columnExplodeString)->toArray()
                 );
             });
         });
