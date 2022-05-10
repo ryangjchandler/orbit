@@ -199,7 +199,6 @@ trait Orbital
         // Get the primary keys of the same amount of recently created models
         $createdModelKeys = $model::take($upsertCount)->get()->pluck($model->getKeyName());
 
-
         // Delete the Meta matching the keys and morphClass from those records
         $metaToDelete = [];
         foreach ($createdModelKeys as $modelKey) {
@@ -222,8 +221,6 @@ trait Orbital
             $query->delete();
         });
 
-
-
         // Now make an array of Metas combining the model keys and the paths
         $metaToInsert = [];
         $i = 0;
@@ -237,7 +234,7 @@ trait Orbital
             $i++;
         }
 
-
+        // Chunk the upsert
         collect($metaToInsert)->chunk(200)->each(function ($chunkedMetaToInsert) use ($model) {
             Meta::upsert(
                 values: $chunkedMetaToInsert->toArray(),
@@ -245,28 +242,6 @@ trait Orbital
                 update: ['orbital_type', 'orbital_key', 'file_path_read_from']
             );
         });
-
-        // // Delete the old Meta from the array
-        // collect($metaToDelete)->chunk(200)->each(function ($chunkedMetaToDelete) use ($model) {
-        //     $query = $model::query();
-        //     foreach ($chunkedMetaToDelete as $record => $wheres) {
-        //         $query->orWhere(function ($q) use ($wheres) {
-        //             foreach ($wheres as $column => $value) {
-        //                 $q->where($column, $value);
-        //             }
-        //         });
-        //     }
-        //     $query->delete();
-        // });
-
-        // // Create the Meta from the array
-        // collect($metaToCreate)->chunk(200)->each(function ($chunkedMetaToCreate) use ($model) {
-        //     Meta::upsert(
-        //         values: $chunkedMetaToCreate->toArray(),
-        //         uniqueBy: ['id'],
-        //         update: ['orbital_type', 'orbital_key', 'file_path_read_from']
-        //     );
-        // });
     }
 
     public function orbitMeta(): MorphOne
