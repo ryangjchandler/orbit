@@ -7,18 +7,26 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Orbit\Contracts\Driver;
-use Orbit\Drivers\Markdown;
 use Orbit\Facades\Orbit;
 
 final class OrbitOptions
 {
     use Macroable;
 
-    private string $driver = Markdown::class;
+    private ?string $driver = null;
 
     private ?string $source = null;
 
     private ?Closure $generateFilenameUsing = null;
+
+    private bool $enabled = true;
+
+    public function disable(): self
+    {
+        $this->enabled = false;
+
+        return $this;
+    }
 
     public function driver(string $driver): self
     {
@@ -43,18 +51,17 @@ final class OrbitOptions
 
     public static function default(): self
     {
-        return self::make()
-            ->driver(Markdown::class);
+        return self::make();
     }
 
     public function getDriver(): Driver
     {
-        return app($this->driver);
+        return app($this->driver ?? config('orbit.driver'));
     }
 
     public function getSource(Model $model): string
     {
-        $source = $this->source ?? Str::of($model::class)->classBasename()->kebab();
+        $source = $this->source ?? Str::of($model::class)->classBasename()->snake()->plural();
 
         if (is_dir($source)) {
             return $source;
@@ -65,7 +72,12 @@ final class OrbitOptions
 
     public function getFilenameGenerator(): ?Closure
     {
-        return $this->generateFilenameUsing ?? fn () => '{getKeyName}';
+        return $this->generateFilenameUsing ?? fn () => '{getKey}';
+    }
+
+    public function isEnabled(): bool
+    {
+        return $this->enabled;
     }
 
     public static function make(): self

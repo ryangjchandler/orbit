@@ -8,16 +8,22 @@ class Json implements Driver
 {
     public function fromFile(string $path): array
     {
-        return [];
+        $contents = file_get_contents($path);
+
+        if (! $contents) {
+            return [];
+        }
+
+        return json_decode($contents, associative: true);
     }
 
     public function toFile(array $attributes): string
     {
-        return '';
+        return json_encode($attributes, JSON_PRETTY_PRINT);
     }
 
-    public function extension(): string|array
+    public function extension(): string
     {
-        return ['json'];
+        return 'json';
     }
 }

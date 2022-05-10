@@ -5,13 +5,19 @@ namespace Orbit\Drivers;
 use Illuminate\Database\Schema\Blueprint;
 use Orbit\Contracts\Driver;
 use Orbit\Contracts\ModifiesSchema;
+use Spatie\YamlFrontMatter\YamlFrontMatter;
 use Symfony\Component\Yaml\Yaml;
 
 class Markdown implements Driver, ModifiesSchema
 {
     public function fromFile(string $path): array
     {
-        return [];
+        $document = YamlFrontMatter::parseFile($path);
+
+        return [
+            'content' => trim($document->body()),
+            ...$document->matter(),
+        ];
     }
 
     public function toFile(array $attributes): string
@@ -28,13 +34,15 @@ class Markdown implements Driver, ModifiesSchema
             $content;
     }
 
-    public function extension(): string|array
+    public function extension(): string
     {
-        return ['md', 'markdown'];
+        return 'md';
     }
 
     public function schema(Blueprint $table): void
     {
-        $table->longText('content')->nullable();
+        if (! $table->hasColumn('content')) {
+            $table->longText('content')->nullable();
+        }
     }
 }

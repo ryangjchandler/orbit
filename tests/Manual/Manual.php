@@ -1,6 +1,6 @@
 <?php
 
-namespace Orbit\Tests\Simple;
+namespace Orbit\Tests\Manual;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
@@ -8,21 +8,16 @@ use Orbit\Concerns\Orbital;
 use Orbit\Contracts\IsOrbital;
 use Orbit\OrbitOptions;
 
-class Simple extends Model implements IsOrbital
+class Manual extends Model implements IsOrbital
 {
     use Orbital;
 
     protected $guarded = [];
 
-    protected $casts = [
-        'published' => 'bool',
-    ];
-
     public static function schema(Blueprint $table): void
     {
         $table->id();
         $table->string('title');
-        $table->boolean('published')->default(false);
     }
 
     public static function getOrbitOptions(): OrbitOptions

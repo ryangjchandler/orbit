@@ -1,28 +1,25 @@
 <?php
 
-namespace Orbit\Tests\Simple;
+namespace Orbit\Tests\SoftDeletes;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Orbit\Concerns\Orbital;
+use Orbit\Concerns\SoftDeletes;
 use Orbit\Contracts\IsOrbital;
 use Orbit\OrbitOptions;
 
-class Simple extends Model implements IsOrbital
+class SoftDeletesModel extends Model implements IsOrbital
 {
     use Orbital;
+    use SoftDeletes;
 
     protected $guarded = [];
-
-    protected $casts = [
-        'published' => 'bool',
-    ];
 
     public static function schema(Blueprint $table): void
     {
         $table->id();
         $table->string('title');
-        $table->boolean('published')->default(false);
     }
 
     public static function getOrbitOptions(): OrbitOptions

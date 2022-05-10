@@ -9,7 +9,7 @@ jobs:
       fail-fast: true
       matrix:
         os: [ubuntu-latest, windows-latest]
-        php: [8.0]
+        php: [8.1]
         laravel: [9.*]
         stability: [prefer-lowest, prefer-stable]
         include:
@@ -40,4 +40,4 @@ jobs:
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction
 
       - name: Execute tests
-        run: vendor/bin/phpunit --colors=always
+        run: composer test
