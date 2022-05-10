@@ -37,9 +37,9 @@ trait Orbital
 
         if (Support::modelNeedsMigration(static::class)) {
             static::migrate($options);
-            static::seedData($options, force: true);
+            static::seedDataUsingUpsert($options, force: true);
         } else {
-            static::seedData($options);
+            static::seedDataUsingUpsert($options);
         }
 
         static::observe(OrbitalObserver::class);
@@ -97,18 +97,64 @@ trait Orbital
             ->in($source)
             ->files()
             ->name("*.{$driver->extension()}")
+            ->date('> ' . Carbon::createFromTimestamp(filemtime($oldestFile))->format('Y-m-d H:i:s'))
+            ->sortByModifiedTime();
+
+        // 1a. For each of the files in that directory, we need to insert a record into the
+        //     the SQLite database cache.
+        foreach ($files as $file) {
+            $path = $file->getPathname();
+
+            $record = new static($driver->fromFile($path));
+            $schema = static::resolveConnection()->getSchemaBuilder()->getColumnListing($record->getTable());
+
+            // 1b. We need to drop any values from the file that do not have a valid DB column.
+            $attributes = collect($record->getAttributes())
+                ->except($record->getKeyName())
+                ->only($schema)
+                // 1bb. This is needed to ensure all values are casted correctly before inserting.
+                ->map(fn ($_, $key) => $record->{$key})
+                ->all();
+
+            // 1c. We want to updateOrCreate so that we don't need to wipe out
+            //     the entire cache. This should be a performance boost on larger projects.
+            $record = static::query()->updateOrCreate([
+                $record->getKeyName() => $record->getKey(),
+            ], $attributes);
+
+            Meta::query()
+                ->where('orbital_type', $record->getMorphClass())
+                ->where('orbital_key', $record->getKey())
+                ->delete();
+
+            $record->orbitMeta()->create([
+                'file_path_read_from' => ltrim(Str::after($path, $options->getSource($record)), '/'),
+            ]);
+        }
+    }
+
+    protected static function seedDataUsingUpsert(OrbitOptions $options, bool $force = false): void
+    {
+        $model = new static();
+        $driver = $options->getDriver();
+        $source = $options->getSource($model);
+
+        $orbitCacheFile = Orbit::getCachePath();
+        $modelFile = (new ReflectionClass(static::class))->getFileName();
+        $oldestFile = filemtime($modelFile) > filemtime($orbitCacheFile) ? $orbitCacheFile : $modelFile;
+
+        $files = Finder::create()
+            ->in($source)
+            ->files()
+            ->name("*.{$driver->extension()}")
             ->sortByModifiedTime();
 
         if (!$force) {
             $files = $files->date('> ' . Carbon::createFromTimestamp(filemtime($oldestFile))->format('Y-m-d H:i:s'));
         }
 
-        // 1a. For each of the files in that directory, we need to insert a record into the
-        //     the SQLite database cache.
-
         $recordsToUpsert = [];
-        $metaToDelete = [];
-        $metaToCreate = [];
+        $paths = [];
 
         foreach ($files as $file) {
 
@@ -127,17 +173,16 @@ trait Orbital
             // Build array of records for bulk upsert later.
             $recordsToUpsert[$attributeKeysPresent][] = $attributesForInsert;
 
-            // Build arrays of Meta data to process later
-            $metaToDelete[] = [
-                'orbital_type' => $record->getMorphClass(),
-                'orbital_key' => $record->getKey()
-            ];
+            // Add the path of this file so we can attach it to the Meta later
+            $paths[] = ltrim(Str::after($path, $source), '/');
+        }
 
-            $metaToCreate[] = [
-                'orbital_type' => $record->getMorphClass(),
-                'orbital_key' => $record->getKey(),
-                'file_path_read_from' => ltrim(Str::after($path, $options->getSource($record)), '/'),
-            ];
+        // Get a count so we only retrieve the relevant models for Meta creation
+        // Only 1 deep though, else we include attributes
+        $upsertCount = collect($recordsToUpsert)->flatten(1)->count();
+
+        if ($upsertCount === 0) {
+            return;
         }
 
         // Upsert the records in bulk
@@ -150,6 +195,19 @@ trait Orbital
                 );
             });
         });
+
+        // Get the primary keys of the same amount of recently created models
+        $createdModelKeys = $model::take($upsertCount)->get()->pluck($model->getKeyName());
+
+
+        // Delete the Meta matching the keys and morphClass from those records
+        $metaToDelete = [];
+        foreach ($createdModelKeys as $modelKey) {
+            $metaToDelete[] = [
+                'orbital_type' => $model->getMorphClass(),
+                'orbital_key' => $modelKey,
+            ];
+        }
 
         // Delete the old Meta from the array
         collect($metaToDelete)->chunk(200)->each(function ($chunkedMetaToDelete) use ($model) {
@@ -164,14 +222,51 @@ trait Orbital
             $query->delete();
         });
 
-        // Create the Meta from the array
-        collect($metaToCreate)->chunk(200)->each(function ($chunkedMetaToCreate) use ($model) {
+
+
+        // Now make an array of Metas combining the model keys and the paths
+        $metaToInsert = [];
+        $i = 0;
+        foreach ($createdModelKeys as $modelKey) {
+            $metaToInsert[] = [
+                'orbital_type' => $model->getMorphClass(),
+                'orbital_key' => $modelKey,
+                'file_path_read_from' => $paths[$i],
+            ];
+
+            $i++;
+        }
+
+
+        collect($metaToInsert)->chunk(200)->each(function ($chunkedMetaToInsert) use ($model) {
             Meta::upsert(
-                values: $chunkedMetaToCreate->toArray(),
+                values: $chunkedMetaToInsert->toArray(),
                 uniqueBy: ['id'],
                 update: ['orbital_type', 'orbital_key', 'file_path_read_from']
             );
         });
+
+        // // Delete the old Meta from the array
+        // collect($metaToDelete)->chunk(200)->each(function ($chunkedMetaToDelete) use ($model) {
+        //     $query = $model::query();
+        //     foreach ($chunkedMetaToDelete as $record => $wheres) {
+        //         $query->orWhere(function ($q) use ($wheres) {
+        //             foreach ($wheres as $column => $value) {
+        //                 $q->where($column, $value);
+        //             }
+        //         });
+        //     }
+        //     $query->delete();
+        // });
+
+        // // Create the Meta from the array
+        // collect($metaToCreate)->chunk(200)->each(function ($chunkedMetaToCreate) use ($model) {
+        //     Meta::upsert(
+        //         values: $chunkedMetaToCreate->toArray(),
+        //         uniqueBy: ['id'],
+        //         update: ['orbital_type', 'orbital_key', 'file_path_read_from']
+        //     );
+        // });
     }
 
     public function orbitMeta(): MorphOne
