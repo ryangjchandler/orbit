@@ -97,40 +97,81 @@ trait Orbital
             ->in($source)
             ->files()
             ->name("*.{$driver->extension()}")
-            ->date('> ' . Carbon::createFromTimestamp(filemtime($oldestFile))->format('Y-m-d H:i:s'))
             ->sortByModifiedTime();
+
+        if (!$force) {
+            $files = $files->date('> ' . Carbon::createFromTimestamp(filemtime($oldestFile))->format('Y-m-d H:i:s'));
+        }
 
         // 1a. For each of the files in that directory, we need to insert a record into the
         //     the SQLite database cache.
-        foreach ($files as $file) {
-            $path = $file->getPathname();
 
+        $recordsToUpsert = [];
+        $metaToDelete = [];
+        $metaToCreate = [];
+
+        foreach ($files as $file) {
+
+            $path = $file->getPathname();
             $record = new static($driver->fromFile($path));
             $schema = static::resolveConnection()->getSchemaBuilder()->getColumnListing($record->getTable());
 
-            // 1b. We need to drop any values from the file that do not have a valid DB column.
-            $attributes = collect($record->getAttributes())
-                ->except($record->getKeyName())
+            $attributesForInsert = collect($record->getAttributesForInsert())
                 ->only($schema)
-                // 1bb. This is needed to ensure all values are casted correctly before inserting.
-                ->map(fn ($_, $key) => $record->{$key})
                 ->all();
 
-            // 1c. We want to updateOrCreate so that we don't need to wipe out
-            //     the entire cache. This should be a performance boost on larger projects.
-            $record = static::query()->updateOrCreate([
-                $record->getKeyName() => $record->getKey(),
-            ], $attributes);
+            // ❕ You have to add files to seperate arrays using their attributes as a key, incase of attributes missing.
+            // If not, you get `General error: 1 all VALUES must have the same number of terms.`
+            $attributeKeysPresent = collect($attributesForInsert)->keys()->implode('_orbit_column_');
 
-            Meta::query()
-                ->where('orbital_type', $record->getMorphClass())
-                ->where('orbital_key', $record->getKey())
-                ->delete();
+            // Build array of records for bulk upsert later.
+            $recordsToUpsert[$attributeKeysPresent][] = $attributesForInsert;
 
-            $record->orbitMeta()->create([
+            // Build arrays of Meta data to process later
+            $metaToDelete[] = [
+                'orbital_type' => $record->getMorphClass(),
+                'orbital_key' => $record->getKey()
+            ];
+
+            $metaToCreate[] = [
+                'orbital_type' => $record->getMorphClass(),
+                'orbital_key' => $record->getKey(),
                 'file_path_read_from' => ltrim(Str::after($path, $options->getSource($record)), '/'),
-            ]);
+            ];
         }
+
+        // Upsert the records in bulk
+        collect($recordsToUpsert)->each(function ($chunkedRecords, $schemaString) use ($model) {
+            collect($chunkedRecords)->chunk(200)->each(function ($chunkedRecordsToUpsert) use ($model, $schemaString) {
+                $model::upsert(
+                    values: $chunkedRecordsToUpsert->toArray(),
+                    uniqueBy: [$model->getKeyName()],
+                    update: Str::of($schemaString)->explode('_orbit_column_')->toArray()
+                );
+            });
+        });
+
+        // Delete the old Meta from the array
+        collect($metaToDelete)->chunk(200)->each(function ($chunkedMetaToDelete) use ($model) {
+            $query = $model::query();
+            foreach ($chunkedMetaToDelete as $record => $wheres) {
+                $query->orWhere(function ($q) use ($wheres) {
+                    foreach ($wheres as $column => $value) {
+                        $q->where($column, $value);
+                    }
+                });
+            }
+            $query->delete();
+        });
+
+        // Create the Meta from the array
+        collect($metaToCreate)->chunk(200)->each(function ($chunkedMetaToCreate) use ($model) {
+            Meta::upsert(
+                values: $chunkedMetaToCreate->toArray(),
+                uniqueBy: ['id'],
+                update: ['orbital_type', 'orbital_key', 'file_path_read_from']
+            );
+        });
     }
 
     public function orbitMeta(): MorphOne
