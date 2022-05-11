@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
-use Orbit\Facades\Orbit;
 use Orbit\Concerns\Orbital;
 use ReflectionClass;
 
@@ -41,14 +40,14 @@ class RefreshCommand extends Command
                 );
             })
             ->filter(function ($class) {
-                if (!class_exists($class)) {
+                if (! class_exists($class)) {
                     return false;
                 }
 
                 $reflection = new ReflectionClass($class);
 
                 return $reflection->isSubclassOf(Model::class) &&
-                    !$reflection->isAbstract() &&
+                    ! $reflection->isAbstract() &&
                     isset(class_uses_recursive($class)[Orbital::class]);
             });
     }

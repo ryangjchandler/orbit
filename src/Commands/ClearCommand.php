@@ -3,7 +3,6 @@
 namespace Orbit\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Orbit\Facades\Orbit;
 use Orbit\Models\Meta;
