@@ -27,11 +27,11 @@ trait Orbital
     {
         $options = static::getOrbitOptions();
 
-        if (! $options->isEnabled()) {
+        if (!$options->isEnabled()) {
             return;
         }
 
-        if (! File::exists(Orbit::getCachePath())) {
+        if (!File::exists(Orbit::getCachePath())) {
             File::put(Orbit::getCachePath(), '');
         }
 

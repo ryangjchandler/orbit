@@ -4,6 +4,7 @@ namespace Orbit\Observers;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\File;
+use Orbit\Concerns\Orbital;
 use Orbit\Contracts\Driver;
 use Orbit\Contracts\IsOrbital;
 use Orbit\Support;
