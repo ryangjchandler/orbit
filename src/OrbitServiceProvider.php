@@ -4,6 +4,8 @@ namespace Orbit;
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ColumnDefinition;
+use Orbit\Commands\ClearCommand;
+use Orbit\Commands\RefreshCommand;
 use Orbit\Commands\UpgradeCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -16,6 +18,8 @@ class OrbitServiceProvider extends PackageServiceProvider
             ->name('orbit')
             ->hasCommands([
                 UpgradeCommand::class,
+                ClearCommand::class,
+                RefreshCommand::class,
             ])
             ->hasConfigFile();
     }
