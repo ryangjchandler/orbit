@@ -51,7 +51,7 @@ test('simple > default column values are persisted to disk', function () {
     assertFileContains(__DIR__ . '/content/1.md', 'published: false');
 });
 
-
+/*
 test('simple > creating a file dispatches model events', function () {
 
     file_put_contents(__DIR__ . '/content/1.md', <<<'md'
@@ -69,6 +69,7 @@ test('simple > creating a file dispatches model events', function () {
 
     Event::assertDispatched("eloquent.created: " . Simple::class);
 });
+ */
 
 afterEach(function () {
     Simple::all()->each->delete();

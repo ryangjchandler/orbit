@@ -32,12 +32,13 @@ class OrbitalObserver
         $source = $options->getSource($model);
         $filename = Support::generateFilename($model, $options, $driver);
 
-        $model->orbitMeta()->create([
-            'file_path_read_from' => $filename,
-        ]);
-
         File::ensureDirectoryExists(dirname($source . DIRECTORY_SEPARATOR . $filename));
+
         File::put($source . DIRECTORY_SEPARATOR . $filename, $serialised);
+
+        // Save **full** path here
+        $model->orbit_file_path = $source . DIRECTORY_SEPARATOR . $filename;
+        $model->saveQuietly();
     }
 
     public function updated(Model & IsOrbital $model): void
@@ -49,8 +50,8 @@ class OrbitalObserver
 
         // 1. In some cases, the primary key of a record might change during a save.
         //    If that does happen, we need to clean things up and remove the old file.
-        if ($model->orbitMeta->file_path_read_from !== $filename) {
-            File::delete($source . DIRECTORY_SEPARATOR . $model->orbitMeta->file_path_read_from);
+        if ($model->orbit_file_path !== $filename) {
+            File::delete($model->orbit_file_path);
         }
 
         // 2. We can then write to the new file, storing the updated contents of the model.
@@ -59,19 +60,18 @@ class OrbitalObserver
         File::ensureDirectoryExists(dirname($source . DIRECTORY_SEPARATOR . $filename));
         File::put($source . DIRECTORY_SEPARATOR . $filename, $serialised);
 
-        $model->orbitMeta->update([
-            'file_path_read_from' => $filename,
-        ]);
+        $model->orbit_file_path = $source . DIRECTORY_SEPARATOR . $filename;
+
+        // Don't trigger the event again.
+        $model->saveQuietly();
     }
 
     public function deleted(Model & IsOrbital $model): void
     {
         $options = $model::getOrbitOptions();
         $source = $options->getSource($model);
-        $filename = $model->orbitMeta->file_path_read_from;
 
-        // 1. We just need to delete the file here. Nothing special at all.
-        File::delete($source . DIRECTORY_SEPARATOR . $filename);
+        File::delete($model->orbit_file_path);
     }
 
     private function getModelAttributes(Model & IsOrbital $model)

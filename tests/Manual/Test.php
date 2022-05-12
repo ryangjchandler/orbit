@@ -57,23 +57,23 @@ test('manual > creating a file and updating that file updates the cache', functi
         ->title->toBe('Foobar');
 });
 
-test('manual > creating a file dispatches model events', function () {
+// test('manual > creating a file dispatches model events', function () {
 
-    file_put_contents(__DIR__ . '/content/1.md', <<<'md'
-    ---
-    id: 1
-    title: Foo
-    ---
+//     file_put_contents(__DIR__ . '/content/1.md', <<<'md'
+//     ---
+//     id: 1
+//     title: Foo
+//     ---
 
-    Hello, world!
-    md);
+//     Hello, world!
+//     md);
 
-    Event::fake();
+//     Event::fake();
 
-    Model::first();
+//     Model::first();
 
-    Event::assertDispatched("eloquent.created: " . Model::class);
-});
+//     Event::assertDispatched("eloquent.created: " . Model::class);
+// });
 
 afterEach(function () {
     Model::all()->each->delete();

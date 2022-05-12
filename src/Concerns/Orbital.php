@@ -60,6 +60,9 @@ trait Orbital
         $schema->create($table, function (Blueprint $table) use ($driver, $model) {
             static::schema($table);
 
+            $table->string('orbit_file_path')->nullable()->unique();
+            $table->boolean('orbit_needs_meta')->default(0);
+
             if ($driver instanceof ModifiesSchema) {
                 $driver->schema($table);
             }
@@ -149,15 +152,14 @@ trait Orbital
         $files = Finder::create()
             ->in($source)
             ->files()
-            ->name("*.{$driver->extension()}")
-            ->sortByModifiedTime();
+            ->name("*.{$driver->extension()}");
 
         if (!$force) {
             $files = $files->date('> ' . Carbon::createFromTimestamp(filemtime($oldestFile))->format('Y-m-d H:i:s'));
         }
 
         $recordsToUpsert = [];
-        $paths = [];
+        $pathsToUpsert = [];
         $columnExplodeString = '_' . Str::random(12) . '_';
 
         foreach ($files as $file) {
@@ -168,6 +170,8 @@ trait Orbital
 
             $attributesForInsert = collect($record->getAttributesForInsert())
                 ->only($schema)
+                ->put('orbit_file_path', $path)
+                ->put('orbit_needs_meta', 1)
                 ->all();
 
             // ❕ You have to add files to seperate arrays using their attributes as a key, incase of attributes missing.
@@ -178,15 +182,7 @@ trait Orbital
             $recordsToUpsert[$attributeKeysPresent][] = $attributesForInsert;
 
             // Add the path of this file so we can attach it to the Meta later
-            $paths[] = ltrim(Str::after($path, $source), '/');
-        }
-
-        // Get a count so we only retrieve the relevant models for Meta creation
-        // Only 1 deep though, else we include attributes
-        $upsertCount = collect($recordsToUpsert)->flatten(1)->count();
-
-        if ($upsertCount === 0) {
-            return;
+            // $pathsToUpsert[] = ltrim(Str::after($path, $source), '/');
         }
 
         // Upsert the records in bulk
@@ -201,11 +197,11 @@ trait Orbital
         });
 
         // Get the primary keys of the same amount of recently created models
-        $createdModelKeys = $model::take($upsertCount)->get()->pluck($model->getKeyName());
+        $modelsNeedMeta = $model::where('orbit_needs_meta')->get()->pluck($model->getKeyName(), 'orbit_file_path');
 
         // Delete the Meta matching the keys and morphClass from those records
         $metaToDelete = [];
-        foreach ($createdModelKeys as $modelKey) {
+        foreach ($modelsNeedMeta as $modelData) {
             $metaToDelete[] = [
                 'orbital_type' => $model->getMorphClass(),
                 'orbital_key' => $modelKey,
@@ -228,11 +224,11 @@ trait Orbital
         // Now make an array of Metas combining the model keys and the paths
         $metaToInsert = [];
         $i = 0;
-        foreach ($createdModelKeys as $modelKey) {
+        foreach ($modelsNeedMeta as $modelKey) {
             $metaToInsert[] = [
                 'orbital_type' => $model->getMorphClass(),
                 'orbital_key' => $modelKey,
-                'file_path_read_from' => $paths[$i],
+                'file_path_read_from' => $pathsToUpsert[$i],
             ];
 
             $i++;

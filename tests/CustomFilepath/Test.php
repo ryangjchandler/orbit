@@ -17,7 +17,7 @@ test('custom filepath > creates a file with a custom filepath', function () {
 });
 
 test('custom filepath > reads files with custom filepath', function () {
-    if (! is_dir($path = __DIR__ . '/content/2022-01-01')) {
+    if (!is_dir($path = __DIR__ . '/content/2022-01-01')) {
         File::ensureDirectoryExists($path);
     }
 
@@ -30,12 +30,12 @@ test('custom filepath > reads files with custom filepath', function () {
     md);
 
     $record = CustomFilepath::first();
+    $options = $record::getOrbitOptions();
+    $source = $options->getSource($record);
 
     expect($record)
-        ->title->toBe('bar-baz');
-
-    expect($record->orbitMeta)
-        ->file_path_read_from->toBe('2022-01-01/bar-baz.md');
+        ->title->toBe('bar-baz')
+        ->orbit_file_path->toBe($source . '/2022-01-01/bar-baz.md');
 });
 
 test('custom filepath > correctly removes outdated files when filepath changes', function () {
@@ -44,14 +44,17 @@ test('custom filepath > correctly removes outdated files when filepath changes',
         'published_at' => now(),
     ]);
 
-    assertFileExists(__DIR__ . '/content/' . $record->published_at->format('Y-m-d') . '/barbar.md');
+    $options = $record::getOrbitOptions();
+    $source = $options->getSource($record);
+
+    assertFileExists($source . '/' . $record->published_at->format('Y-m-d') . '/barbar.md');
 
     $record->update([
         'title' => 'booboo',
     ]);
 
-    assertFileExists(__DIR__ . '/content/' . $record->published_at->format('Y-m-d') . '/booboo.md');
-    assertFileDoesNotExist(__DIR__ . '/content/' . $record->published_at->format('Y-m-d') . '/barbar.md');
+    assertFileExists($source . '/' . $record->published_at->format('Y-m-d') . '/booboo.md');
+    assertFileDoesNotExist($source . '/' . $record->published_at->format('Y-m-d') . '/barbar.md');
 });
 
 test('custom filepath > it can use static data in filepath', function () {
@@ -63,7 +66,7 @@ test('custom filepath > it can use static data in filepath', function () {
 });
 
 test('custom filepath > it can seed data from file with static filepath', function () {
-    if (! is_dir($path = __DIR__ . '/static-content/static-folder')) {
+    if (!is_dir($path = __DIR__ . '/static-content/static-folder')) {
         File::ensureDirectoryExists($path);
     }
 

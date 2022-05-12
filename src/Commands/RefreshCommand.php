@@ -40,14 +40,14 @@ class RefreshCommand extends Command
                 );
             })
             ->filter(function ($class) {
-                if (! class_exists($class)) {
+                if (!class_exists($class)) {
                     return false;
                 }
 
                 $reflection = new ReflectionClass($class);
 
                 return $reflection->isSubclassOf(Model::class) &&
-                    ! $reflection->isAbstract() &&
+                    !$reflection->isAbstract() &&
                     isset(class_uses_recursive($class)[Orbital::class]);
             });
     }
