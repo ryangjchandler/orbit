@@ -27,11 +27,11 @@ trait Orbital
     {
         $options = static::getOrbitOptions();
 
-        if (!$options->isEnabled()) {
+        if (! $options->isEnabled()) {
             return;
         }
 
-        if (!File::exists(Orbit::getCachePath())) {
+        if (! File::exists(Orbit::getCachePath())) {
             File::put(Orbit::getCachePath(), '');
         }
 
@@ -97,8 +97,11 @@ trait Orbital
             ->in($source)
             ->files()
             ->name("*.{$driver->extension()}")
-            ->date('> ' . Carbon::createFromTimestamp(filemtime($oldestFile))->format('Y-m-d H:i:s'))
             ->sortByModifiedTime();
+
+        if (! $force) {
+            $files = $files->date('> ' . Carbon::createFromTimestamp(filemtime($oldestFile))->format('Y-m-d H:i:s'));
+        }
 
         // 1a. For each of the files in that directory, we need to insert a record into the
         //     the SQLite database cache.
