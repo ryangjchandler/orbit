@@ -36,8 +36,8 @@ class OrbitalObserver
 
         File::put($source . DIRECTORY_SEPARATOR . $filename, $serialised);
 
-        // Save **full** path here
         $model->orbit_file_path = $source . DIRECTORY_SEPARATOR . $filename;
+
         $model->saveQuietly();
     }
 

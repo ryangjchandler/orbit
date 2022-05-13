@@ -8,6 +8,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Orbit\Contracts\ModifiesSchema;
+use Orbit\Events\OrbitSeeded;
 use Orbit\Facades\Orbit;
 use Orbit\Models\Meta;
 use Orbit\Observers\OrbitalObserver;
@@ -61,7 +62,7 @@ trait Orbital
             static::schema($table);
 
             $table->string('orbit_file_path')->nullable()->unique();
-            $table->boolean('orbit_needs_meta')->default(0);
+            $table->boolean('orbit_recently_inserted')->default(0);
 
             if ($driver instanceof ModifiesSchema) {
                 $driver->schema($table);
@@ -162,6 +163,10 @@ trait Orbital
         $pathsToUpsert = [];
         $columnExplodeString = '_' . Str::random(12) . '_';
 
+        if (!count($files)) {
+            return;
+        }
+
         foreach ($files as $file) {
 
             $path = $file->getPathname();
@@ -171,7 +176,7 @@ trait Orbital
             $attributesForInsert = collect($record->getAttributesForInsert())
                 ->only($schema)
                 ->put('orbit_file_path', $path)
-                ->put('orbit_needs_meta', 1)
+                ->put('orbit_recently_inserted', 1)
                 ->all();
 
             // ❕ You have to add files to seperate arrays using their attributes as a key, incase of attributes missing.
@@ -180,9 +185,6 @@ trait Orbital
 
             // Build array of records for bulk upsert later.
             $recordsToUpsert[$attributeKeysPresent][] = $attributesForInsert;
-
-            // Add the path of this file so we can attach it to the Meta later
-            // $pathsToUpsert[] = ltrim(Str::after($path, $source), '/');
         }
 
         // Upsert the records in bulk
@@ -196,52 +198,15 @@ trait Orbital
             });
         });
 
-        // Get the primary keys of the same amount of recently created models
-        $modelsNeedMeta = $model::where('orbit_needs_meta')->get()->pluck($model->getKeyName(), 'orbit_file_path');
+        // Get the recently created models
+        $recentlyInsertedModels = $model::where('orbit_recently_inserted', 1);
 
-        // Delete the Meta matching the keys and morphClass from those records
-        $metaToDelete = [];
-        foreach ($modelsNeedMeta as $modelData) {
-            $metaToDelete[] = [
-                'orbital_type' => $model->getMorphClass(),
-                'orbital_key' => $modelKey,
-            ];
-        }
+        // Fire OrbitSeeded event on each dirty model
+        $recentlyInsertedModels->get()->each(fn ($recentlyInsertedModel) => OrbitSeeded::dispatch($recentlyInsertedModel));
 
-        // Delete the old Meta from the array
-        collect($metaToDelete)->chunk(200)->each(function ($chunkedMetaToDelete) use ($model) {
-            $query = $model::query();
-            foreach ($chunkedMetaToDelete as $record => $wheres) {
-                $query->orWhere(function ($q) use ($wheres) {
-                    foreach ($wheres as $column => $value) {
-                        $q->where($column, $value);
-                    }
-                });
-            }
-            $query->delete();
-        });
-
-        // Now make an array of Metas combining the model keys and the paths
-        $metaToInsert = [];
-        $i = 0;
-        foreach ($modelsNeedMeta as $modelKey) {
-            $metaToInsert[] = [
-                'orbital_type' => $model->getMorphClass(),
-                'orbital_key' => $modelKey,
-                'file_path_read_from' => $pathsToUpsert[$i],
-            ];
-
-            $i++;
-        }
-
-        // Chunk the upsert
-        collect($metaToInsert)->chunk(200)->each(function ($chunkedMetaToInsert) use ($model) {
-            Meta::upsert(
-                values: $chunkedMetaToInsert->toArray(),
-                uniqueBy: ['id'],
-                update: ['orbital_type', 'orbital_key', 'file_path_read_from']
-            );
-        });
+        // Run mass update to unset recently inserted flag
+        // No need for upsert here as Laravel supports mass updates in core
+        $recentlyInsertedModels->update(['orbit_recently_inserted' => 0]);
     }
 
     public function orbitMeta(): MorphOne
