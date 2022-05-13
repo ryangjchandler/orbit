@@ -38,12 +38,6 @@ class OrbitServiceProvider extends PackageServiceProvider
             'database' => $orbit->getCachePath(),
             'foreign_key_constraints' => false,
         ]);
-
-        $this->app['config']->set('database.connections.orbit_meta', [
-            'driver' => 'sqlite',
-            'database' => storage_path('framework/cache/orbit_meta.sqlite'),
-            'foreign_key_constraints' => false,
-        ]);
     }
 
     public function packageBooted()
