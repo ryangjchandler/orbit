@@ -18,6 +18,8 @@ class RefreshCommand extends Command
 
     public function handle(): int
     {
+        $start = microtime(true);
+
         Artisan::call('orbit:clear');
 
         $this->findOrbitModels()
@@ -25,7 +27,7 @@ class RefreshCommand extends Command
             // New up each model to trigger bootOrbital, which will migrate and force seed
             ->each(fn (string $modelFQN) => new $modelFQN());
 
-        $this->info('✅ Rebuilt the Orbit database from content source files.');
+        $this->info('✅ Rebuilt the Orbit database from content source files in ' . number_format(microtime(true) - $start, 2) . 's.');
 
         return 0;
     }
