@@ -16,12 +16,18 @@ class RefreshCommand extends Command
 
     protected $description = 'Remove the Orbit database and then rebuild it from the content source files.';
 
-    public function handle()
+    public function handle(): int
     {
         Artisan::call('orbit:clear');
 
-        // New up each model to trigger bootOrbital, which will migrate and force seed
-        $this->findOrbitModels()->each(fn (string $modelFQN) => new $modelFQN());
+        $this->findOrbitModels()
+            ->tap(fn ($c) => $this->info('Found ' . $c->count() . ' Orbit models. Rebuilding database...'))
+            // New up each model to trigger bootOrbital, which will migrate and force seed
+            ->each(fn (string $modelFQN) => new $modelFQN());
+
+        $this->info('✅ Rebuilt the Orbit database from content source files.');
+
+        return 0;
     }
 
     protected function findOrbitModels(): Collection
