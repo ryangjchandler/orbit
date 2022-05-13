@@ -1,9 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Event;
-use Orbit\Models\Meta;
 use Orbit\Tests\Simple\Simple;
-
 use function PHPUnit\Framework\assertDispatched;
 use function PHPUnit\Framework\assertFileDoesNotExist;
 use function PHPUnit\Framework\assertFileExists;

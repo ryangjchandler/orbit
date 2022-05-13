@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
 use Orbit\Events\OrbitSeeded;
-use Orbit\Models\Meta;
 use Orbit\Tests\Seeder\TestModel;
 
 use function PHPUnit\Framework\assertDispatched;

@@ -7,7 +7,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Orbit\OrbitOptions;
 
 /**
- * @property-read \Orbit\Models\Meta $orbitMeta
  * @property string $orbit_file_path
  */
 interface IsOrbital
