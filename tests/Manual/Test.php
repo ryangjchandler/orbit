@@ -1,9 +1,10 @@
 <?php
 
-use Illuminate\Support\Facades\Event;
-use Orbit\Tests\Manual\Manual as Model;
-use function PHPUnit\Framework\assertFileExists;
 use function PHPUnit\Framework\assertDispatched;
+use function PHPUnit\Framework\assertFileExists;
+use Illuminate\Support\Facades\Event;
+use Orbit\Events\OrbitSeeded;
+use Orbit\Tests\Manual\Manual as Model;
 
 test('manual > creating a file manually adds it to the cache', function () {
     file_put_contents(__DIR__ . '/content/1.md', <<<'md'
@@ -57,23 +58,22 @@ test('manual > creating a file and updating that file updates the cache', functi
         ->title->toBe('Foobar');
 });
 
-// test('manual > creating a file dispatches model events', function () {
+test('manual > creating a file dispatches orbital seeded event', function () {
+    Event::fake();
 
-//     file_put_contents(__DIR__ . '/content/1.md', <<<'md'
-//     ---
-//     id: 1
-//     title: Foo
-//     ---
+    file_put_contents(__DIR__ . '/content/1.md', <<<'md'
+    ---
+    id: 1
+    title: Foo
+    ---
 
-//     Hello, world!
-//     md);
+    Hello, world!
+    md);
 
-//     Event::fake();
+    Model::first();
 
-//     Model::first();
-
-//     Event::assertDispatched("eloquent.created: " . Model::class);
-// });
+    Event::assertDispatched(OrbitSeeded::class);
+});
 
 afterEach(function () {
     Model::all()->each->delete();

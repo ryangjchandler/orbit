@@ -4,13 +4,12 @@ namespace Orbit\Observers;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\File;
-use Orbit\Contracts\Driver;
 use Orbit\Contracts\IsOrbital;
 use Orbit\Support;
 
 class OrbitalObserver
 {
-    public function created(Model & IsOrbital $model): void
+    public function created(Model&IsOrbital $model): void
     {
         $options = $model::getOrbitOptions();
 
@@ -41,7 +40,7 @@ class OrbitalObserver
         $model->saveQuietly();
     }
 
-    public function updated(Model & IsOrbital $model): void
+    public function updated(Model&IsOrbital $model): void
     {
         $options = $model::getOrbitOptions();
         $source = $options->getSource($model);
@@ -66,7 +65,7 @@ class OrbitalObserver
         $model->saveQuietly();
     }
 
-    public function deleted(Model & IsOrbital $model): void
+    public function deleted(Model&IsOrbital $model): void
     {
         $options = $model::getOrbitOptions();
         $source = $options->getSource($model);
@@ -74,11 +73,11 @@ class OrbitalObserver
         File::delete($model->orbit_file_path);
     }
 
-    private function getModelAttributes(Model & IsOrbital $model)
+    private function getModelAttributes(Model&IsOrbital $model)
     {
         // TODO: Do we need to do anything special here for casted values?
         return collect($model->getAttributes())
-            ->map(fn ($_, string $key) => $model->{$key})
+            ->map(fn($_, string $key) => $model->{$key})
             ->toArray();
     }
 }
