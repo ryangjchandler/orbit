@@ -2,6 +2,7 @@
 
 use function PHPUnit\Framework\assertDispatched;
 use function PHPUnit\Framework\assertFileExists;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Event;
 use Orbit\Events\OrbitSeeded;
 use Orbit\Tests\Manual\Manual as Model;
@@ -75,6 +76,10 @@ test('manual > creating a file dispatches orbital seeded event', function () {
     Event::assertDispatched(OrbitSeeded::class);
 });
 
+beforeEach(function () {
+    File::ensureDirectoryExists(__DIR__ . '/content/');
+});
+
 afterEach(function () {
-    Model::all()->each->delete();
+    File::deleteDirectory(__DIR__ . '/content/');
 });

@@ -1,6 +1,7 @@
 <?php
 
 use Orbit\Tests\DefaultColumnValues\DefaultColumnValues;
+use Illuminate\Support\Facades\File;
 
 use function PHPUnit\Framework\assertFileExists;
 
@@ -22,6 +23,10 @@ test('default column values > default values missing from file get added', funct
         ->foo->toBe('bar');
 });
 
+beforeEach(function () {
+    File::ensureDirectoryExists(__DIR__ . '/content/');
+});
+
 afterEach(function () {
-    DefaultColumnValues::all()->each->delete();
+    File::deleteDirectory(__DIR__ . '/content/');
 });

@@ -2,12 +2,13 @@
 
 use function PHPUnit\Framework\assertFileExists;
 use Orbit\Tests\Casts\AddressValue;
-use Orbit\Tests\Casts\UserModel;
+use Orbit\Tests\Casts\TestModel;
+use Illuminate\Support\Facades\File;
 
 // test('casts > it casts a value object when using eloquent', function () {
 //     // TODO check this is the expected way to set the casted attribute 🤔
 //     // Shouldn't it be $u->address->line* = *; ?
-//     $u = new UserModel();
+//     $u = new TestModel();
 //     $u->email = 'willywonka@example.net';
 //     $u->address->lineOne = 'Flat 1A';
 //     $u->address->lineTwo = '123 Fake St';
@@ -15,10 +16,10 @@ use Orbit\Tests\Casts\UserModel;
 
 //     assertFileContains(__DIR__ . '/content/1.md', 'address_line_one: \'Flat 1A\'');
 
-//     expect(UserModel::first())
+//     expect(TestModel::first())
 //         ->address->toBeInstanceOf(AddressValue::class);
 
-//     $u = UserModel::first();
+//     $u = TestModel::first();
 //     $u->address->lineOne = 'Dojo number 36';
 //     $u->address->lineTwo = 'Wutang Avenue';
 //     $u->save();
@@ -43,13 +44,16 @@ test('casts > it casts a value object when using manual file edit', function () 
 
     assertFileExists(__DIR__ . '/content/1.md');
 
-    expect(UserModel::first())
+    expect(TestModel::first())
         ->address->toBeInstanceOf(AddressValue::class)
         ->address->lineOne->toBe('Flat 1A')
         ->address->lineTwo->toBe('123 Fake St');
+});
 
+beforeEach(function () {
+    File::ensureDirectoryExists(__DIR__ . '/content/');
 });
 
 afterEach(function () {
-    UserModel::all()->each->delete();
+    File::deleteDirectory(__DIR__ . '/content/');
 });

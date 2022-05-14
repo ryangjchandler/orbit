@@ -8,7 +8,7 @@ use Orbit\Concerns\Orbital;
 use Orbit\Contracts\IsOrbital;
 use Orbit\OrbitOptions;
 
-class UserModel extends Model implements IsOrbital
+class TestModel extends Model implements IsOrbital
 {
     use Orbital;
 

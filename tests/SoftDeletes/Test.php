@@ -1,7 +1,7 @@
 <?php
 
-
 use Orbit\Tests\SoftDeletes\SoftDeletesModel;
+use Illuminate\Support\Facades\File;
 
 use function PHPUnit\Framework\assertFileExists;
 
@@ -20,6 +20,10 @@ test('soft deletes > update the file correctly', function () {
     assertFileContains($path, 'deleted_at: ' . $model->deleted_at->toIso8601String());
 });
 
+beforeEach(function () {
+    File::ensureDirectoryExists(__DIR__ . '/content/');
+});
+
 afterEach(function () {
-    SoftDeletesModel::all()->each->forceDelete();
+    File::deleteDirectory(__DIR__ . '/content/');
 });

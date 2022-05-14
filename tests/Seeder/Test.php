@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
 use Orbit\Events\OrbitSeeded;
 use Orbit\Tests\Seeder\TestModel;
+use Illuminate\Support\Facades\File;
 
 use function PHPUnit\Framework\assertDispatched;
 use function PHPUnit\Framework\assertFileExists;
@@ -62,6 +63,10 @@ test('seeder > it custom casts attributes when upsert seeding', function () {
     //
 });
 
+beforeEach(function () {
+    File::ensureDirectoryExists(__DIR__ . '/content/');
+});
+
 afterEach(function () {
-    TestModel::all()->each->delete();
+    File::deleteDirectory(__DIR__ . '/content/');
 });

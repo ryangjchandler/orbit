@@ -90,7 +90,12 @@ test('custom filepath > it can seed data from file with static filepath', functi
     assertFileDoesNotExist(__DIR__ . '/static-content/static-folder/bahbah.md');
 });
 
+beforeEach(function () {
+    File::ensureDirectoryExists(__DIR__ . '/content/');
+    File::ensureDirectoryExists(__DIR__ . '/static-content/');
+});
+
 afterEach(function () {
-    CustomFilepath::all()->each->delete();
-    StaticCustomFilepath::all()->each->delete();
+    File::deleteDirectory(__DIR__ . '/content/');
+    File::deleteDirectory(__DIR__ . '/static-content/');
 });

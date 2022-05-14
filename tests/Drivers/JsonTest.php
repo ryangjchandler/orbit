@@ -6,6 +6,8 @@ use Orbit\Concerns\Orbital;
 use Orbit\Contracts\IsOrbital;
 use Orbit\Drivers\Json;
 use Orbit\OrbitOptions;
+use Illuminate\Support\Facades\File;
+
 
 use function PHPUnit\Framework\assertFileExists;
 
@@ -67,6 +69,10 @@ test('json > can read from a json file', function () {
         ->content->toBeArray();
 });
 
+beforeEach(function () {
+    File::ensureDirectoryExists(__DIR__ . '/json');
+});
+
 afterEach(function () {
-    JsonModel::all()->each->delete();
+    File::deleteDirectory(__DIR__ . '/json');
 });
