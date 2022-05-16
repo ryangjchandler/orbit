@@ -36,7 +36,7 @@ trait Orbital
 
         if (Support::modelNeedsMigration(static::class)) {
             static::migrate($options);
-            static::seedData($options, force:true);
+            static::seedData($options, force: true);
         } else {
             static::seedData($options);
         }
@@ -101,7 +101,6 @@ trait Orbital
         }
 
         $recordsToUpsert = [];
-        $pathsToUpsert = [];
         $columnExplodeString = '_' . Str::random(12) . '_';
 
         if (!count($files)) {
@@ -132,9 +131,9 @@ trait Orbital
         collect($recordsToUpsert)->each(function ($chunkedRecords, $schemaString) use ($model, $columnExplodeString) {
             collect($chunkedRecords)->chunk(200)->each(function ($chunkedRecordsToUpsert) use ($model, $schemaString, $columnExplodeString) {
                 $model::upsert(
-                    values:$chunkedRecordsToUpsert->toArray(),
-                    uniqueBy:[$model->getKeyName()],
-                    update:Str::of($schemaString)->explode($columnExplodeString)->toArray()
+                    values: $chunkedRecordsToUpsert->toArray(),
+                    uniqueBy: [$model->getKeyName()],
+                    update: Str::of($schemaString)->explode($columnExplodeString)->toArray()
                 );
             });
         });
@@ -143,7 +142,7 @@ trait Orbital
         $recentlyInsertedModels = $model::where('orbit_recently_inserted', 1);
 
         // Fire OrbitSeeded event on each dirty model
-        $recentlyInsertedModels->get()->each(fn($recentlyInsertedModel) => OrbitSeeded::dispatch($recentlyInsertedModel));
+        $recentlyInsertedModels->get()->each(fn ($recentlyInsertedModel) => OrbitSeeded::dispatch($recentlyInsertedModel));
 
         // Run mass update to unset recently inserted flag
         // No need for upsert here as Laravel supports mass updates in core
