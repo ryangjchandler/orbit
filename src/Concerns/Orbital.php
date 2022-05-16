@@ -103,10 +103,6 @@ trait Orbital
         $recordsToUpsert = [];
         $columnExplodeString = '_' . Str::random(12) . '_';
 
-        if (!count($files)) {
-            return;
-        }
-
         foreach ($files as $file) {
 
             $path = $file->getPathname();
@@ -137,6 +133,17 @@ trait Orbital
                 );
             });
         });
+
+
+        // Handle manually deleted files
+        $filePathsFromDB = $model::select('orbit_file_path')->get()->flatten(1)->pluck('orbit_file_path');
+
+        $filepathsFromFiles = collect($recordsToUpsert)->flatten(1)->pluck('orbit_file_path');
+
+        $filePathsFromDB->diff($filepathsFromFiles)->each(function (string $filepath) use ($model) {
+            $model::where('orbit_file_path', $filepath)->delete();
+        });
+
 
         // Get the recently created models
         $recentlyInsertedModels = $model::where('orbit_recently_inserted', 1);

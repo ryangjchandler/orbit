@@ -59,6 +59,30 @@ test('manual > creating a file and updating that file updates the cache', functi
         ->title->toBe('Foobar');
 });
 
+
+test('manual > deleting an existing file removes the record from the database', function () {
+    $filepath = __DIR__ . '/content/1.md';
+
+    file_put_contents($filepath, <<<'md'
+    ---
+    id: 1
+    title: Foo
+    ---
+
+    Hello, world!
+    md);
+
+    expect(Model::count())->toBe(1);
+
+    File::delete($filepath);
+
+    Model::clearBootedModels();
+
+    Model::count();
+
+    expect(Model::count())->toBe(0);
+});
+
 test('manual > creating a file dispatches orbital seeded event', function () {
     Event::fake();
 

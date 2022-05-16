@@ -21,7 +21,7 @@ final class Support
         return Str::of($pattern)
             ->explode('/')
             ->map(static function (string $part) use ($object): string {
-                if (! Str::startsWith($part, '{') && ! Str::endsWith($part, '}')) {
+                if (!Str::startsWith($part, '{') && !Str::endsWith($part, '}')) {
                     return $part;
                 }
 
@@ -53,7 +53,7 @@ final class Support
         foreach (class_uses_recursive($object) as $trait) {
             $method = $prefix . class_basename($trait);
 
-            if (! method_exists($object, $method) || in_array($method, $called)) {
+            if (!method_exists($object, $method) || in_array($method, $called)) {
                 continue;
             }
 
@@ -76,17 +76,13 @@ final class Support
     {
         $modelFile = (new ReflectionClass($modelClass))->getFileName();
 
-        if (App::environment('testing')) {
-            return true;
-        }
-
         if (filemtime($modelFile) > filemtime(Orbit::getCachePath())) {
             return true;
         }
 
         $table = (new $modelClass())->getTable();
 
-        if (! $modelClass::resolveConnection()->getSchemaBuilder()->hasTable($table)) {
+        if (!$modelClass::resolveConnection()->getSchemaBuilder()->hasTable($table)) {
             return true;
         }
 
