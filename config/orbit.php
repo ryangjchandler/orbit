@@ -13,4 +13,6 @@ return [
 
     'connection' => 'orbit',
 
+    'manual_mode' => env('ORBIT_MANUAL_MODE', true)
+
 ];

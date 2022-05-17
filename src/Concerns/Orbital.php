@@ -96,6 +96,15 @@ trait Orbital
     protected static function seedData(OrbitOptions $options, bool $force = false): void
     {
         $model = new static();
+
+        $model::handleUpdatedOrCreatedFiles($model, $options, $force);
+
+        $model::handleDeletedFiles($model, $options);
+    }
+
+    protected static function handleUpdatedOrCreatedFiles($model, $options, $force)
+    {
+        $model = new static();
         $driver = $options->getDriver();
         $source = $options->getSource($model);
 
@@ -148,17 +157,6 @@ trait Orbital
             });
         }
 
-
-        // Handle manually deleted files
-        $filePathsFromDB = $model::select('orbit_file_path')->get()->flatten(1)->pluck('orbit_file_path');
-
-        $filepathsFromFiles = collect($recordsToUpsert)->flatten(1)->pluck('orbit_file_path');
-
-        $filePathsFromDB->diff($filepathsFromFiles)->each(function (string $filepath) use ($model) {
-            $model::where('orbit_file_path', $filepath)->delete();
-        });
-
-
         // Get the recently created models
         $recentlyInsertedModels = $model::where('orbit_recently_inserted', 1);
 
@@ -168,5 +166,40 @@ trait Orbital
         // Run mass update to unset recently inserted flag
         // No need for upsert here as Laravel supports mass updates in core
         $recentlyInsertedModels->update(['orbit_recently_inserted' => 0]);
+    }
+
+    protected static function handleDeletedFiles($model, $options)
+    {
+        if (!config('orbit.manual_mode')) {
+            return;
+        }
+
+        $driver = $options->getDriver();
+        $source = $options->getSource($model);
+
+        $files = Finder::create()
+            ->in($source)
+            ->files()
+            ->name("*.{$driver->extension()}");
+
+        $fileData = [];
+
+        foreach ($files as $file) {
+            $fileData[] = $file->getPathname();
+        }
+
+        $filepathsFromDB = $model::select('orbit_file_path')->get()->flatten(1)->pluck('orbit_file_path');
+        if ($model::class == 'App\Models\ProductBrand') ray($filepathsFromDB);
+
+        $filepathsFromFiles = collect($fileData);
+        if ($model::class == 'App\Models\ProductBrand') ray($filepathsFromFiles);
+
+        $filepathsFromDB->diff($filepathsFromFiles)->tap(function ($collection) use ($model) {
+            if ($model::class == 'App\Models\ProductBrand') {
+                ray($collection);
+            }
+        })->each(function (?string $filepath) use ($model) {
+            $model::where('orbit_file_path', $filepath)->delete();
+        });
     }
 }

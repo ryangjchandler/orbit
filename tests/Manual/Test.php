@@ -61,24 +61,15 @@ test('manual > creating a file and updating that file updates the cache', functi
 
 
 test('manual > deleting an existing file removes the record from the database', function () {
-    $filepath = __DIR__ . '/content/1.md';
-
-    file_put_contents($filepath, <<<'md'
-    ---
-    id: 1
-    title: Foo
-    ---
-
-    Hello, world!
-    md);
+    Model::create([
+        'title' => 'Spin it up'
+    ]);
 
     expect(Model::count())->toBe(1);
 
-    File::delete($filepath);
+    File::delete(Model::first()->orbit_file_path);
 
     Model::clearBootedModels();
-
-    Model::count();
 
     expect(Model::count())->toBe(0);
 });
