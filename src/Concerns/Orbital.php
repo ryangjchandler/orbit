@@ -13,6 +13,7 @@ use Orbit\Observers\OrbitalObserver;
 use Orbit\OrbitOptions;
 use Orbit\Support;
 use ReflectionClass;
+use ReflectionMethod;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -79,6 +80,17 @@ trait Orbital
 
         // 3b. Laravel's excellent Filesystem API can make this simple.
         File::ensureDirectoryExists($source);
+
+        // Boot any associated pivot relationships of this model
+        collect((new ReflectionClass($model))->getMethods(ReflectionMethod::IS_PUBLIC))
+            ->filter(function (ReflectionMethod $method) {
+                return $method->getReturnType() == 'Illuminate\Database\Eloquent\Relations\BelongsToMany';
+            })
+            ->each(function (ReflectionMethod $method) use ($model) {
+                $pivotClass = $method->invoke($model)->getPivotClass();
+                // Trigger boot
+                new $pivotClass();
+            });
     }
 
     protected static function seedData(OrbitOptions $options, bool $force = false): void
@@ -124,15 +136,17 @@ trait Orbital
         }
 
         // Upsert the records in bulk
-        collect($recordsToUpsert)->each(function ($chunkedRecords, $schemaString) use ($model, $columnExplodeString) {
-            collect($chunkedRecords)->chunk(200)->each(function ($chunkedRecordsToUpsert) use ($model, $schemaString, $columnExplodeString) {
-                $model::upsert(
-                    values: $chunkedRecordsToUpsert->toArray(),
-                    uniqueBy: [$model->getKeyName()],
-                    update: Str::of($schemaString)->explode($columnExplodeString)->toArray()
-                );
+        if (collect($recordsToUpsert)->count()) {
+            collect($recordsToUpsert)->each(function ($chunkedRecords, $schemaString) use ($model, $columnExplodeString) {
+                collect($chunkedRecords)->chunk(200)->each(function ($chunkedRecordsToUpsert) use ($model, $schemaString, $columnExplodeString) {
+                    $model::upsert(
+                        values: $chunkedRecordsToUpsert->toArray(),
+                        uniqueBy: [$model->getKeyName()],
+                        update: Str::of($schemaString)->explode($columnExplodeString)->toArray()
+                    );
+                });
             });
-        });
+        }
 
 
         // Handle manually deleted files
