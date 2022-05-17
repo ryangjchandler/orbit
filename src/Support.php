@@ -4,12 +4,16 @@ namespace Orbit;
 
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use Orbit\Contracts\Driver;
 use Orbit\Contracts\IsOrbital;
+use Orbit\Concerns\Orbital;
 use Orbit\Facades\Orbit;
 use ReflectionClass;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo as FinderSplFileInfo;
 
 /** @internal */
 final class Support
@@ -87,5 +91,38 @@ final class Support
         }
 
         return false;
+    }
+
+    public static function getOrbitalModels(): Collection
+    {
+        $files = Finder::create()
+            ->in(App::basePath('app'))
+            ->files()
+            ->name("*.php")
+            ->contains('implements IsOrbital');
+
+        $models = collect(iterator_to_array($files))
+            ->map(function (FinderSplFileInfo $file) {
+                if (preg_match('#^namespace\s+(.+?);.*class\s+(\w+).+;$#sm', file_get_contents($file->getPathname()), $m)) {
+                    $namespace = $m[1];
+                    $className = $m[2];
+                    $classFQN = '\\' . $namespace . '\\' . $className;
+                }
+
+                return $classFQN;
+            })
+            ->filter(function ($class) {
+                if (!class_exists($class)) {
+                    return false;
+                }
+
+                $reflection = new ReflectionClass($class);
+
+                return $reflection->isSubclassOf(Model::class) &&
+                    !$reflection->isAbstract() &&
+                    isset(class_uses_recursive($class)[Orbital::class]);
+            });
+
+        return collect($models);
     }
 }
