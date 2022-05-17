@@ -11,4 +11,6 @@ return [
         'cache' => storage_path('framework/cache/orbit.sqlite'),
     ],
 
+    'connection' => 'orbit',
+
 ];

@@ -10,11 +10,11 @@ trait HandlesOrbitConnection
 {
     public function getConnectionName()
     {
-        return 'orbit';
+        return config('orbit.connection');
     }
 
     public static function resolveConnection($connection = null)
     {
-        return parent::resolveConnection('orbit');
+        return parent::resolveConnection(config('orbit.connection'));
     }
 }

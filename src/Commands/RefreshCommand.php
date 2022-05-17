@@ -6,13 +6,14 @@ use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
 use Orbit\Concerns\Orbital;
 use ReflectionClass;
 
 class RefreshCommand extends Command
 {
-    protected $signature = 'orbit:refresh';
+    protected $signature = 'orbit:refresh {--connection=}';
 
     protected $description = 'Remove the Orbit database and then rebuild it from the content source files.';
 
@@ -22,10 +23,15 @@ class RefreshCommand extends Command
 
         Artisan::call('orbit:clear');
 
+        // Set the connection if we want to migrate and seed mysql
+        if ($this->option('connection')) {
+            Config::set('orbit.connection', $this->option('connection'));
+        }
+
         $this->findOrbitModels()
             ->tap(fn ($c) => $this->info('Found ' . $c->count() . ' Orbit models. Rebuilding database...'))
             // New up each model to trigger bootOrbital, which will migrate and force seed
-            ->each(fn (string $modelFQN) => new $modelFQN());
+            ->each(fn (string $modelFQN) => new $modelFQN);
 
         $this->info('✅ Rebuilt the Orbit database from content source files in ' . number_format(microtime(true) - $start, 2) . 's.');
 
