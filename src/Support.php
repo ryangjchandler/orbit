@@ -109,7 +109,7 @@ final class Support
                     $classFQN = '\\' . $namespace . '\\' . $className;
                 }
 
-                return $classFQN;
+                return $classFQN ?? null;
             })
             ->filter(function ($class) {
                 if (!class_exists($class)) {
