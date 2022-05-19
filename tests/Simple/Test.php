@@ -50,6 +50,38 @@ test('simple > default column values are persisted to disk', function () {
     assertFileContains(__DIR__ . '/content/1.md', 'published: false');
 });
 
+test('simple > creating a model doesnt pollute file with orbit columns', function () {
+    Simple::create([
+        'title' => 'Orbit!',
+    ]);
+
+    assertFileExists(__DIR__ . '/content/1.md');
+
+    assertFileNotContains(__DIR__ . '/content/1.md', 'orbit_file_path');
+
+    assertFileNotContains(__DIR__ . '/content/1.md', 'orbit_recently_inserted');
+});
+
+
+test('simple > updating a model doesnt pollute file with orbit columns', function () {
+    $s = Simple::create([
+        'title' => 'Orbit!',
+    ]);
+
+    $s->title = 'Snorbit!';
+
+    $s->save();
+
+    assertFileExists(__DIR__ . '/content/1.md');
+
+    assertFileContains(__DIR__ . '/content/1.md', 'Snorbit!');
+
+    assertFileNotContains(__DIR__ . '/content/1.md', 'orbit_file_path');
+
+    assertFileNotContains(__DIR__ . '/content/1.md', 'orbit_recently_inserted');
+});
+
+
 test('simple > creating a file dispatches orbital seeded event', function () {
     Event::fake();
 
