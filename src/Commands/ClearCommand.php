@@ -3,6 +3,7 @@
 namespace Orbit\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Orbit\Facades\Orbit;
 
@@ -14,7 +15,7 @@ class ClearCommand extends Command
 
     public function handle()
     {
-        File::delete(Orbit::getCachePath());
+        Artisan::call('db:wipe --database=orbit');
 
         $this->info('Deleted Orbit\'s sqlite database');
 
