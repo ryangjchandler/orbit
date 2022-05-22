@@ -189,16 +189,10 @@ trait Orbital
         }
 
         $filepathsFromDB = $model::select('orbit_file_path')->get()->flatten(1)->pluck('orbit_file_path');
-        if ($model::class == 'App\Models\ProductBrand') ray($filepathsFromDB);
 
         $filepathsFromFiles = collect($fileData);
-        if ($model::class == 'App\Models\ProductBrand') ray($filepathsFromFiles);
 
-        $filepathsFromDB->diff($filepathsFromFiles)->tap(function ($collection) use ($model) {
-            if ($model::class == 'App\Models\ProductBrand') {
-                ray($collection);
-            }
-        })->each(function (?string $filepath) use ($model) {
+        $filepathsFromDB->diff($filepathsFromFiles)->each(function (?string $filepath) use ($model) {
             $model::where('orbit_file_path', $filepath)->delete();
         });
     }
