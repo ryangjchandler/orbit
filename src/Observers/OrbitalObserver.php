@@ -65,11 +65,16 @@ class OrbitalObserver
         $model->saveQuietly();
     }
 
+    // Laravel does not pass any Pivot model attributes, other than pivot keys to the deleting/ed events.
+    // As a workaround we can refresh the model in deleting as described below:
+    // https://github.com/laravel/framework/issues/42415
+    public function deleting(Model&IsOrbital $model): void
+    {
+        $model->refresh();
+    }
+
     public function deleted(Model&IsOrbital $model): void
     {
-        $options = $model::getOrbitOptions();
-        $source = $options->getSource($model);
-
         File::delete($model->orbit_file_path);
     }
 

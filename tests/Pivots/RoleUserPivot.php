@@ -14,10 +14,6 @@ class RoleUserPivot extends Pivot implements IsOrbital
 
     protected $guarded = [];
 
-    protected $casts = [
-        'published' => 'bool',
-    ];
-
     public static function schema(Blueprint $table): void
     {
         $table->id();
@@ -28,6 +24,6 @@ class RoleUserPivot extends Pivot implements IsOrbital
     public static function getOrbitOptions(): OrbitOptions
     {
         return OrbitOptions::make()
-            ->source(__DIR__ . '/role_user_pivot');
+            ->default();
     }
 }

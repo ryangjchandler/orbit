@@ -15,10 +15,6 @@ class User extends Model implements IsOrbital
 
     protected $guarded = [];
 
-    protected $casts = [
-        'published' => 'bool',
-    ];
-
     public static function schema(Blueprint $table): void
     {
         $table->id();
@@ -28,7 +24,7 @@ class User extends Model implements IsOrbital
     public static function getOrbitOptions(): OrbitOptions
     {
         return OrbitOptions::make()
-            ->source(__DIR__ . '/content/users');
+            ->default();
     }
 
     public function roles(): BelongsToMany
@@ -36,6 +32,7 @@ class User extends Model implements IsOrbital
         return $this->belongsToMany(
             related: Role::class,
             table: 'role_user_pivot'
-        )->using(RoleUserPivot::class);
+        )
+            ->using(RoleUserPivot::class);
     }
 }

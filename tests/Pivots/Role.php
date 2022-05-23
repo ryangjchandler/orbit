@@ -28,7 +28,7 @@ class Role extends Model implements IsOrbital
     public static function getOrbitOptions(): OrbitOptions
     {
         return OrbitOptions::make()
-            ->source(__DIR__ . '/content/roles');
+            ->default();
     }
 
     public function users(): BelongsToMany
