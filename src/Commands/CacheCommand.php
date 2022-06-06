@@ -46,7 +46,7 @@ class CacheCommand extends Command
                 $path = $item->getRelativePathName();
                 $class = sprintf(
                     '\%s%s',
-                    $laravel->getNamespace().'\\',
+                    $laravel->getNamespace(),
                     strtr(substr($path, 0, strrpos($path, '.')), '/', '\\')
                 );
 
