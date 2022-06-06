@@ -53,7 +53,7 @@ class CacheCommand extends Command
                 return $class;
             })
             ->filter(function ($class) {
-                if (! class_exists($class, false)) {
+                if (! class_exists($class)) {
                     return false;
                 }
 
