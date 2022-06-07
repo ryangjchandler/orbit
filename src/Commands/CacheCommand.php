@@ -44,9 +44,10 @@ class CacheCommand extends Command
             ->map(function ($item) use ($laravel) {
                 // Convert file path to namespace
                 $path = $item->getRelativePathName();
+                $ns = $laravel->getNamespace();
                 $class = sprintf(
                     '\%s%s',
-                    $laravel->getNamespace(),
+                    str_ends_with($ns, "\\") ? $ns : $ns."\\",
                     strtr(substr($path, 0, strrpos($path, '.')), '/', '\\')
                 );
 
