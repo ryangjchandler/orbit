@@ -2,6 +2,7 @@
 
 namespace Orbit\Commands;
 
+use App\Models\ProductVariation;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
@@ -17,16 +18,16 @@ class RefreshCommand extends Command
     {
         $start = microtime(true);
 
+        // Remove all the tables of existing Orbital models
         Artisan::call('orbit:clear');
 
-        // Set the connection if we want to migrate and seed mysql
+        // Set the connection if we want to migrate and seed a different connection(e.g. MySQL)
         if ($this->option('connection')) {
             Config::set('orbit.connection', $this->option('connection'));
         }
 
-        Support::getOrbitalModels()
-            ->tap(fn ($c) => $this->info('Found ' . $c->count() . ' Orbit models. Rebuilding database...'))
-            // New up each model to trigger bootOrbital, which will migrate and force seed
+        Support::getOrbitalModels()->tap(fn ($c) => $this->info('Found ' . $c->count() . ' Orbit models. Rebuilding database...'))
+            // New-up each model to trigger bootOrbital, which will migrate and force seed
             ->each(fn (string $modelFQN) => new $modelFQN);
 
         $this->info('✅ Rebuilt the Orbit database from content source files in ' . number_format(microtime(true) - $start, 2) . 's.');
