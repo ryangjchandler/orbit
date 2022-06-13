@@ -108,6 +108,8 @@ trait Orbital
         $driver = $options->getDriver();
         $source = $options->getSource($model);
 
+        // We determine if the file should be put into the database by comparing it's modified date.
+        // If the file is newer than the model class file or the sqlite database file, we should add fromFile() it into the database.
         $orbitCacheFile = Orbit::getCachePath();
         $modelFile = (new ReflectionClass(static::class))->getFileName();
         $oldestFile = filemtime($modelFile) > filemtime($orbitCacheFile) ? $orbitCacheFile : $modelFile;
@@ -124,11 +126,12 @@ trait Orbital
         $recordsToUpsert = [];
         $columnExplodeString = '_' . Str::random(12) . '_';
 
+        $schema = static::resolveConnection()->getSchemaBuilder()->getColumnListing($model->getTable());
+
         foreach ($files as $file) {
 
             $path = $file->getPathname();
             $record = new static($driver->fromFile($path));
-            $schema = static::resolveConnection()->getSchemaBuilder()->getColumnListing($record->getTable());
 
             $attributesForInsert = collect($record->getAttributesForInsert())
                 ->only($schema)
