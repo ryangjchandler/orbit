@@ -108,19 +108,15 @@ trait Orbital
         $driver = $options->getDriver();
         $source = $options->getSource($model);
 
-        // We determine if the file should be put into the database by comparing it's modified date.
-        // If the file is newer than the model class file or the sqlite database file, we should add fromFile() it into the database.
-        $orbitCacheFile = Orbit::getCachePath();
-        $modelFile = (new ReflectionClass(static::class))->getFileName();
-        $oldestFile = filemtime($modelFile) > filemtime($orbitCacheFile) ? $orbitCacheFile : $modelFile;
-
         $files = Finder::create()
             ->in($source)
             ->files()
             ->name("*.{$driver->extension()}");
 
         if (!$force) {
-            $files = $files->date('> ' . Carbon::createFromTimestamp(filemtime($oldestFile))->format('Y-m-d H:i:s'));
+            // We determine if the file should be put into the database by comparing it's modified date with the SQLite / Model file.
+            // If the file is newer than the sqlite database file, it probably has new or changed data so should be added/updated in the database.
+            $files = $files->date('> ' . Carbon::createFromTimestamp(filemtime(Orbit::getCachePath()))->format('Y-m-d H:i:s'));
         }
 
         $recordsToUpsert = [];
