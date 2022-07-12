@@ -108,6 +108,9 @@ trait Orbital
         $driver = $options->getDriver();
         $source = $options->getSource($model);
 
+        // Application tests fail without this additional existence check.
+        File::ensureDirectoryExists($source);
+
         $files = Finder::create()
             ->in($source)
             ->files()
