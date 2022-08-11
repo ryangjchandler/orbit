@@ -13,7 +13,7 @@ class CacheCommand extends Command
 {
     protected $name = 'orbit:cache';
 
-    protected $descripition = 'Cache all Orbit models.';
+    protected $description = 'Cache all Orbit models.';
 
     public function handle()
     {
