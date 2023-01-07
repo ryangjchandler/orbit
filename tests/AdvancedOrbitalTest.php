@@ -10,6 +10,7 @@ use Orbit\Tests\Fixtures\CustomKey;
 use Orbit\Tests\Fixtures\JsonModel;
 use Orbit\Tests\Fixtures\Post;
 use Orbit\Tests\Fixtures\YamlModel;
+use Orbit\Tests\Fixtures\CsvModel;
 
 class AdvancedOrbitalTest extends TestCase
 {
@@ -18,6 +19,7 @@ class AdvancedOrbitalTest extends TestCase
         CustomKey::all()->each->delete();
         JsonModel::all()->each->delete();
         YamlModel::all()->each->delete();
+        CsvModel::all()->each->delete();
         Post::all()->each->delete();
     }
 
@@ -62,6 +64,16 @@ class AdvancedOrbitalTest extends TestCase
         ]);
 
         $this->assertFileExists(__DIR__.'/content/yaml_models/'.$yaml->getKey().'.yml');
+    }
+
+
+    public function test_it_can_use_csv_driver()
+    {
+        $csv = CsvModel::create([
+            'name' => 'Ryan',
+        ]);
+
+        $this->assertFileExists(__DIR__.'/content/csv_models/'.$csv->getKey().'.csv');
     }
 
     public function test_it_writes_hidden_columns()
