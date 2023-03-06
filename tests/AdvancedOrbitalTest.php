@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Schema;
 use Orbit\Concerns\Orbital;
 use Orbit\Tests\Fixtures\CustomKey;
 use Orbit\Tests\Fixtures\JsonModel;
+use Orbit\Tests\Fixtures\FlatJsonModel;
 use Orbit\Tests\Fixtures\Post;
 use Orbit\Tests\Fixtures\YamlModel;
 
@@ -17,6 +18,7 @@ class AdvancedOrbitalTest extends TestCase
     {
         CustomKey::all()->each->delete();
         JsonModel::all()->each->delete();
+        FlatJsonModel::all()->each->delete();
         YamlModel::all()->each->delete();
         Post::all()->each->delete();
     }
@@ -53,6 +55,18 @@ class AdvancedOrbitalTest extends TestCase
         ]);
 
         $this->assertFileExists(__DIR__.'/content/json_models/'.$json->getKey().'.json');
+    }
+    
+    public function test_it_can_use_flat_json_driver()
+    {
+        $json = FlatJsonModel::create([
+            'name' => 'Ryan',
+        ]);
+
+        $this->assertFileExists(__DIR__.'/content/flat_json_model.json');
+        
+        $retrieved_json = FlatJsonModel::first();
+        $this->assertEquals($retrieved_json->name, 'Ryan'); 
     }
 
     public function test_it_can_use_yaml_driver()
