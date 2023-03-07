@@ -8,6 +8,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Orbit\Drivers\FileDriver;
+use Orbit\Drivers\FlatJson;
 use Orbit\Events\OrbitalCreated;
 use Orbit\Events\OrbitalDeleted;
 use Orbit\Events\OrbitalUpdated;
@@ -257,6 +258,11 @@ trait Orbital
 
     public static function getOrbitalPath()
     {
+        $driver = Orbit::driver(static::getOrbitalDriver());
+        if ($driver instanceof FlatJson) {
+            return \config('orbit.paths.content');
+        }
+
         return \config('orbit.paths.content') . DIRECTORY_SEPARATOR . static::getOrbitalName();
     }
 
