@@ -66,7 +66,7 @@ class FlatJsonDriver extends FileDriver
 
     protected function parseContent(SplFileInfo $file): array
     {
-        if ($file->isFile()) {
+        if (!$file->isFile()) {
             file_put_contents($file->getPathname(), '');
         }
         
