@@ -8,6 +8,14 @@ use SplFileInfo;
 
 class FlatJsonDriver extends FileDriver
 {
+    public function shouldRestoreCache(string $directory): bool
+    {
+        $file = new SplFileInfo($this->filepath($directory));
+        $highest = $file->isFile() ? $file->getMTime() : 0;
+
+        return $highest > filemtime(Orbit::getDatabasePath());
+    }
+    
     public function save(Model $model, string $directory): bool
     {
         $existing = $this->all($directory)
