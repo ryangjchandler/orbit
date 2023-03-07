@@ -230,10 +230,13 @@ trait Orbital
         }
 
         $fs = new Filesystem();
+        $driver = Orbit::driver(static::getOrbitalDriver());
 
-        $fs->ensureDirectoryExists(
-            static::getOrbitalPath()
-        );
+        if (!($driver instanceof FlatJson)) {
+            $fs->ensureDirectoryExists(
+                static::getOrbitalPath()
+            );
+        }
 
         $fs->ensureDirectoryExists(
             \config('orbit.paths.cache')
@@ -258,11 +261,6 @@ trait Orbital
 
     public static function getOrbitalPath()
     {
-        $driver = Orbit::driver(static::getOrbitalDriver());
-        if ($driver instanceof FlatJson) {
-            return \config('orbit.paths.content');
-        }
-
         return \config('orbit.paths.content') . DIRECTORY_SEPARATOR . static::getOrbitalName();
     }
 
@@ -280,7 +278,10 @@ trait Orbital
         $pattern = static::getOrbitalPathPattern();
         $path = static::getOrbitalPath() . DIRECTORY_SEPARATOR . Support::buildPathForPattern($pattern, $model);
 
-        (new Filesystem())->ensureDirectoryExists($path);
+        $driver = Orbit::driver(static::getOrbitalDriver());
+        if (!($driver instanceof FlatJsonDriver)) {
+            (new Filesystem())->ensureDirectoryExists($path);
+        }
 
         return $path;
     }
