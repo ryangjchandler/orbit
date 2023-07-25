@@ -2,6 +2,7 @@
 
 namespace Orbit\Drivers;
 
+use BackedEnum;
 use FilesystemIterator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -85,7 +86,15 @@ abstract class FileDriver implements DriverContract
     protected function getModelAttributes(Model $model)
     {
         return collect($model->getAttributes())
-            ->map(fn ($_, $key) => $model->{$key})
+            ->map(function ($_, $key) use ($model) {
+                $value = $model->{$key};
+
+                if ($value instanceof BackedEnum) {
+                    return $value->value;
+                }
+
+                return $value;
+            })
             ->toArray();
     }
 
