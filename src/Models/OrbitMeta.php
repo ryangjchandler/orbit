@@ -27,6 +27,6 @@ final class OrbitMeta extends Model
 
     public static function forOrbital(Model $model)
     {
-        return static::query()->where('orbital_type', $model::class)->where('orbital_key', $model->getKey())->first();
+        return static::query()->where(['orbital_type' => $model::class, 'orbital_key' => $model->getKey()])->first();
     }
 }
