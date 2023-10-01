@@ -25,10 +25,12 @@
         "laravel/scout": "^9.4",
         "nunomaduro/larastan": "^2.0",
         "orchestra/testbench": "^8.0",
+        "pestphp/pest": "^2.20",
+        "pestphp/pest-plugin-laravel": "^2.2",
         "phpstan/extension-installer": "^1.1",
         "phpstan/phpstan-deprecation-rules": "^1.0",
         "phpstan/phpstan-phpunit": "^1.0",
-        "phpunit/phpunit": "^9.0"
+        "phpunit/phpunit": "^10.0"
     },
     "extra": {
         "laravel": {
