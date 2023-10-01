@@ -17,6 +17,7 @@
         "illuminate/database": "^10.0",
         "illuminate/events": "^10.0",
         "illuminate/support": "^10.0",
+        "spatie/laravel-package-tools": "^1.16",
         "spatie/yaml-front-matter": "^2.0",
         "symfony/yaml": "^6.0"
     },
