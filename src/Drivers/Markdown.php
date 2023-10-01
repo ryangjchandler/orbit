@@ -3,7 +3,6 @@
 namespace Orbit\Drivers;
 
 use Spatie\YamlFrontMatter\YamlFrontMatter;
-use SplFileInfo;
 use Symfony\Component\Yaml\Yaml;
 
 class Markdown extends Driver

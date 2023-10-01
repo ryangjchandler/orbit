@@ -2,8 +2,6 @@
 
 namespace Orbit\Contracts;
 
-use SplFileInfo;
-
 interface Driver
 {
     /**

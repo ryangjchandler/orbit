@@ -22,6 +22,7 @@
         "symfony/yaml": "^6.0"
     },
     "require-dev": {
+        "laravel/pint": "^1.13",
         "laravel/scout": "^9.4",
         "nunomaduro/larastan": "^2.0",
         "orchestra/testbench": "^8.0",
