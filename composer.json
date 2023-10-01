@@ -55,7 +55,8 @@
     "prefer-stable": true,
     "scripts": {
         "lint": "vendor/bin/phpstan analyse",
-        "test": "vendor/bin/phpunit --colors=always"
+        "test": "vendor/bin/pest",
+        "fmt": "vendor/bin/pint"
     },
     "config": {
         "sort-packages": true,
