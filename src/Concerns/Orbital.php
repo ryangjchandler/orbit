@@ -3,6 +3,7 @@
 namespace Orbit\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
+use Orbit\Actions\DeleteSourceFile;
 use Orbit\Actions\InitialiseOrbitalTable;
 use Orbit\Actions\MaybeCreateOrbitDirectories;
 use Orbit\Actions\SaveCompiledAttributesToFile;
@@ -60,6 +61,11 @@ trait Orbital
             $compiledAttributes = $driver->compile($attributes);
 
             $saveCompiledAttributesToFile->execute($model, $compiledAttributes, $driver);
+        });
+
+        static::deleted(function (Orbit & Model $model) use ($driver) {
+            $deleteSourceFile = new DeleteSourceFile();
+            $deleteSourceFile->execute($model, $driver);
         });
     }
 
