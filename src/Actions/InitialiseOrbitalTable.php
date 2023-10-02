@@ -5,6 +5,7 @@ namespace Orbit\Actions;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Orbit\Contracts\Orbit;
+use Orbit\Support\ModelUsesSoftDeletes;
 
 class InitialiseOrbitalTable
 {
@@ -33,6 +34,10 @@ class InitialiseOrbitalTable
 
             if ($model->usesTimestamps()) {
                 $blueprint->timestamps();
+            }
+
+            if (ModelUsesSoftDeletes::check($model)) {
+                $blueprint->softDeletes();
             }
         });
     }

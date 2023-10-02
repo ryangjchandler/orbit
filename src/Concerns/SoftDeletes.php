@@ -3,29 +3,28 @@
 namespace Orbit\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes as BaseSoftDeletes;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Orbit\Actions\DeleteSourceFile;
-use Orbit\Actions\InitialiseOrbitalTable;
-use Orbit\Actions\MaybeCreateOrbitDirectories;
 use Orbit\Actions\SaveCompiledAttributesToFile;
 use Orbit\Contracts\Driver;
 use Orbit\Contracts\Orbit;
-use Orbit\Drivers\Markdown;
 use Orbit\Exceptions\InvalidDriverException;
 use Orbit\Support\ModelAttributeFormatter;
-use Orbit\Support\ModelUsesSoftDeletes;
 
 /**
  * @mixin \Illuminate\Database\Eloquent\Model
  * @mixin \Orbit\Contracts\Orbit
  */
-trait Orbital
+trait SoftDeletes
 {
-    public static function bootOrbital()
-    {
-        $model = new static();
-        $maybeCreateOrbitDirectories = new MaybeCreateOrbitDirectories();
-        $maybeCreateOrbitDirectories->execute($model);
+    use BaseSoftDeletes;
 
+    public static function bootSoftDeletes()
+    {
+        static::addGlobalScope(new SoftDeletingScope);
+
+        $model = new static();
         $driver = $model->getOrbitDriver();
 
         if (!class_exists($driver)) {
@@ -38,15 +37,9 @@ trait Orbital
             throw InvalidDriverException::make($driver::class);
         }
 
-        $initialiseOrbitTable = new InitialiseOrbitalTable();
-
-        if (! $initialiseOrbitTable->hasTable($model)) {
-            $initialiseOrbitTable->migrate($model);
-        }
-
         $saveCompiledAttributesToFile = new SaveCompiledAttributesToFile();
 
-        static::created(function (Orbit & Model $model) use ($driver, $saveCompiledAttributesToFile) {
+        static::deleted(function (Orbit & Model $model) use ($driver, $saveCompiledAttributesToFile) {
             $model->refresh();
 
             $attributes = ModelAttributeFormatter::format($model, $model->getAttributes());
@@ -55,7 +48,7 @@ trait Orbital
             $saveCompiledAttributesToFile->execute($model, $compiledAttributes, $driver);
         });
 
-        static::updated(function (Orbit & Model $model) use ($driver, $saveCompiledAttributesToFile) {
+        static::restored(function (Orbit & Model $model) use ($driver, $saveCompiledAttributesToFile) {
             $model->refresh();
 
             $attributes = ModelAttributeFormatter::format($model, $model->getAttributes());
@@ -64,38 +57,9 @@ trait Orbital
             $saveCompiledAttributesToFile->execute($model, $compiledAttributes, $driver);
         });
 
-        static::deleted(function (Orbit & Model $model) use ($driver) {
-            if (ModelUsesSoftDeletes::check($model)) {
-                return;
-            }
-
+        static::forceDeleted(function (Orbit & Model $model) use ($driver) {
             $deleteSourceFile = new DeleteSourceFile();
             $deleteSourceFile->execute($model, $driver);
         });
-    }
-
-    public static function resolveConnection($connection = null)
-    {
-        return static::$resolver->connection('orbit');
-    }
-
-    public function getConnectionName()
-    {
-        return 'orbit';
-    }
-
-    public function getOrbitDriver(): string
-    {
-        return Markdown::class;
-    }
-
-    public function getOrbitSource(): string
-    {
-        return str(static::class)
-            ->classBasename()
-            ->snake()
-            ->lower()
-            ->plural()
-            ->toString();
     }
 }
