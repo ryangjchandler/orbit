@@ -52,6 +52,15 @@ trait Orbital
 
             $saveCompiledAttributesToFile->execute($model, $compiledAttributes, $driver);
         });
+
+        static::updated(function (Orbit & Model $model) use ($driver, $saveCompiledAttributesToFile) {
+            $model->refresh();
+
+            $attributes = ModelAttributeFormatter::format($model, $model->getAttributes());
+            $compiledAttributes = $driver->compile($attributes);
+
+            $saveCompiledAttributesToFile->execute($model, $compiledAttributes, $driver);
+        });
     }
 
     public static function resolveConnection($connection = null)
