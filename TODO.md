@@ -7,3 +7,5 @@
 * [x] Delete file when deleting a model.
 * [x] Add support for soft deletes.  
 * [ ] Add support for custom path patterns.
+* [ ] Only seed files that have the correct file extension.
+* [ ] Add support for single-file sources / drivers, i.e. CSV, etc.
