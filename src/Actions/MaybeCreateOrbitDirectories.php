@@ -20,7 +20,7 @@ class MaybeCreateOrbitDirectories
         }
 
         if ($model !== null) {
-            $modelDirectory = config('orbit.paths.content') . DIRECTORY_SEPARATOR . $model->getTable();
+            $modelDirectory = config('orbit.paths.content') . DIRECTORY_SEPARATOR . $model->getOrbitSource();
 
             $fs->ensureDirectoryExists($modelDirectory);
         }

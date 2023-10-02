@@ -17,4 +17,9 @@ interface Orbit
      * @return class-string<\Orbit\Contracts\Driver>
      */
     public function getOrbitDriver(): string;
+
+    /**
+     * Get the name of the source folder (or file) where model content is stored.
+     */
+    public function getOrbitSource(): string;
 }

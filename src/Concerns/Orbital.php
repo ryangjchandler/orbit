@@ -68,4 +68,14 @@ trait Orbital
     {
         return Markdown::class;
     }
+
+    public function getOrbitSource(): string
+    {
+        return str(static::class)
+            ->classBasename()
+            ->snake()
+            ->lower()
+            ->plural()
+            ->toString();
+    }
 }

@@ -11,7 +11,7 @@ class SaveCompiledAttributesToFile
 {
     public function execute(Orbit & Model $model, string $compiledAttributes, Driver $driver): void
     {
-        $directory = config('orbit.paths.content') . DIRECTORY_SEPARATOR . $model->getTable();
+        $directory = config('orbit.paths.content') . DIRECTORY_SEPARATOR . $model->getOrbitSource();
         $filename = "{$model->getKey()}.{$driver->extension()}";
 
         $fs = new Filesystem();
