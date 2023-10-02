@@ -6,3 +6,4 @@
 * [ ] Delete file when deleting a model.
 * [ ] Add support for soft deletes.  
 * [ ] Add support for single-file drivers, i.e. CSV files.
+* [ ] Add support for custom path patterns.
