@@ -28,13 +28,13 @@ trait Orbital
 
         $driver = $model->getOrbitDriver();
 
-        if (!class_exists($driver)) {
+        if (! class_exists($driver)) {
             throw InvalidDriverException::make($driver);
         }
 
         $driver = app($driver);
 
-        if (!$driver instanceof Driver) {
+        if (! $driver instanceof Driver) {
             throw InvalidDriverException::make($driver::class);
         }
 
@@ -46,7 +46,7 @@ trait Orbital
 
         $saveCompiledAttributesToFile = new SaveCompiledAttributesToFile();
 
-        static::created(function (Orbit & Model $model) use ($driver, $saveCompiledAttributesToFile) {
+        static::created(function (Orbit&Model $model) use ($driver, $saveCompiledAttributesToFile) {
             $model->refresh();
 
             $attributes = ModelAttributeFormatter::format($model, $model->getAttributes());
@@ -55,7 +55,7 @@ trait Orbital
             $saveCompiledAttributesToFile->execute($model, $compiledAttributes, $driver);
         });
 
-        static::updated(function (Orbit & Model $model) use ($driver, $saveCompiledAttributesToFile) {
+        static::updated(function (Orbit&Model $model) use ($driver, $saveCompiledAttributesToFile) {
             $model->refresh();
 
             $attributes = ModelAttributeFormatter::format($model, $model->getAttributes());
@@ -64,7 +64,7 @@ trait Orbital
             $saveCompiledAttributesToFile->execute($model, $compiledAttributes, $driver);
         });
 
-        static::deleted(function (Orbit & Model $model) use ($driver) {
+        static::deleted(function (Orbit&Model $model) use ($driver) {
             if (ModelUsesSoftDeletes::check($model)) {
                 return;
             }

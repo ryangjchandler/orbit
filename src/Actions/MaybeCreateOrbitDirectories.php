@@ -8,7 +8,7 @@ use Orbit\Contracts\Orbit;
 
 class MaybeCreateOrbitDirectories
 {
-    public function execute((Orbit & Model)|null $model = null)
+    public function execute(Orbit&Model $model = null)
     {
         $fs = new Filesystem();
 
@@ -20,7 +20,7 @@ class MaybeCreateOrbitDirectories
         }
 
         if ($model !== null) {
-            $modelDirectory = config('orbit.paths.content') . DIRECTORY_SEPARATOR . $model->getOrbitSource();
+            $modelDirectory = config('orbit.paths.content').DIRECTORY_SEPARATOR.$model->getOrbitSource();
 
             $fs->ensureDirectoryExists($modelDirectory);
         }

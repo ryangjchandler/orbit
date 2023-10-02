@@ -3,7 +3,6 @@
 namespace Orbit;
 
 use Illuminate\Config\Repository;
-use Illuminate\Filesystem\Filesystem;
 use Orbit\Actions\MaybeCreateOrbitDirectories;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;

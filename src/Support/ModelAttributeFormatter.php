@@ -8,7 +8,7 @@ use Orbit\Contracts\Orbit;
 
 class ModelAttributeFormatter
 {
-    public static function format(Orbit & Model $model, array $attributes): array
+    public static function format(Orbit&Model $model, array $attributes): array
     {
         $formatted = [];
 

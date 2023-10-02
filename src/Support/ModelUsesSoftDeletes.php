@@ -3,12 +3,12 @@
 namespace Orbit\Support;
 
 use Illuminate\Database\Eloquent\Model;
-use Orbit\Contracts\Orbit;
 use Orbit\Concerns\SoftDeletes;
+use Orbit\Contracts\Orbit;
 
 class ModelUsesSoftDeletes
 {
-    public static function check(Orbit & Model $model): bool
+    public static function check(Orbit&Model $model): bool
     {
         $uses = class_uses_recursive($model);
 

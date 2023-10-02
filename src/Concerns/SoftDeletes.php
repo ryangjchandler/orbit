@@ -27,19 +27,19 @@ trait SoftDeletes
         $model = new static();
         $driver = $model->getOrbitDriver();
 
-        if (!class_exists($driver)) {
+        if (! class_exists($driver)) {
             throw InvalidDriverException::make($driver);
         }
 
         $driver = app($driver);
 
-        if (!$driver instanceof Driver) {
+        if (! $driver instanceof Driver) {
             throw InvalidDriverException::make($driver::class);
         }
 
         $saveCompiledAttributesToFile = new SaveCompiledAttributesToFile();
 
-        static::deleted(function (Orbit & Model $model) use ($driver, $saveCompiledAttributesToFile) {
+        static::deleted(function (Orbit&Model $model) use ($driver, $saveCompiledAttributesToFile) {
             $model->refresh();
 
             $attributes = ModelAttributeFormatter::format($model, $model->getAttributes());
@@ -48,7 +48,7 @@ trait SoftDeletes
             $saveCompiledAttributesToFile->execute($model, $compiledAttributes, $driver);
         });
 
-        static::restored(function (Orbit & Model $model) use ($driver, $saveCompiledAttributesToFile) {
+        static::restored(function (Orbit&Model $model) use ($driver, $saveCompiledAttributesToFile) {
             $model->refresh();
 
             $attributes = ModelAttributeFormatter::format($model, $model->getAttributes());
@@ -57,7 +57,7 @@ trait SoftDeletes
             $saveCompiledAttributesToFile->execute($model, $compiledAttributes, $driver);
         });
 
-        static::forceDeleted(function (Orbit & Model $model) use ($driver) {
+        static::forceDeleted(function (Orbit&Model $model) use ($driver) {
             $deleteSourceFile = new DeleteSourceFile();
             $deleteSourceFile->execute($model, $driver);
         });
