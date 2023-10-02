@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Orbit\Actions\DeleteSourceFile;
 use Orbit\Actions\InitialiseOrbitalTable;
 use Orbit\Actions\MaybeCreateOrbitDirectories;
+use Orbit\Actions\MaybeRefreshDatabaseContent;
 use Orbit\Actions\SaveCompiledAttributesToFile;
 use Orbit\Contracts\Driver;
 use Orbit\Contracts\Orbit;
@@ -23,6 +24,7 @@ trait Orbital
     public static function bootOrbital()
     {
         $model = new static();
+
         $maybeCreateOrbitDirectories = new MaybeCreateOrbitDirectories();
         $maybeCreateOrbitDirectories->execute($model);
 
@@ -45,6 +47,12 @@ trait Orbital
         }
 
         $saveCompiledAttributesToFile = new SaveCompiledAttributesToFile();
+
+        $maybeRefreshDatabaseContent = new MaybeRefreshDatabaseContent();
+
+        if ($maybeRefreshDatabaseContent->shouldRefresh($model)) {
+            $maybeRefreshDatabaseContent->refresh($model, $driver, $saveCompiledAttributesToFile);
+        }
 
         static::created(function (Orbit&Model $model) use ($driver, $saveCompiledAttributesToFile) {
             $model->refresh();
