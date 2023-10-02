@@ -1,0 +1,71 @@
+<?php
+
+namespace Orbit\Concerns;
+
+use Illuminate\Database\Eloquent\Model;
+use Orbit\Actions\InitialiseOrbitalTable;
+use Orbit\Actions\MaybeCreateOrbitDirectories;
+use Orbit\Actions\SaveCompiledAttributesToFile;
+use Orbit\Contracts\Driver;
+use Orbit\Contracts\Orbit;
+use Orbit\Drivers\Markdown;
+use Orbit\Exceptions\InvalidDriverException;
+use Orbit\Support\ModelAttributeFormatter;
+
+/**
+ * @mixin \Illuminate\Database\Eloquent\Model
+ * @mixin \Orbit\Contracts\Orbit
+ */
+trait Orbital
+{
+    public static function bootOrbital()
+    {
+        $model = new static();
+        $maybeCreateOrbitDirectories = new MaybeCreateOrbitDirectories();
+        $maybeCreateOrbitDirectories->execute($model);
+
+        $driver = $model->getOrbitDriver();
+
+        if (!class_exists($driver)) {
+            throw InvalidDriverException::make($driver);
+        }
+
+        $driver = app($driver);
+
+        if (!$driver instanceof Driver) {
+            throw InvalidDriverException::make($driver::class);
+        }
+
+        $initialiseOrbitTable = new InitialiseOrbitalTable();
+
+        if (! $initialiseOrbitTable->hasTable($model)) {
+            $initialiseOrbitTable->migrate($model);
+        }
+
+        $saveCompiledAttributesToFile = new SaveCompiledAttributesToFile();
+
+        static::created(function (Orbit & Model $model) use ($driver, $saveCompiledAttributesToFile) {
+            $model->refresh();
+
+            $attributes = ModelAttributeFormatter::format($model, $model->getAttributes());
+            $compiledAttributes = $driver->compile($attributes);
+
+            $saveCompiledAttributesToFile->execute($model, $compiledAttributes, $driver);
+        });
+    }
+
+    public static function resolveConnection($connection = null)
+    {
+        return static::$resolver->connection('orbit');
+    }
+
+    public function getConnectionName()
+    {
+        return 'orbit';
+    }
+
+    public function getOrbitDriver(): string
+    {
+        return Markdown::class;
+    }
+}

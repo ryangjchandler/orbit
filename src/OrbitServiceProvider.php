@@ -4,6 +4,7 @@ namespace Orbit;
 
 use Illuminate\Config\Repository;
 use Illuminate\Filesystem\Filesystem;
+use Orbit\Actions\MaybeCreateOrbitDirectories;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -17,14 +18,12 @@ class OrbitServiceProvider extends PackageServiceProvider
             ->hasInstallCommand(function (InstallCommand $command) {
                 $command
                     ->startWith(function () {
-                        $fs = new Filesystem();
-
-                        $fs->ensureDirectoryExists(base_path('content'));
-                        $fs->ensureDirectoryExists(storage_path('framework/cache/orbit'));
-                        $fs->ensureDirectoryExists(storage_path('framework/cache/orbit/database.sqlite'));
+                        $maybeCreateOrbitDirectories = new MaybeCreateOrbitDirectories();
+                        $maybeCreateOrbitDirectories->execute();
                     })
                     ->askToStarRepoOnGitHub('ryangjchandler/orbit');
-            });
+            })
+            ->hasConfigFile();
     }
 
     public function packageRegistered()
@@ -33,7 +32,7 @@ class OrbitServiceProvider extends PackageServiceProvider
 
         $config->set('database.connections.orbit', [
             'driver' => 'sqlite',
-            'database' => base_path('framework/cache/orbit/database.sqlite'),
+            'database' => $config->get('orbit.paths.database'),
             'foreign_key_constraints' => false,
         ]);
     }

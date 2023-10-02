@@ -25,7 +25,7 @@
         "laravel/pint": "^1.13",
         "laravel/scout": "^9.4",
         "nunomaduro/larastan": "^2.0",
-        "orchestra/testbench": "^8.0",
+        "orchestra/testbench": "^8.12",
         "pestphp/pest": "^2.20",
         "pestphp/pest-plugin-laravel": "^2.2",
         "phpstan/extension-installer": "^1.1",
@@ -48,7 +48,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Orbit\\Tests\\": "tests/"
+            "Tests\\": "tests/"
         }
     },
     "minimum-stability": "dev",

@@ -13,4 +13,9 @@ interface Driver
      * Use the given array of attributes to generate the contents of a file.
      */
     public function compile(array $attributes): string;
+
+    /**
+     * Specify the file extension used by this driver.
+     */
+    public function extension(): string;
 }

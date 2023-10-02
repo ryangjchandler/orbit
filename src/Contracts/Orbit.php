@@ -4,12 +4,12 @@ namespace Orbit\Contracts;
 
 use Illuminate\Database\Schema\Blueprint;
 
-interface Orbital
+interface Orbit
 {
     /**
      * Define the structure of your Orbital model.
      */
-    public static function schema(Blueprint $table): void;
+    public function schema(Blueprint $table): void;
 
     /**
      * Declare which driver the Orbital should use.

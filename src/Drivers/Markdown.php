@@ -25,4 +25,9 @@ class Markdown extends Driver
 
         return sprintf("---\n%s\n---\n\n%s", Yaml::dump($attributes), $content);
     }
+
+    public function extension(): string
+    {
+        return 'md';
+    }
 }
