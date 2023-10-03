@@ -46,6 +46,7 @@ class MaybeRefreshDatabaseContent
         collect($records)
             ->chunk(100)
             ->each(function (Collection $chunk) use ($model) {
+                // This will ensure that we don't have any collisions with existing data in the SQLite database.
                 $model->query()->whereKey($chunk->pluck($model->getKey()))->delete();
                 $model->insert($chunk->all());
             });
