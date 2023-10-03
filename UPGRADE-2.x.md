@@ -127,6 +127,13 @@ The name of this method was rather vague and has been updated in 2.x.
 }
 ```
 
+### Removal of custom path pattern support
+
+Although the API was undocumented in 1.x, it was possible to define a custom "path pattern" for your Orbit models using the `getOrbitalPathPattern()` method.
+
+This method has been removed and is no longer supported. It could potentially come back in a future release, but the API was weird and didn't have a great set of features.
+
 ## Missing information?
 
 If you encounter anything that is missing from this upgrade guide, please open an issue on the repository with the missing information and any changes you made to resolve the error / issue.
+
