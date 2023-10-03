@@ -5,7 +5,9 @@ namespace Orbit\Actions;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Orbit\Contracts\Orbit;
+use Orbit\Support\ConfigureBlueprintFromModel;
 use Orbit\Support\ModelUsesSoftDeletes;
+use ReflectionClass;
 
 class InitialiseOrbitalTable
 {
@@ -13,7 +15,11 @@ class InitialiseOrbitalTable
     {
         $schemaBuilder = $model->resolveConnection()->getSchemaBuilder();
 
-        return $schemaBuilder->hasTable($model->getTable());
+        $modelFile = (new ReflectionClass($model))->getFileName();
+        $modelFileMTime = filemtime($modelFile);
+        $databaseMTime = filemtime(config('orbit.paths.database'));
+
+        return ($modelFileMTime > $databaseMTime) || !$schemaBuilder->hasTable($model->getTable());
     }
 
     public function migrate(Orbit&Model $model): void
@@ -30,15 +36,7 @@ class InitialiseOrbitalTable
         $schemaBuilder->create($table, static function (Blueprint $table) use (&$blueprint, $model) {
             $blueprint = $table;
 
-            $model->schema($blueprint);
-
-            if ($model->usesTimestamps()) {
-                $blueprint->timestamps();
-            }
-
-            if (ModelUsesSoftDeletes::check($model)) {
-                $blueprint->softDeletes();
-            }
+            ConfigureBlueprintFromModel::configure($model, $blueprint);
         });
     }
 }

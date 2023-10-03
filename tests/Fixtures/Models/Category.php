@@ -19,5 +19,6 @@ class Category extends Model implements Orbit
     {
         $table->id();
         $table->string('title');
+        $table->longText('content')->nullable();
     }
 }

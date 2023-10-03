@@ -46,13 +46,13 @@ trait Orbital
             $initialiseOrbitTable->migrate($model);
         }
 
-        $saveCompiledAttributesToFile = new SaveCompiledAttributesToFile();
-
         $maybeRefreshDatabaseContent = new MaybeRefreshDatabaseContent();
 
         if ($maybeRefreshDatabaseContent->shouldRefresh($model)) {
             $maybeRefreshDatabaseContent->refresh($model, $driver);
         }
+
+        $saveCompiledAttributesToFile = new SaveCompiledAttributesToFile();
 
         static::created(function (Orbit&Model $model) use ($driver, $saveCompiledAttributesToFile) {
             $model->refresh();

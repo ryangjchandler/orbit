@@ -13,8 +13,12 @@ class SaveCompiledAttributesToFile
     {
         $directory = config('orbit.paths.content').DIRECTORY_SEPARATOR.$model->getOrbitSource();
         $filename = "{$model->getKey()}.{$driver->extension()}";
-
         $fs = new Filesystem();
+
+        if ($model->wasChanged($model->getKey())) {
+            $fs->delete($directory . DIRECTORY_SEPARATOR . $model->getOriginal($model->getKeyName()) . '.' . $driver->extension());
+        }
+
         $fs->put($directory.DIRECTORY_SEPARATOR.$filename, $compiledAttributes);
     }
 }
