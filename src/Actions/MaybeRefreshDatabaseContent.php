@@ -33,7 +33,7 @@ class MaybeRefreshDatabaseContent
         $records = [];
 
         foreach ($iterator as $file) {
-            if ($file->getMTime() <= $databaseMTime) {
+            if ($file->getMTime() <= $databaseMTime || $file->getExtension() !== $driver->extension()) {
                 continue;
             }
 
