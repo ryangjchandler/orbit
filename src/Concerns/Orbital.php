@@ -51,7 +51,7 @@ trait Orbital
         $maybeRefreshDatabaseContent = new MaybeRefreshDatabaseContent();
 
         if ($maybeRefreshDatabaseContent->shouldRefresh($model)) {
-            $maybeRefreshDatabaseContent->refresh($model, $driver, $saveCompiledAttributesToFile);
+            $maybeRefreshDatabaseContent->refresh($model, $driver);
         }
 
         static::created(function (Orbit&Model $model) use ($driver, $saveCompiledAttributesToFile) {

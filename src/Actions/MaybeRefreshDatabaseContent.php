@@ -7,11 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Orbit\Contracts\Driver;
 use Orbit\Contracts\Orbit;
+use ReflectionClass;
 
 class MaybeRefreshDatabaseContent
 {
     public function shouldRefresh(Orbit&Model $model): bool
     {
+        $databaseMTime = filemtime(config('orbit.paths.database'));
         $directory = config('orbit.paths.content').DIRECTORY_SEPARATOR.$model->getOrbitSource();
         $highestMTime = 0;
 
@@ -21,11 +23,13 @@ class MaybeRefreshDatabaseContent
             }
         }
 
-        return $highestMTime > filemtime(config('orbit.paths.database'));
+        return $highestMTime > $databaseMTime;
     }
 
-    public function refresh(Orbit&Model $model, Driver $driver, SaveCompiledAttributesToFile $saveCompiledAttributesToFile): void
+    public function refresh(Orbit&Model $model, Driver $driver): void
     {
+        $model->query()->truncate();
+
         $databaseMTime = filemtime(config('orbit.paths.database'));
 
         $directory = config('orbit.paths.content').DIRECTORY_SEPARATOR.$model->getOrbitSource();
