@@ -2,10 +2,11 @@
 
 namespace Orbit\Drivers;
 
+use Orbit\Contracts\Driver;
 use Spatie\YamlFrontMatter\YamlFrontMatter;
 use Symfony\Component\Yaml\Yaml;
 
-class Markdown extends Driver
+class Markdown implements Driver
 {
     public function parse(string $fileContents): array
     {
