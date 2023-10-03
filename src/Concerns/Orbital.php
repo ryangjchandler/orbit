@@ -42,7 +42,7 @@ trait Orbital
 
         $initialiseOrbitTable = new InitialiseOrbitalTable();
 
-        if (! $initialiseOrbitTable->hasTable($model)) {
+        if (! $initialiseOrbitTable->shouldInitialise($model)) {
             $initialiseOrbitTable->migrate($model);
         }
 

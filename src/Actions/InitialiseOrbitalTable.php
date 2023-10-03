@@ -9,7 +9,7 @@ use Orbit\Support\ModelUsesSoftDeletes;
 
 class InitialiseOrbitalTable
 {
-    public function hasTable(Orbit&Model $model): bool
+    public function shouldInitialise(Orbit&Model $model): bool
     {
         $schemaBuilder = $model->resolveConnection()->getSchemaBuilder();
 

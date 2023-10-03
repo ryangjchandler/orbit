@@ -28,8 +28,6 @@ class MaybeRefreshDatabaseContent
 
     public function refresh(Orbit&Model $model, Driver $driver): void
     {
-        $model->query()->truncate();
-
         $databaseMTime = filemtime(config('orbit.paths.database'));
 
         $directory = config('orbit.paths.content').DIRECTORY_SEPARATOR.$model->getOrbitSource();
@@ -37,7 +35,7 @@ class MaybeRefreshDatabaseContent
         $records = [];
 
         foreach ($iterator as $file) {
-            if ($file->getMTime() <= $databaseMTime || $file->getExtension() !== $driver->extension()) {
+            if ($file->getMTime() <= $databaseMTime) {
                 continue;
             }
 
@@ -48,6 +46,7 @@ class MaybeRefreshDatabaseContent
         collect($records)
             ->chunk(100)
             ->each(function (Collection $chunk) use ($model) {
+                $model->query()->whereKey($chunk->pluck($model->getKey()))->delete();
                 $model->insert($chunk->all());
             });
     }
