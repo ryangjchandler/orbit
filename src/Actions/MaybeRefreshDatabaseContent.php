@@ -48,7 +48,7 @@ class MaybeRefreshDatabaseContent
             ->chunk(100)
             ->each(function (Collection $chunk) use ($model, $blueprint) {
                 // This will ensure that we don't have any collisions with existing data in the SQLite database.
-                $model->query()->whereKey($chunk->pluck($model->getKey()))->delete();
+                $model->query()->whereKey($chunk->pluck($model->getKey())->all())->delete();
 
                 $model->insert(
                     $chunk
