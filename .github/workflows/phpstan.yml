@@ -22,6 +22,7 @@ jobs:
         with:
           php-version: '8.2'
           coverage: none
+          extensions: pdo, pdo_sqlite
 
       - name: Install composer dependencies
         uses: ramsey/composer-install@v2
