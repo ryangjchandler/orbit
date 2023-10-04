@@ -16,7 +16,7 @@ class MaybeRefreshDatabaseContent
     public function shouldRefresh(Orbit&Model $model): bool
     {
         $databaseMTime = filemtime(config('orbit.paths.database'));
-        $directory = config('orbit.paths.content').DIRECTORY_SEPARATOR.$model->getOrbitSource();
+        $directory = config('orbit.paths.content') . DIRECTORY_SEPARATOR . $model->getOrbitSource();
         $highestMTime = 0;
 
         foreach (new FilesystemIterator($directory, FilesystemIterator::SKIP_DOTS) as $file) {
@@ -30,7 +30,7 @@ class MaybeRefreshDatabaseContent
 
     public function refresh(Orbit&Model $model, Driver $driver): void
     {
-        $directory = config('orbit.paths.content').DIRECTORY_SEPARATOR.$model->getOrbitSource();
+        $directory = config('orbit.paths.content') . DIRECTORY_SEPARATOR . $model->getOrbitSource();
         $iterator = new FilesystemIterator($directory, FilesystemIterator::SKIP_DOTS);
         $records = [];
 
@@ -50,9 +50,17 @@ class MaybeRefreshDatabaseContent
                 // This will ensure that we don't have any collisions with existing data in the SQLite database.
                 $model->query()->whereKey($chunk->pluck($model->getKey())->all())->delete();
 
-                $model->insert(
+                $model->query()->insert(
                     $chunk
-                        ->map(fn (array $attributes) => FillMissingAttributeValuesFromBlueprint::fill($attributes, $blueprint))
+                        ->map(function (array $attributes) use ($model, $blueprint) {
+                            foreach ($attributes as $key => $value) {
+                                $model->setAttribute($key, $value);
+                            }
+
+                            $attributes = array_filter($model->getAttributes(), fn (string $key) => array_key_exists($key, $attributes), ARRAY_FILTER_USE_KEY);
+
+                            return FillMissingAttributeValuesFromBlueprint::fill($attributes, $blueprint);
+                        })
                         ->all()
                 );
             });
