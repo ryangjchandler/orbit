@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Orbit\Contracts\Orbit;
 use Orbit\Support\ConfigureBlueprintFromModel;
-use Orbit\Support\ModelUsesSoftDeletes;
 use ReflectionClass;
 
 class InitialiseOrbitalTable
@@ -19,7 +18,7 @@ class InitialiseOrbitalTable
         $modelFileMTime = filemtime($modelFile);
         $databaseMTime = filemtime(config('orbit.paths.database'));
 
-        return ($modelFileMTime > $databaseMTime) || !$schemaBuilder->hasTable($model->getTable());
+        return ($modelFileMTime > $databaseMTime) || ! $schemaBuilder->hasTable($model->getTable());
     }
 
     public function migrate(Orbit&Model $model): void

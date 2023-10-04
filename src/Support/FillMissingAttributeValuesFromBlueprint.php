@@ -2,9 +2,7 @@
 
 namespace Orbit\Support;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
-use Orbit\Contracts\Orbit;
 
 class FillMissingAttributeValuesFromBlueprint
 {

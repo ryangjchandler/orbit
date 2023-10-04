@@ -15,6 +15,6 @@ it('can parse a json file into an array of attributes', function () {
     expect($driver->parse($json))
         ->toBe([
             'name' => 'Ryan',
-            'email' => 'ryan@test.com'
+            'email' => 'ryan@test.com',
         ]);
 });

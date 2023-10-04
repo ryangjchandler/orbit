@@ -8,7 +8,7 @@ use Orbit\Contracts\Orbit;
 
 class ConfigureBlueprintFromModel
 {
-    public static function configure(Orbit & Model $model, Blueprint $blueprint): Blueprint
+    public static function configure(Orbit&Model $model, Blueprint $blueprint): Blueprint
     {
         $model->schema($blueprint);
 

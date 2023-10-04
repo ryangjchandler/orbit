@@ -16,7 +16,7 @@ class SaveCompiledAttributesToFile
         $fs = new Filesystem();
 
         if ($model->wasChanged($model->getKey())) {
-            $fs->delete($directory . DIRECTORY_SEPARATOR . $model->getOriginal($model->getKeyName()) . '.' . $driver->extension());
+            $fs->delete($directory.DIRECTORY_SEPARATOR.$model->getOriginal($model->getKeyName()).'.'.$driver->extension());
         }
 
         $fs->put($directory.DIRECTORY_SEPARATOR.$filename, $compiledAttributes);
