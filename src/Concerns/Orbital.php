@@ -41,14 +41,17 @@ trait Orbital
         }
 
         $initialiseOrbitTable = new InitialiseOrbitalTable();
+        $maybeRefreshDatabaseContent = new MaybeRefreshDatabaseContent();
+        $refreshed = false;
 
         if ($initialiseOrbitTable->shouldInitialise($model)) {
             $initialiseOrbitTable->migrate($model);
+            $maybeRefreshDatabaseContent->refresh($model, $driver);
+
+            $refreshed = true;
         }
 
-        $maybeRefreshDatabaseContent = new MaybeRefreshDatabaseContent();
-
-        if ($maybeRefreshDatabaseContent->shouldRefresh($model)) {
+        if (! $refreshed && $maybeRefreshDatabaseContent->shouldRefresh($model)) {
             $maybeRefreshDatabaseContent->refresh($model, $driver);
         }
 
