@@ -11,16 +11,16 @@ class FillMissingAttributeValuesFromBlueprint
     public static function fill(array $attributes, Blueprint $blueprint): array
     {
         foreach ($blueprint->getColumns() as $column) {
-            $name = $column->name;
+            $name = $column->get('name');
 
             if (array_key_exists($name, $attributes)) {
                 continue;
             }
 
-            if ($column->nullable) {
+            if ($column->get('nullable')) {
                 $attributes[$name] = null;
-            } elseif ($column->default) {
-                $attributes[$name] = $column->default;
+            } elseif ($default = $column->get('default')) {
+                $attributes[$name] = $default;
             }
         }
 
