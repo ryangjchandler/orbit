@@ -22,7 +22,10 @@ class OrbitServiceProvider extends PackageServiceProvider
                     })
                     ->askToStarRepoOnGitHub('ryangjchandler/orbit');
             })
-            ->hasConfigFile();
+            ->hasConfigFile()
+            ->hasCommands([
+                Commands\ClearCommand::class,
+            ]);
     }
 
     public function packageRegistered()
