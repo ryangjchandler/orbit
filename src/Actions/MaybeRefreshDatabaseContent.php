@@ -30,8 +30,6 @@ class MaybeRefreshDatabaseContent
 
     public function refresh(Orbit&Model $model, Driver $driver): void
     {
-        $model->query()->truncate();
-
         $directory = config('orbit.paths.content').DIRECTORY_SEPARATOR.$model->getOrbitSource();
         $iterator = new FilesystemIterator($directory, FilesystemIterator::SKIP_DOTS);
         $records = [];
