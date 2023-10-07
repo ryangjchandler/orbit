@@ -17,8 +17,8 @@ class FillMissingAttributeValuesFromBlueprint
 
             if ($column->get('nullable')) {
                 $attributes[$name] = null;
-            } elseif ($default = $column->get('default')) {
-                $attributes[$name] = $default;
+            } elseif ($column->get('default') !== null) {
+                $attributes[$name] = $column->get('default');
             }
         }
 
