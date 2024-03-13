@@ -8,6 +8,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Orbit\Drivers\FileDriver;
+use Orbit\Drivers\FlatJson;
 use Orbit\Events\OrbitalCreated;
 use Orbit\Events\OrbitalDeleted;
 use Orbit\Events\OrbitalUpdated;
@@ -229,10 +230,13 @@ trait Orbital
         }
 
         $fs = new Filesystem();
+        $driver = Orbit::driver(static::getOrbitalDriver());
 
-        $fs->ensureDirectoryExists(
-            static::getOrbitalPath()
-        );
+        if (!($driver instanceof FlatJson)) {
+            $fs->ensureDirectoryExists(
+                static::getOrbitalPath()
+            );
+        }
 
         $fs->ensureDirectoryExists(
             \config('orbit.paths.cache')
@@ -274,7 +278,10 @@ trait Orbital
         $pattern = static::getOrbitalPathPattern();
         $path = static::getOrbitalPath() . DIRECTORY_SEPARATOR . Support::buildPathForPattern($pattern, $model);
 
-        (new Filesystem())->ensureDirectoryExists($path);
+        $driver = Orbit::driver(static::getOrbitalDriver());
+        if (!($driver instanceof FlatJsonDriver)) {
+            (new Filesystem())->ensureDirectoryExists($path);
+        }
 
         return $path;
     }
