@@ -15,6 +15,8 @@ use Orbit\OrbitManager;
  * @method static string getContentPath()
  * @method static \Orbit\OrbitManager test()
  * @method static bool isTesting()
+ * @method static void registerDynamicSchema()
+ * @method static array dynamicSchemaCallbacks(string $table)
  *
  * @see \Orbit\OrbitManager
  */
