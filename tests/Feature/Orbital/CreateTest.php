@@ -15,3 +15,14 @@ it('creates a new file when a model is created', function () {
         title: 'Example Post'
         MD);
 });
+
+it('does not use accessors when serialising saved data', function () {
+    $post = Post::create([
+        'title' => 'hello',
+    ]);
+
+    expect(base_path("content/posts/{$post->id}.md"))
+        ->toBeFile()
+        ->and(file_get_contents(base_path("content/posts/{$post->id}.md")))
+        ->not->toContain('Hello');
+});

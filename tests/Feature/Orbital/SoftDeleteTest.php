@@ -16,7 +16,7 @@ it('does not delete the source file when soft deleting a model', function () {
         ->toBeFile()
         ->and(file_get_contents(base_path("content/categories/{$category->id}.md")))
         ->toContain(<<<MD
-        deleted_at: {$category->deleted_at->toIso8601String()}
+        deleted_at: '{$category->deleted_at->toIso8601String()}'
         MD);
 });
 
@@ -34,7 +34,7 @@ it('updates the source file when restoring a soft deleted model', function () {
         ->toBeFile()
         ->and(file_get_contents(base_path("content/categories/{$category->id}.md")))
         ->toContain(<<<MD
-        deleted_at: {$category->deleted_at->toIso8601String()}
+        deleted_at: '{$category->deleted_at->toIso8601String()}'
         MD);
 
     $category->restore();
