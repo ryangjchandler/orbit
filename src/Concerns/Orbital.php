@@ -45,7 +45,7 @@ trait Orbital
         $refreshed = false;
 
         if ($initialiseOrbitTable->shouldInitialise($model)) {
-            $initialiseOrbitTable->migrate($model);
+            $initialiseOrbitTable->migrate($model, $driver);
             $maybeRefreshDatabaseContent->refresh($model, $driver);
 
             $refreshed = true;

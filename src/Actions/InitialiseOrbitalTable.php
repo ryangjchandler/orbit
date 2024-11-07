@@ -4,6 +4,8 @@ namespace Orbit\Actions;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Orbit\Contracts\Driver;
+use Orbit\Contracts\ModifiesSchema;
 use Orbit\Contracts\Orbit;
 use Orbit\Support\ConfigureBlueprintFromModel;
 use ReflectionClass;
@@ -21,7 +23,7 @@ class InitialiseOrbitalTable
         return ($modelFileMTime > $databaseMTime) || ! $schemaBuilder->hasTable($model->getTable());
     }
 
-    public function migrate(Orbit&Model $model): void
+    public function migrate(Orbit&Model $model, Driver $driver): void
     {
         $table = $model->getTable();
         $schemaBuilder = $model->resolveConnection()->getSchemaBuilder();
@@ -30,12 +32,12 @@ class InitialiseOrbitalTable
             $schemaBuilder->drop($table);
         }
 
-        $blueprint = null;
+        $schemaBuilder->create($table, static function (Blueprint $table) use ($model, $driver) {
+            ConfigureBlueprintFromModel::configure($model, $table);
 
-        $schemaBuilder->create($table, static function (Blueprint $table) use (&$blueprint, $model) {
-            $blueprint = $table;
-
-            ConfigureBlueprintFromModel::configure($model, $blueprint);
+            if ($driver instanceof ModifiesSchema) {
+                $driver->schema($table);
+            }
         });
     }
 }

@@ -2,12 +2,22 @@
 
 namespace Orbit\Drivers;
 
+use Illuminate\Database\Schema\Blueprint;
 use Orbit\Contracts\Driver;
+use Orbit\Contracts\ModifiesSchema;
+use Orbit\Support\BlueprintUtilities;
 use Spatie\YamlFrontMatter\YamlFrontMatter;
 use Symfony\Component\Yaml\Yaml;
 
-class Markdown implements Driver
+class Markdown implements Driver, ModifiesSchema
 {
+    public function schema(Blueprint $table): void
+    {
+        if (! BlueprintUtilities::hasColumn($table, 'content')) {
+            $table->text('content')->nullable();
+        }
+    }
+
     public function parse(string $fileContents): array
     {
         $document = YamlFrontMatter::parse($fileContents);
