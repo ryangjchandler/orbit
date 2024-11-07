@@ -13,6 +13,7 @@
     "require": {
         "php": "^8.2",
         "ext-json": "*",
+        "ext-pdo_sqlite": "*",
         "illuminate/console": "*",
         "illuminate/database": "^11.0",
         "illuminate/events": "^11.0",
