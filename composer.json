@@ -18,22 +18,22 @@
         "illuminate/database": "^11.0",
         "illuminate/events": "^11.0",
         "illuminate/support": "^11.0",
-        "spatie/laravel-package-tools": "^1.16",
-        "spatie/yaml-front-matter": "^2.0",
-        "symfony/yaml": "^7.0"
+        "spatie/laravel-package-tools": "^1.16.5",
+        "spatie/yaml-front-matter": "^2.0.9",
+        "symfony/yaml": "^7.1.6"
     },
     "require-dev": {
-        "laravel/pint": "^1.13",
-        "laravel/scout": "^10.0",
-        "nunomaduro/larastan": "^2.0",
-        "orchestra/testbench": "^9.0",
-        "pestphp/pest": "^2.20",
-        "pestphp/pest-plugin-laravel": "^2.2",
-        "phpstan/extension-installer": "^1.1",
-        "phpstan/phpstan": "^1.10",
-        "phpstan/phpstan-deprecation-rules": "^1.0",
-        "phpstan/phpstan-phpunit": "^1.0",
-        "phpunit/phpunit": "^10.0"
+        "laravel/pint": "^1.18.1",
+        "laravel/scout": "^10.11.5",
+        "larastan/larastan": "^2.9.10",
+        "orchestra/testbench": "^9.5.2",
+        "pestphp/pest": "^2.36",
+        "pestphp/pest-plugin-laravel": "^2.4",
+        "phpstan/extension-installer": "^1.4.3",
+        "phpstan/phpstan": "^1.12.8",
+        "phpstan/phpstan-deprecation-rules": "^1.2.1",
+        "phpstan/phpstan-phpunit": "^1.4",
+        "phpunit/phpunit": "^10.5.36"
     },
     "extra": {
         "laravel": {
