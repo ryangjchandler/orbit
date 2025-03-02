@@ -13,6 +13,8 @@ class ScoutSupportTest extends TestCase
     protected function tearDown(): void
     {
         ScoutPost::all()->each->delete();
+
+        parent::tearDown();
     }
 
     /** @test */

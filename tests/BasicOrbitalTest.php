@@ -10,6 +10,8 @@ class BasicOrbitalTest extends TestCase
     public function tearDown(): void
     {
         Post::all()->each->delete();
+
+        parent::tearDown();
     }
 
     public function test_it_will_return_an_empty_collection_when_no_content_present()

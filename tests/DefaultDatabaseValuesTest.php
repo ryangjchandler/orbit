@@ -38,6 +38,8 @@ class DefaultDatabaseValuesTest extends TestCase
     protected function tearDown(): void
     {
         DefaultValues::all()->each->delete();
+
+        parent::tearDown();
     }
 
     public function test_default_values_are_stored_on_disk()
