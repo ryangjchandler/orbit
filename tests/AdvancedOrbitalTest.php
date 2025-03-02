@@ -19,6 +19,8 @@ class AdvancedOrbitalTest extends TestCase
         JsonModel::all()->each->delete();
         YamlModel::all()->each->delete();
         Post::all()->each->delete();
+
+        parent::tearDown();
     }
 
     public function test_it_can_create_files_using_custom_primary_key()

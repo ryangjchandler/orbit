@@ -9,6 +9,8 @@ class SoftDeletesTest extends TestCase
     protected function tearDown(): void
     {
         SoftDeletedPost::all()->each->forceDelete();
+
+        parent::tearDown();
     }
 
     public function test_it_will_update_deleted_at_when_deleting()

@@ -13,21 +13,21 @@
     "require": {
         "php": "^8.0",
         "ext-json": "*",
-        "illuminate/console": "^9.0 | ^10.0 | ^11.0",
-        "illuminate/database": "^9.0 | ^10.0 | ^11.0",
-        "illuminate/events": "^9.0 | ^10.0 | ^11.0",
-        "illuminate/support": "^9.0 | ^10.0 | ^11.0",
+        "illuminate/console": "^11.0 | ^12.0",
+        "illuminate/database": "^11.0 | ^12.0",
+        "illuminate/events": "^11.0 | ^12.0",
+        "illuminate/support": "^11.0 | ^12.0",
         "spatie/yaml-front-matter": "^2.0",
         "symfony/yaml": "^6.0 | ^7.0"
     },
     "require-dev": {
         "laravel/scout": "^9.4 | ^10.0",
         "nunomaduro/larastan": "^2.0",
-        "orchestra/testbench": "^7.0 | ^8.0 | ^9.0",
+        "orchestra/testbench": "^9.0 | ^10.0",
         "phpstan/extension-installer": "^1.1",
-        "phpstan/phpstan-deprecation-rules": "^1.0",
-        "phpstan/phpstan-phpunit": "^1.0",
-        "phpunit/phpunit": "^9.0 | ^10.0"
+        "phpstan/phpstan-deprecation-rules": "^1.0 | ^2.0",
+        "phpstan/phpstan-phpunit": "^1.0 | ^2.0",
+        "phpunit/phpunit": "^10.0 | ^11.5.3"
     },
     "extra": {
         "laravel": {
