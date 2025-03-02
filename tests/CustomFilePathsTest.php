@@ -8,6 +8,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Orbit\Concerns\Orbital;
+use PHPUnit\Framework\Attributes\Test;
 
 class CustomFilePathModel extends Model
 {
@@ -50,7 +51,7 @@ class CustomFilePathsTest extends TestCase
         (new Filesystem())->deleteDirectory(__DIR__ . '/content/custom_file_path_models');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_be_stored_in_a_custom_path()
     {
         CustomFilePathModel::create([
@@ -61,7 +62,7 @@ class CustomFilePathsTest extends TestCase
         $this->assertFileExists(__DIR__ . '/content/custom_file_path_models/2022-02-12/foo-bar.md');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_read_files_stored_in_a_custom_path()
     {
         (new Filesystem())->ensureDirectoryExists(__DIR__ . '/content/custom_file_path_models/2022-04-01');
@@ -87,7 +88,7 @@ class CustomFilePathsTest extends TestCase
         $this->assertEquals('2022-04-01', $record->published_at->format('Y-m-d'));
     }
 
-    /** @test */
+    #[Test]
     public function it_removes_old_custom_file_paths_for_stale_data()
     {
         $record = CustomFilePathModel::create([

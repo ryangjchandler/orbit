@@ -7,6 +7,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Laravel\Scout\ScoutServiceProvider;
 use Laravel\Scout\Searchable;
 use Orbit\Concerns\Orbital;
+use PHPUnit\Framework\Attributes\Test;
 
 class ScoutSupportTest extends TestCase
 {
@@ -17,7 +18,7 @@ class ScoutSupportTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
+    #[Test]
     public function orbit_models_can_be_searched_with_scout()
     {
         config()->set('scout.driver', 'collection');
