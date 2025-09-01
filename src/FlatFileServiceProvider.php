@@ -3,40 +3,53 @@
 namespace RyanChandler\FlatFile;
 
 use Illuminate\Config\Repository;
-use RyanChandler\FlatFile\Actions\MaybeCreateFlatFileDirectories;
-use RyanChandler\FlatFile\Actions\MaybeCreateOrbitDirectories;
-use Spatie\LaravelPackageTools\Commands\InstallCommand;
-use Spatie\LaravelPackageTools\Package;
-use Spatie\LaravelPackageTools\PackageServiceProvider;
+use Illuminate\Support\ServiceProvider;
 
-class FlatFileServiceProvider extends PackageServiceProvider
+class FlatFileServiceProvider extends ServiceProvider
 {
-    public function configurePackage(Package $package): void
+    /**
+     * Register application services.
+     */
+    public function register(): void
     {
-        $package
-            ->name('eloquent-flat-file')
-            ->hasInstallCommand(function (InstallCommand $command) {
-                $command
-                    ->startWith(function () {
-                        $maybeCreateFlatFileDirectories = new MaybeCreateFlatFileDirectories();
-                        $maybeCreateFlatFileDirectories->execute();
-                    })
-                    ->askToStarRepoOnGitHub('ryangjchandler/eloquent-flat-file');
-            })
-            ->hasConfigFile('flat-file')
-            ->hasCommands([
-                Commands\ClearCommand::class,
-            ]);
+        $this->mergeConfigFrom(__DIR__ . '/../config/flat-file.php', 'flat-file');
+
+        $repository = $this->app->get(Repository::class);
+
+        $this->app->singleton(FlatFile::class, static function () use ($repository): FlatFile {
+            return new FlatFile(
+                config: new Repository($repository->get('flat-file')),
+            );
+        });
+
+        $repository->set('database.connections.flat-file', [
+            'driver' => 'sqlite',
+            'database' => $repository->get('flat-file.paths.database'),
+            'foreign_key_constraints' => false,
+            'journal_mode' => 'WAL',
+            'busy_timeout' => 5000,
+            'synchronous' => 'NORMAL',
+            'transaction_mode' => 'DEFERRED',
+        ]);
     }
 
-    public function packageRegistered()
+    /**
+     * Bootstrap application services.
+     */
+    public function boot(): void
     {
-        $config = $this->app->get(Repository::class);
+        $this->publishes([
+            __DIR__ . '/../config/flat-file.php' => config_path('flat-file.php'),
+        ], 'config');
 
-        $config->set('database.connections.flat-file', [
-            'driver' => 'sqlite',
-            'database' => $config->get('flat-file.paths.database'),
-            'foreign_key_constraints' => false,
-        ]);
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                Commands\ClearCommand::class,
+            ]);
+
+            $this->optimizes(
+                clear: 'orbit:clear --force',
+            );
+        }
     }
 }

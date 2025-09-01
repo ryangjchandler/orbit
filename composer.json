@@ -18,7 +18,6 @@
         "illuminate/database": "^12.0",
         "illuminate/events": "^12.0",
         "illuminate/support": "^12.0",
-        "spatie/laravel-package-tools": "^1.16.5",
         "spatie/yaml-front-matter": "^2.0.9",
         "symfony/yaml": "^7.1.6"
     },
@@ -55,7 +54,7 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "scripts": {
-        "lint": "vendor/bin/phpstan analyse",
+        "lint": "vendor/bin/phpstan --memory-limit=-1 analyse",
         "test": "vendor/bin/pest",
         "fmt": "vendor/bin/pint"
     },
