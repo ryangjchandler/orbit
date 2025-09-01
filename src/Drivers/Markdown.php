@@ -1,11 +1,11 @@
 <?php
 
-namespace Orbit\Drivers;
+namespace RyanChandler\FlatFile\Drivers;
 
 use Illuminate\Database\Schema\Blueprint;
-use Orbit\Contracts\Driver;
-use Orbit\Contracts\ModifiesSchema;
-use Orbit\Support\BlueprintUtilities;
+use RyanChandler\FlatFile\Contracts\Driver;
+use RyanChandler\FlatFile\Contracts\ModifiesSchema;
+use RyanChandler\FlatFile\Support\BlueprintUtilities;
 use Spatie\YamlFrontMatter\YamlFrontMatter;
 use Symfony\Component\Yaml\Yaml;
 

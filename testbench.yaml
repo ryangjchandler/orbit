@@ -1,2 +1,2 @@
 providers:
-  - Orbit\OrbitServiceProvider
+  - RyanChandler\FlatFile\FlatFileServiceProvider

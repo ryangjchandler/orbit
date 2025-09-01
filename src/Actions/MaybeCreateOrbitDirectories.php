@@ -1,10 +1,10 @@
 <?php
 
-namespace Orbit\Actions;
+namespace RyanChandler\FlatFile\Actions;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
-use Orbit\Contracts\Orbit;
+use RyanChandler\FlatFile\Contracts\Orbit;
 
 class MaybeCreateOrbitDirectories
 {

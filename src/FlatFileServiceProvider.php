@@ -1,26 +1,26 @@
 <?php
 
-namespace Orbit;
+namespace RyanChandler\FlatFile;
 
 use Illuminate\Config\Repository;
-use Orbit\Actions\MaybeCreateOrbitDirectories;
+use RyanChandler\FlatFile\Actions\MaybeCreateOrbitDirectories;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
-class OrbitServiceProvider extends PackageServiceProvider
+class FlatFileServiceProvider extends PackageServiceProvider
 {
     public function configurePackage(Package $package): void
     {
         $package
-            ->name('orbit')
+            ->name('eloquent-flat-file')
             ->hasInstallCommand(function (InstallCommand $command) {
                 $command
                     ->startWith(function () {
                         $maybeCreateOrbitDirectories = new MaybeCreateOrbitDirectories();
                         $maybeCreateOrbitDirectories->execute();
                     })
-                    ->askToStarRepoOnGitHub('ryangjchandler/orbit');
+                    ->askToStarRepoOnGitHub('ryangjchandler/eloquent-flat-file');
             })
             ->hasConfigFile()
             ->hasCommands([

@@ -1,6 +1,6 @@
 <?php
 
-namespace Orbit\Commands;
+namespace RyanChandler\FlatFile\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;

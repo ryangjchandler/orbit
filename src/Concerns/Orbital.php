@@ -1,23 +1,23 @@
 <?php
 
-namespace Orbit\Concerns;
+namespace RyanChandler\FlatFile\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
-use Orbit\Actions\DeleteSourceFile;
-use Orbit\Actions\InitialiseOrbitalTable;
-use Orbit\Actions\MaybeCreateOrbitDirectories;
-use Orbit\Actions\MaybeRefreshDatabaseContent;
-use Orbit\Actions\SaveCompiledAttributesToFile;
-use Orbit\Contracts\Driver;
-use Orbit\Contracts\Orbit;
-use Orbit\Drivers\Markdown;
-use Orbit\Exceptions\InvalidDriverException;
-use Orbit\Support\ModelAttributeFormatter;
-use Orbit\Support\ModelUsesSoftDeletes;
+use RyanChandler\FlatFile\Actions\DeleteSourceFile;
+use RyanChandler\FlatFile\Actions\InitialiseOrbitalTable;
+use RyanChandler\FlatFile\Actions\MaybeCreateOrbitDirectories;
+use RyanChandler\FlatFile\Actions\MaybeRefreshDatabaseContent;
+use RyanChandler\FlatFile\Actions\SaveCompiledAttributesToFile;
+use RyanChandler\FlatFile\Contracts\Driver;
+use RyanChandler\FlatFile\Contracts\Orbit;
+use RyanChandler\FlatFile\Drivers\Markdown;
+use RyanChandler\FlatFile\Exceptions\InvalidDriverException;
+use RyanChandler\FlatFile\Support\ModelAttributeFormatter;
+use RyanChandler\FlatFile\Support\ModelUsesSoftDeletes;
 
 /**
  * @mixin \Illuminate\Database\Eloquent\Model
- * @mixin \Orbit\Contracts\Orbit
+ * @mixin \RyanChandler\FlatFile\Contracts\Orbit
  */
 trait Orbital
 {

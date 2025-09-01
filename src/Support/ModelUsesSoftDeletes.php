@@ -1,10 +1,10 @@
 <?php
 
-namespace Orbit\Support;
+namespace RyanChandler\FlatFile\Support;
 
 use Illuminate\Database\Eloquent\Model;
-use Orbit\Concerns\SoftDeletes;
-use Orbit\Contracts\Orbit;
+use RyanChandler\FlatFile\Concerns\SoftDeletes;
+use RyanChandler\FlatFile\Contracts\Orbit;
 
 class ModelUsesSoftDeletes
 {

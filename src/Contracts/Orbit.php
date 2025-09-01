@@ -1,6 +1,6 @@
 <?php
 
-namespace Orbit\Contracts;
+namespace RyanChandler\FlatFile\Contracts;
 
 use Illuminate\Database\Schema\Blueprint;
 
@@ -14,7 +14,7 @@ interface Orbit
     /**
      * Declare which driver the Orbital should use.
      *
-     * @return class-string<\Orbit\Contracts\Driver>
+     * @return class-string<\RyanChandler\FlatFile\Contracts\Driver>
      */
     public function getOrbitDriver(): string;
 

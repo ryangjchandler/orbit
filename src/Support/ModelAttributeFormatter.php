@@ -1,12 +1,12 @@
 <?php
 
-namespace Orbit\Support;
+namespace RyanChandler\FlatFile\Support;
 
 use BackedEnum;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
-use Orbit\Contracts\Orbit;
+use RyanChandler\FlatFile\Contracts\Orbit;
 
 class ModelAttributeFormatter
 {

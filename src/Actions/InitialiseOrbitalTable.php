@@ -1,13 +1,13 @@
 <?php
 
-namespace Orbit\Actions;
+namespace RyanChandler\FlatFile\Actions;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
-use Orbit\Contracts\Driver;
-use Orbit\Contracts\ModifiesSchema;
-use Orbit\Contracts\Orbit;
-use Orbit\Support\ConfigureBlueprintFromModel;
+use RyanChandler\FlatFile\Contracts\Driver;
+use RyanChandler\FlatFile\Contracts\ModifiesSchema;
+use RyanChandler\FlatFile\Contracts\Orbit;
+use RyanChandler\FlatFile\Support\ConfigureBlueprintFromModel;
 use ReflectionClass;
 
 class InitialiseOrbitalTable

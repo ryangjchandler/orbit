@@ -1,6 +1,6 @@
 <?php
 
-use Orbit\Drivers\Markdown;
+use RyanChandler\FlatFile\Drivers\Markdown;
 use PHPUnit\Framework\TestCase;
 
 uses(TestCase::class);

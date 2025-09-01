@@ -38,13 +38,13 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Orbit\\OrbitServiceProvider"
+                "RyanChandler\\FlatFile\\FlatFileServiceProvider"
             ]
         }
     },
     "autoload": {
         "psr-4": {
-            "Orbit\\": "src/"
+            "RyanChandler\\FlatFile\\": "src/"
         }
     },
     "autoload-dev": {

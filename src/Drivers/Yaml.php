@@ -1,8 +1,8 @@
 <?php
 
-namespace Orbit\Drivers;
+namespace RyanChandler\FlatFile\Drivers;
 
-use Orbit\Contracts\Driver;
+use RyanChandler\FlatFile\Contracts\Driver;
 use Symfony\Component\Yaml\Yaml as YamlParser;
 
 class Yaml implements Driver

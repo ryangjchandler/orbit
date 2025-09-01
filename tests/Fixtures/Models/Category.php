@@ -4,9 +4,9 @@ namespace Tests\Fixtures\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
-use Orbit\Concerns\Orbital;
-use Orbit\Concerns\SoftDeletes;
-use Orbit\Contracts\Orbit;
+use RyanChandler\FlatFile\Concerns\Orbital;
+use RyanChandler\FlatFile\Concerns\SoftDeletes;
+use RyanChandler\FlatFile\Contracts\Orbit;
 
 class Category extends Model implements Orbit
 {

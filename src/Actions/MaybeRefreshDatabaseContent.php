@@ -1,15 +1,15 @@
 <?php
 
-namespace Orbit\Actions;
+namespace RyanChandler\FlatFile\Actions;
 
 use FilesystemIterator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
-use Orbit\Contracts\Driver;
-use Orbit\Contracts\Orbit;
-use Orbit\Support\ConfigureBlueprintFromModel;
-use Orbit\Support\FillMissingAttributeValuesFromBlueprint;
+use RyanChandler\FlatFile\Contracts\Driver;
+use RyanChandler\FlatFile\Contracts\Orbit;
+use RyanChandler\FlatFile\Support\ConfigureBlueprintFromModel;
+use RyanChandler\FlatFile\Support\FillMissingAttributeValuesFromBlueprint;
 
 class MaybeRefreshDatabaseContent
 {

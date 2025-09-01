@@ -1,8 +1,8 @@
 <?php
 
-namespace Orbit\Drivers;
+namespace RyanChandler\FlatFile\Drivers;
 
-use Orbit\Contracts\Driver;
+use RyanChandler\FlatFile\Contracts\Driver;
 
 class Json implements Driver
 {

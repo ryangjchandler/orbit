@@ -1,20 +1,20 @@
 <?php
 
-namespace Orbit\Concerns;
+namespace RyanChandler\FlatFile\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes as BaseSoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Orbit\Actions\DeleteSourceFile;
-use Orbit\Actions\SaveCompiledAttributesToFile;
-use Orbit\Contracts\Driver;
-use Orbit\Contracts\Orbit;
-use Orbit\Exceptions\InvalidDriverException;
-use Orbit\Support\ModelAttributeFormatter;
+use RyanChandler\FlatFile\Actions\DeleteSourceFile;
+use RyanChandler\FlatFile\Actions\SaveCompiledAttributesToFile;
+use RyanChandler\FlatFile\Contracts\Driver;
+use RyanChandler\FlatFile\Contracts\Orbit;
+use RyanChandler\FlatFile\Exceptions\InvalidDriverException;
+use RyanChandler\FlatFile\Support\ModelAttributeFormatter;
 
 /**
  * @mixin \Illuminate\Database\Eloquent\Model
- * @mixin \Orbit\Contracts\Orbit
+ * @mixin \RyanChandler\FlatFile\Contracts\Orbit
  */
 trait SoftDeletes
 {

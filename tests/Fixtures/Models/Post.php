@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Str;
-use Orbit\Concerns\Orbital;
-use Orbit\Contracts\Orbit;
+use RyanChandler\FlatFile\Concerns\Orbital;
+use RyanChandler\FlatFile\Contracts\Orbit;
 
 class Post extends Model implements Orbit
 {
