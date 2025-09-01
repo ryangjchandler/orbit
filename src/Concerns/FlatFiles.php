@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 use RyanChandler\FlatFile\Actions\DeleteSourceFile;
 use RyanChandler\FlatFile\Actions\InitializeFlatFileTable;
 use RyanChandler\FlatFile\Actions\MaybeCreateFlatFileDirectories;
-use RyanChandler\FlatFile\Actions\MaybeCreateOrbitDirectories;
 use RyanChandler\FlatFile\Actions\MaybeRefreshDatabaseContent;
 use RyanChandler\FlatFile\Actions\SaveCompiledAttributesToFile;
 use RyanChandler\FlatFile\Contracts\Driver;
@@ -19,6 +18,8 @@ use RyanChandler\FlatFile\Support\ModelUsesSoftDeletes;
 /**
  * @mixin \Illuminate\Database\Eloquent\Model
  * @mixin \RyanChandler\FlatFile\Contracts\InteractsWithFlatFiles
+ * 
+ * @phpstan-ignore trait.unused
  */
 trait FlatFiles
 {

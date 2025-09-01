@@ -15,6 +15,8 @@ use RyanChandler\FlatFile\Support\ModelAttributeFormatter;
 /**
  * @mixin \Illuminate\Database\Eloquent\Model
  * @mixin \RyanChandler\FlatFile\Contracts\InteractsWithFlatFiles
+ * 
+ * @phpstan-ignore trait.unused
  */
 trait SoftDeletes
 {
