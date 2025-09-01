@@ -41,7 +41,7 @@ class MaybeRefreshDatabaseContent
 
         $blueprint = ConfigureBlueprintFromModel::configure(
             $model,
-            new Blueprint($model->getTable())
+            new Blueprint($model->getConnection(), $model->getTable())
         );
 
         collect($records)
