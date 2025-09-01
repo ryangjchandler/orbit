@@ -4,13 +4,13 @@ namespace Tests\Fixtures\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
-use RyanChandler\FlatFile\Concerns\Orbital;
+use RyanChandler\FlatFile\Concerns\FlatFiles;
 use RyanChandler\FlatFile\Concerns\SoftDeletes;
-use RyanChandler\FlatFile\Contracts\Orbit;
+use RyanChandler\FlatFile\Contracts\InteractsWithFlatFiles;
 
-class Category extends Model implements Orbit
+class Category extends Model implements InteractsWithFlatFiles
 {
-    use Orbital;
+    use FlatFiles;
     use SoftDeletes;
 
     protected $guarded = [];

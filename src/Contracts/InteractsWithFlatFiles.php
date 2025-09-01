@@ -4,7 +4,7 @@ namespace RyanChandler\FlatFile\Contracts;
 
 use Illuminate\Database\Schema\Blueprint;
 
-interface Orbit
+interface InteractsWithFlatFiles
 {
     /**
      * Define the structure of your Orbital model.
@@ -16,10 +16,10 @@ interface Orbit
      *
      * @return class-string<\RyanChandler\FlatFile\Contracts\Driver>
      */
-    public function getOrbitDriver(): string;
+    public function getFlatFileDriver(): string;
 
     /**
      * Get the name of the source folder (or file) where model content is stored.
      */
-    public function getOrbitSource(): string;
+    public function getFlatFileSource(): string;
 }

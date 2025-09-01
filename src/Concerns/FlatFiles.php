@@ -4,12 +4,13 @@ namespace RyanChandler\FlatFile\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
 use RyanChandler\FlatFile\Actions\DeleteSourceFile;
-use RyanChandler\FlatFile\Actions\InitialiseOrbitalTable;
+use RyanChandler\FlatFile\Actions\InitializeFlatFileTable;
+use RyanChandler\FlatFile\Actions\MaybeCreateFlatFileDirectories;
 use RyanChandler\FlatFile\Actions\MaybeCreateOrbitDirectories;
 use RyanChandler\FlatFile\Actions\MaybeRefreshDatabaseContent;
 use RyanChandler\FlatFile\Actions\SaveCompiledAttributesToFile;
 use RyanChandler\FlatFile\Contracts\Driver;
-use RyanChandler\FlatFile\Contracts\Orbit;
+use RyanChandler\FlatFile\Contracts\InteractsWithFlatFiles;
 use RyanChandler\FlatFile\Drivers\Markdown;
 use RyanChandler\FlatFile\Exceptions\InvalidDriverException;
 use RyanChandler\FlatFile\Support\ModelAttributeFormatter;
@@ -17,18 +18,18 @@ use RyanChandler\FlatFile\Support\ModelUsesSoftDeletes;
 
 /**
  * @mixin \Illuminate\Database\Eloquent\Model
- * @mixin \RyanChandler\FlatFile\Contracts\Orbit
+ * @mixin \RyanChandler\FlatFile\Contracts\InteractsWithFlatFiles
  */
-trait Orbital
+trait FlatFiles
 {
-    public static function bootOrbital()
+    public static function bootFlatFiles()
     {
         $model = new static();
 
-        $maybeCreateOrbitDirectories = new MaybeCreateOrbitDirectories();
+        $maybeCreateOrbitDirectories = new MaybeCreateFlatFileDirectories();
         $maybeCreateOrbitDirectories->execute($model);
 
-        $driver = $model->getOrbitDriver();
+        $driver = $model->getFlatFileDriver();
 
         if (! class_exists($driver)) {
             throw InvalidDriverException::make($driver);
@@ -40,7 +41,7 @@ trait Orbital
             throw InvalidDriverException::make($driver::class);
         }
 
-        $initialiseOrbitTable = new InitialiseOrbitalTable();
+        $initialiseOrbitTable = new InitializeFlatFileTable();
         $maybeRefreshDatabaseContent = new MaybeRefreshDatabaseContent();
         $refreshed = false;
 
@@ -57,7 +58,7 @@ trait Orbital
 
         $saveCompiledAttributesToFile = new SaveCompiledAttributesToFile();
 
-        static::created(function (Orbit&Model $model) use ($driver, $saveCompiledAttributesToFile) {
+        static::created(function (InteractsWithFlatFiles&Model $model) use ($driver, $saveCompiledAttributesToFile) {
             $model->refresh();
 
             $attributes = ModelAttributeFormatter::format($model, $model->getAttributes());
@@ -66,7 +67,7 @@ trait Orbital
             $saveCompiledAttributesToFile->execute($model, $compiledAttributes, $driver);
         });
 
-        static::updated(function (Orbit&Model $model) use ($driver, $saveCompiledAttributesToFile) {
+        static::updated(function (InteractsWithFlatFiles&Model $model) use ($driver, $saveCompiledAttributesToFile) {
             $model->refresh();
 
             $attributes = ModelAttributeFormatter::format($model, $model->getAttributes());
@@ -75,7 +76,7 @@ trait Orbital
             $saveCompiledAttributesToFile->execute($model, $compiledAttributes, $driver);
         });
 
-        static::deleted(function (Orbit&Model $model) use ($driver) {
+        static::deleted(function (InteractsWithFlatFiles&Model $model) use ($driver) {
             if (ModelUsesSoftDeletes::check($model)) {
                 return;
             }
@@ -87,20 +88,20 @@ trait Orbital
 
     public static function resolveConnection($connection = null)
     {
-        return static::$resolver->connection('orbit');
+        return static::$resolver->connection('flat-file');
     }
 
     public function getConnectionName()
     {
-        return 'orbit';
+        return 'flat-file';
     }
 
-    public function getOrbitDriver(): string
+    public function getFlatFileDriver(): string
     {
         return Markdown::class;
     }
 
-    public function getOrbitSource(): string
+    public function getFlatFileSource(): string
     {
         return str(static::class)
             ->classBasename()

@@ -4,11 +4,11 @@ namespace RyanChandler\FlatFile\Support;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
-use RyanChandler\FlatFile\Contracts\Orbit;
+use RyanChandler\FlatFile\Contracts\InteractsWithFlatFiles;
 
 class ConfigureBlueprintFromModel
 {
-    public static function configure(Orbit&Model $model, Blueprint $blueprint): Blueprint
+    public static function configure(InteractsWithFlatFiles&Model $model, Blueprint $blueprint): Blueprint
     {
         $model->schema($blueprint);
 

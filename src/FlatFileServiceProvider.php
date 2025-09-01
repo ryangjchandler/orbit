@@ -3,6 +3,7 @@
 namespace RyanChandler\FlatFile;
 
 use Illuminate\Config\Repository;
+use RyanChandler\FlatFile\Actions\MaybeCreateFlatFileDirectories;
 use RyanChandler\FlatFile\Actions\MaybeCreateOrbitDirectories;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
@@ -17,12 +18,12 @@ class FlatFileServiceProvider extends PackageServiceProvider
             ->hasInstallCommand(function (InstallCommand $command) {
                 $command
                     ->startWith(function () {
-                        $maybeCreateOrbitDirectories = new MaybeCreateOrbitDirectories();
-                        $maybeCreateOrbitDirectories->execute();
+                        $maybeCreateFlatFileDirectories = new MaybeCreateFlatFileDirectories();
+                        $maybeCreateFlatFileDirectories->execute();
                     })
                     ->askToStarRepoOnGitHub('ryangjchandler/eloquent-flat-file');
             })
-            ->hasConfigFile()
+            ->hasConfigFile('flat-file')
             ->hasCommands([
                 Commands\ClearCommand::class,
             ]);
@@ -32,9 +33,9 @@ class FlatFileServiceProvider extends PackageServiceProvider
     {
         $config = $this->app->get(Repository::class);
 
-        $config->set('database.connections.orbit', [
+        $config->set('database.connections.flat-file', [
             'driver' => 'sqlite',
-            'database' => $config->get('orbit.paths.database'),
+            'database' => $config->get('flat-file.paths.database'),
             'foreign_key_constraints' => false,
         ]);
     }

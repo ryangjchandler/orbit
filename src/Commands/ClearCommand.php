@@ -7,18 +7,18 @@ use Illuminate\Filesystem\Filesystem;
 
 class ClearCommand extends Command
 {
-    protected $signature = 'orbit:clear {--force}';
+    protected $signature = 'flat-file:cache:clear {--force}';
 
-    protected $description = 'Clear Orbit\'s cache.';
+    protected $description = 'Clear the flat-file SQLite cache.';
 
     public function handle()
     {
-        if (! $this->option('force') && ! $this->confirm('Are you sure you want to clear Orbit\'s cache?')) {
+        if (! $this->option('force') && ! $this->confirm('Are you sure you want to clear the flat-file SQLite cache?')) {
             return self::SUCCESS;
         }
 
         $fs = new Filesystem();
-        $fs->delete(config('orbit.paths.database'));
+        $fs->delete(config('flat-file.paths.database'));
 
         $this->info('Cache cleared.');
 

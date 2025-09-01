@@ -6,11 +6,11 @@ use BackedEnum;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
-use RyanChandler\FlatFile\Contracts\Orbit;
+use RyanChandler\FlatFile\Contracts\InteractsWithFlatFiles;
 
 class ModelAttributeFormatter
 {
-    public static function format(Orbit&Model $model, array $attributes): array
+    public static function format(InteractsWithFlatFiles&Model $model, array $attributes): array
     {
         return Arr::map($attributes, static function (mixed $value, string $key) use ($model) {
             $cast = $model->{$key};

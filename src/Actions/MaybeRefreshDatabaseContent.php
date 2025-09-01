@@ -7,16 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
 use RyanChandler\FlatFile\Contracts\Driver;
-use RyanChandler\FlatFile\Contracts\Orbit;
+use RyanChandler\FlatFile\Contracts\InteractsWithFlatFiles;
 use RyanChandler\FlatFile\Support\ConfigureBlueprintFromModel;
 use RyanChandler\FlatFile\Support\FillMissingAttributeValuesFromBlueprint;
 
 class MaybeRefreshDatabaseContent
 {
-    public function shouldRefresh(Orbit&Model $model): bool
+    public function shouldRefresh(InteractsWithFlatFiles&Model $model): bool
     {
-        $databaseMTime = filemtime(config('orbit.paths.database'));
-        $directory = config('orbit.paths.content') . DIRECTORY_SEPARATOR . $model->getOrbitSource();
+        $databaseMTime = filemtime(config('flat-file.paths.database'));
+        $directory = config('flat-file.paths.content') . DIRECTORY_SEPARATOR . $model->getFlatFileSource();
         $highestMTime = 0;
 
         foreach (new FilesystemIterator($directory, FilesystemIterator::SKIP_DOTS) as $file) {
@@ -28,9 +28,9 @@ class MaybeRefreshDatabaseContent
         return $highestMTime >= $databaseMTime;
     }
 
-    public function refresh(Orbit&Model $model, Driver $driver): void
+    public function refresh(InteractsWithFlatFiles&Model $model, Driver $driver): void
     {
-        $directory = config('orbit.paths.content') . DIRECTORY_SEPARATOR . $model->getOrbitSource();
+        $directory = config('flat-file.paths.content') . DIRECTORY_SEPARATOR . $model->getFlatFileSource();
         $iterator = new FilesystemIterator($directory, FilesystemIterator::SKIP_DOTS);
         $records = [];
 

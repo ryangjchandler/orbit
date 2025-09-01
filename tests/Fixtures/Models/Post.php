@@ -6,12 +6,12 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Str;
-use RyanChandler\FlatFile\Concerns\Orbital;
-use RyanChandler\FlatFile\Contracts\Orbit;
+use RyanChandler\FlatFile\Concerns\FlatFiles;
+use RyanChandler\FlatFile\Contracts\InteractsWithFlatFiles;
 
-class Post extends Model implements Orbit
+class Post extends Model implements InteractsWithFlatFiles
 {
-    use Orbital;
+    use FlatFiles;
 
     protected $guarded = [];
 

@@ -8,13 +8,13 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use RyanChandler\FlatFile\Actions\DeleteSourceFile;
 use RyanChandler\FlatFile\Actions\SaveCompiledAttributesToFile;
 use RyanChandler\FlatFile\Contracts\Driver;
-use RyanChandler\FlatFile\Contracts\Orbit;
+use RyanChandler\FlatFile\Contracts\InteractsWithFlatFiles;
 use RyanChandler\FlatFile\Exceptions\InvalidDriverException;
 use RyanChandler\FlatFile\Support\ModelAttributeFormatter;
 
 /**
  * @mixin \Illuminate\Database\Eloquent\Model
- * @mixin \RyanChandler\FlatFile\Contracts\Orbit
+ * @mixin \RyanChandler\FlatFile\Contracts\InteractsWithFlatFiles
  */
 trait SoftDeletes
 {
@@ -25,7 +25,7 @@ trait SoftDeletes
         static::addGlobalScope(new SoftDeletingScope);
 
         $model = new static();
-        $driver = $model->getOrbitDriver();
+        $driver = $model->getFlatFileDriver();
 
         if (! class_exists($driver)) {
             throw InvalidDriverException::make($driver);
@@ -39,7 +39,7 @@ trait SoftDeletes
 
         $saveCompiledAttributesToFile = new SaveCompiledAttributesToFile();
 
-        static::deleted(function (Orbit&Model $model) use ($driver, $saveCompiledAttributesToFile) {
+        static::deleted(function (InteractsWithFlatFiles&Model $model) use ($driver, $saveCompiledAttributesToFile) {
             $model->refresh();
 
             $attributes = ModelAttributeFormatter::format($model, $model->getAttributes());
@@ -48,7 +48,7 @@ trait SoftDeletes
             $saveCompiledAttributesToFile->execute($model, $compiledAttributes, $driver);
         });
 
-        static::restored(function (Orbit&Model $model) use ($driver, $saveCompiledAttributesToFile) {
+        static::restored(function (InteractsWithFlatFiles&Model $model) use ($driver, $saveCompiledAttributesToFile) {
             $model->refresh();
 
             $attributes = ModelAttributeFormatter::format($model, $model->getAttributes());
@@ -57,7 +57,7 @@ trait SoftDeletes
             $saveCompiledAttributesToFile->execute($model, $compiledAttributes, $driver);
         });
 
-        static::forceDeleted(function (Orbit&Model $model) use ($driver) {
+        static::forceDeleted(function (InteractsWithFlatFiles&Model $model) use ($driver) {
             $deleteSourceFile = new DeleteSourceFile();
             $deleteSourceFile->execute($model, $driver);
         });
