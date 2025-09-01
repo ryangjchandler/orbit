@@ -1,6 +1,6 @@
 {
-    "name": "ryangjchandler/orbit",
-    "description": "A flat-file database driver for Eloquent.",
+    "name": "ryangjchandler/eloquent-flat-file",
+    "description": "Power your Eloquent models with flat-file storage.",
     "license": "MIT",
     "authors": [
         {
