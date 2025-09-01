@@ -1,17 +1,17 @@
 <?php
 
-namespace Orbit\Actions;
+namespace RyanChandler\FlatFile\Actions;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
-use Orbit\Contracts\Driver;
-use Orbit\Contracts\Orbit;
+use RyanChandler\FlatFile\Contracts\Driver;
+use RyanChandler\FlatFile\Contracts\InteractsWithFlatFiles;
 
 class SaveCompiledAttributesToFile
 {
-    public function execute(Orbit&Model $model, string $compiledAttributes, Driver $driver): void
+    public function execute(InteractsWithFlatFiles&Model $model, string $compiledAttributes, Driver $driver): void
     {
-        $directory = config('orbit.paths.content').DIRECTORY_SEPARATOR.$model->getOrbitSource();
+        $directory = config('flat-file.paths.content').DIRECTORY_SEPARATOR.$model->getFlatFileSource();
         $filename = "{$model->getKey()}.{$driver->extension()}";
         $fs = new Filesystem();
 

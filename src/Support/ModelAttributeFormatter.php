@@ -1,16 +1,16 @@
 <?php
 
-namespace Orbit\Support;
+namespace RyanChandler\FlatFile\Support;
 
 use BackedEnum;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
-use Orbit\Contracts\Orbit;
+use RyanChandler\FlatFile\Contracts\InteractsWithFlatFiles;
 
 class ModelAttributeFormatter
 {
-    public static function format(Orbit&Model $model, array $attributes): array
+    public static function format(InteractsWithFlatFiles&Model $model, array $attributes): array
     {
         return Arr::map($attributes, static function (mixed $value, string $key) use ($model) {
             $cast = $model->{$key};

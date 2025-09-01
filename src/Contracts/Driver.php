@@ -1,6 +1,6 @@
 <?php
 
-namespace Orbit\Contracts;
+namespace RyanChandler\FlatFile\Contracts;
 
 interface Driver
 {

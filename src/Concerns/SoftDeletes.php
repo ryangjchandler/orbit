@@ -1,20 +1,22 @@
 <?php
 
-namespace Orbit\Concerns;
+namespace RyanChandler\FlatFile\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes as BaseSoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Orbit\Actions\DeleteSourceFile;
-use Orbit\Actions\SaveCompiledAttributesToFile;
-use Orbit\Contracts\Driver;
-use Orbit\Contracts\Orbit;
-use Orbit\Exceptions\InvalidDriverException;
-use Orbit\Support\ModelAttributeFormatter;
+use RyanChandler\FlatFile\Actions\DeleteSourceFile;
+use RyanChandler\FlatFile\Actions\SaveCompiledAttributesToFile;
+use RyanChandler\FlatFile\Contracts\Driver;
+use RyanChandler\FlatFile\Contracts\InteractsWithFlatFiles;
+use RyanChandler\FlatFile\Exceptions\InvalidDriverException;
+use RyanChandler\FlatFile\Support\ModelAttributeFormatter;
 
 /**
  * @mixin \Illuminate\Database\Eloquent\Model
- * @mixin \Orbit\Contracts\Orbit
+ * @mixin \RyanChandler\FlatFile\Contracts\InteractsWithFlatFiles
+ * 
+ * @phpstan-ignore trait.unused
  */
 trait SoftDeletes
 {
@@ -25,7 +27,7 @@ trait SoftDeletes
         static::addGlobalScope(new SoftDeletingScope);
 
         $model = new static();
-        $driver = $model->getOrbitDriver();
+        $driver = $model->getFlatFileDriver();
 
         if (! class_exists($driver)) {
             throw InvalidDriverException::make($driver);
@@ -39,7 +41,7 @@ trait SoftDeletes
 
         $saveCompiledAttributesToFile = new SaveCompiledAttributesToFile();
 
-        static::deleted(function (Orbit&Model $model) use ($driver, $saveCompiledAttributesToFile) {
+        static::deleted(function (InteractsWithFlatFiles&Model $model) use ($driver, $saveCompiledAttributesToFile) {
             $model->refresh();
 
             $attributes = ModelAttributeFormatter::format($model, $model->getAttributes());
@@ -48,7 +50,7 @@ trait SoftDeletes
             $saveCompiledAttributesToFile->execute($model, $compiledAttributes, $driver);
         });
 
-        static::restored(function (Orbit&Model $model) use ($driver, $saveCompiledAttributesToFile) {
+        static::restored(function (InteractsWithFlatFiles&Model $model) use ($driver, $saveCompiledAttributesToFile) {
             $model->refresh();
 
             $attributes = ModelAttributeFormatter::format($model, $model->getAttributes());
@@ -57,7 +59,7 @@ trait SoftDeletes
             $saveCompiledAttributesToFile->execute($model, $compiledAttributes, $driver);
         });
 
-        static::forceDeleted(function (Orbit&Model $model) use ($driver) {
+        static::forceDeleted(function (InteractsWithFlatFiles&Model $model) use ($driver) {
             $deleteSourceFile = new DeleteSourceFile();
             $deleteSourceFile->execute($model, $driver);
         });

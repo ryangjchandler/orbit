@@ -1,6 +1,6 @@
 <?php
 
-use Orbit\Drivers\Yaml;
+use RyanChandler\FlatFile\Drivers\Yaml;
 
 it('can parse a yaml file into an array of attributes', function () {
     $yaml = <<<'YML'

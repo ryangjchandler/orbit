@@ -1,6 +1,6 @@
 <?php
 
-namespace Orbit\Contracts;
+namespace RyanChandler\FlatFile\Contracts;
 
 use Illuminate\Database\Schema\Blueprint;
 

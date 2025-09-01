@@ -1,6 +1,6 @@
 <?php
 
-use Orbit\Drivers\Json;
+use RyanChandler\FlatFile\Drivers\Json;
 
 it('can parse a json file into an array of attributes', function () {
     $json = <<<'JSON'

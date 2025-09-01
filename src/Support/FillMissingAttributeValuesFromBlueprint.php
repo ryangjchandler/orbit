@@ -1,6 +1,6 @@
 <?php
 
-namespace Orbit\Support;
+namespace RyanChandler\FlatFile\Support;
 
 use Illuminate\Database\Schema\Blueprint;
 
