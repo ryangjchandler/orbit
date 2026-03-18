@@ -21,8 +21,8 @@
         "symfony/yaml": "^6.0 | ^7.0"
     },
     "require-dev": {
-        "laravel/scout": "^9.4 | ^10.0 | ^11.0",
-        "nunomaduro/larastan": "^2.0",
+        "laravel/scout": "^10.0 | ^11.0",
+        "nunomaduro/larastan": "^3.0",
         "orchestra/testbench": "^10.0 | ^11.0",
         "phpstan/extension-installer": "^1.1",
         "phpstan/phpstan-deprecation-rules": "^1.0 | ^2.0",
