@@ -13,15 +13,15 @@
     "require": {
         "php": "^8.0",
         "ext-json": "*",
-        "illuminate/console": "^11.0 | ^12.0",
-        "illuminate/database": "^11.0 | ^12.0",
-        "illuminate/events": "^11.0 | ^12.0",
-        "illuminate/support": "^11.0 | ^12.0",
+        "illuminate/console": "^11.0 | ^12.0 | ^13.0",
+        "illuminate/database": "^11.0 | ^12.0 | ^13.0",
+        "illuminate/events": "^11.0 | ^12.0 | ^13.0",
+        "illuminate/support": "^11.0 | ^12.0 | ^13.0",
         "spatie/yaml-front-matter": "^2.0",
         "symfony/yaml": "^6.0 | ^7.0"
     },
     "require-dev": {
-        "laravel/scout": "^9.4 | ^10.0",
+        "laravel/scout": "^9.4 | ^10.0 | ^11.0",
         "nunomaduro/larastan": "^2.0",
         "orchestra/testbench": "^9.0 | ^10.0",
         "phpstan/extension-installer": "^1.1",
