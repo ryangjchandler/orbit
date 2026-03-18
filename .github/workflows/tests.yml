@@ -17,7 +17,7 @@ jobs:
             testbench: 11.*
 
 
-    name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.os }}
+    name: P${{ matrix.php }} - L${{ matrix.laravel }}
 
     steps:
       - name: Checkout code
