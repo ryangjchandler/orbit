@@ -4,11 +4,10 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
   tests:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: true
       matrix:
-        os: ubuntu-latest
         php: ['8.2', '8.3', '8.4']
         laravel: ['12.*', '13.*']
         include:
