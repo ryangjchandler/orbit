@@ -11,6 +11,7 @@ use Orbit\Contracts\Driver;
 use Orbit\Contracts\Orbit;
 use Orbit\Exceptions\InvalidDriverException;
 use Orbit\Support\ModelAttributeFormatter;
+use ReflectionClass;
 
 /**
  * @mixin \Illuminate\Database\Eloquent\Model
@@ -24,7 +25,7 @@ trait SoftDeletes
     {
         static::addGlobalScope(new SoftDeletingScope);
 
-        $model = new static();
+        $model = (new ReflectionClass(static::class))->newInstanceWithoutConstructor();
         $driver = $model->getOrbitDriver();
 
         if (! class_exists($driver)) {

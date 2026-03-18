@@ -14,6 +14,7 @@ use Orbit\Drivers\Markdown;
 use Orbit\Exceptions\InvalidDriverException;
 use Orbit\Support\ModelAttributeFormatter;
 use Orbit\Support\ModelUsesSoftDeletes;
+use ReflectionClass;
 
 /**
  * @mixin \Illuminate\Database\Eloquent\Model
@@ -23,7 +24,7 @@ trait Orbital
 {
     public static function bootOrbital()
     {
-        $model = new static();
+        $model = (new ReflectionClass(static::class))->newInstanceWithoutConstructor();
 
         $maybeCreateOrbitDirectories = new MaybeCreateOrbitDirectories();
         $maybeCreateOrbitDirectories->execute($model);

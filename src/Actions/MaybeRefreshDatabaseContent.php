@@ -47,10 +47,12 @@ class MaybeRefreshDatabaseContent
         collect($records)
             ->chunk(100)
             ->each(function (Collection $chunk) use ($model, $blueprint) {
-                // This will ensure that we don't have any collisions with existing data in the SQLite database.
-                $model->query()->whereKey($chunk->pluck($model->getKeyName())->all())->delete();
+                $table = $model->getConnection()->table($model->getTable());
 
-                $model->query()->insert(
+                // This will ensure that we don't have any collisions with existing data in the SQLite database.
+                $table->whereIn($model->getKeyName(), $chunk->pluck($model->getKeyName())->all())->delete();
+
+                $model->getConnection()->table($model->getTable())->insert(
                     $chunk
                         ->map(function (array $attributes) use ($model, $blueprint) {
                             foreach ($attributes as $key => $value) {
