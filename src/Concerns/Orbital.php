@@ -16,6 +16,7 @@ use Orbit\Models\OrbitMeta;
 use Orbit\Support;
 use ReflectionClass;
 
+// @phpstan-ignore trait.unused
 trait Orbital
 {
     protected static $orbit;
