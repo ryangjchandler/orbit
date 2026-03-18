@@ -15,7 +15,7 @@ abstract class TestCase extends BaseTestCase
         ];
     }
 
-    public function getEnvironmentSetUp($app)
+    public function defineEnvironment($app)
     {
         $app['config']->set('database.default', 'sqlite');
         $app['config']->set('database.connections.sqlite.database', ':memory:');

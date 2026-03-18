@@ -31,13 +31,15 @@ trait Orbital
         $driver = Orbit::driver(static::getOrbitalDriver());
         $modelFile = (new ReflectionClass(static::class))->getFileName();
 
+        $instance = (new ReflectionClass(static::class))->newInstanceWithoutConstructor();
+
         if (
             Orbit::isTesting() ||
             filemtime($modelFile) > filemtime(Orbit::getDatabasePath()) ||
             $driver->shouldRestoreCache(static::getOrbitalPath()) ||
-            ! static::resolveConnection()->getSchemaBuilder()->hasTable((new static())->getTable())
+            ! static::resolveConnection()->getSchemaBuilder()->hasTable($instance->getTable())
         ) {
-            (new static())->migrate();
+            $instance->migrate();
         }
 
         static::created(function (Model $model) {
