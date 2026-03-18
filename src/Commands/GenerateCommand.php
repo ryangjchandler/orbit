@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ColumnDefinition;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class GenerateCommand extends Command
@@ -41,7 +42,10 @@ class GenerateCommand extends Command
 
     protected function getColumnsFromModel(string $modelClass): Collection
     {
-        $blueprint = new Blueprint('__orbit:generate__');
+        $blueprint = new Blueprint(
+            DB::connection('orbit'),
+            Str::snake(Str::pluralStudly(class_basename($modelClass))),
+        );
 
         /**
          * @psalm-suppress InvalidStringClass

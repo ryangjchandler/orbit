@@ -12,6 +12,7 @@ use Orbit\Events\OrbitalForceDeleted;
 use Orbit\Events\OrbitalUpdated;
 use Orbit\Facades\Orbit;
 
+// @phpstan-ignore trait.unused
 trait SoftDeletes
 {
     use EloquentSoftDeletes;
