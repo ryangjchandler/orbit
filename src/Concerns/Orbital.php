@@ -32,16 +32,21 @@ trait Orbital
         $driver = Orbit::driver(static::getOrbitalDriver());
         $modelFile = (new ReflectionClass(static::class))->getFileName();
 
-        $instance = (new ReflectionClass(static::class))->newInstanceWithoutConstructor();
+        // Eloquent applies the `casts()` method and class attributes such as `#[Table]`
+        // in the constructor, and Laravel 13 only allows the model to be constructed
+        // once the class is booted.
+        static::whenBooted(function () use ($driver, $modelFile) {
+            $instance = new static();
 
-        if (
-            Orbit::isTesting() ||
-            filemtime($modelFile) > filemtime(Orbit::getDatabasePath()) ||
-            $driver->shouldRestoreCache(static::getOrbitalPath()) ||
-            ! static::resolveConnection()->getSchemaBuilder()->hasTable($instance->getTable())
-        ) {
-            $instance->migrate();
-        }
+            if (
+                Orbit::isTesting() ||
+                filemtime($modelFile) > filemtime(Orbit::getDatabasePath()) ||
+                $driver->shouldRestoreCache(static::getOrbitalPath()) ||
+                ! static::resolveConnection()->getSchemaBuilder()->hasTable($instance->getTable())
+            ) {
+                $instance->migrate();
+            }
+        });
 
         static::created(function (Model $model) {
             if ($model->callTraitMethod('shouldCreate', $model) === false) {
