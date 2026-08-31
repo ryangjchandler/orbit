@@ -1,3 +1,6 @@
 *
 !.gitignore
 !missing_rows
+!cast_property_models
+!cast_method_models
+!table_attribute_models
