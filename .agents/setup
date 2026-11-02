@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+# Prepares an Amp orb to develop and test Orbit: PHP 8.4, Composer, and dependencies.
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+PHP_VERSION=8.4
+PHP_PACKAGES=(cli curl mbstring xml zip sqlite3 bcmath intl)
+
+step() { echo "==> $*"; }
+timed() { local start=$SECONDS; "$@"; echo "    (${*:1:2}: $((SECONDS - start))s)"; }
+
+install_php() {
+  local packages=()
+  for ext in "${PHP_PACKAGES[@]}"; do
+    dpkg -s "php${PHP_VERSION}-${ext}" >/dev/null 2>&1 || packages+=("php${PHP_VERSION}-${ext}")
+  done
+  [ ${#packages[@]} -eq 0 ] && { echo "    PHP ${PHP_VERSION} already installed"; return; }
+
+  if [ ! -f /etc/apt/sources.list.d/php.list ]; then
+    sudo apt-get update -qq
+    sudo apt-get install -y -qq ca-certificates curl lsb-release >/dev/null
+    sudo curl -fsSLo /usr/share/keyrings/deb.sury.org-php.gpg https://packages.sury.org/php/apt.gpg
+    echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" \
+      | sudo tee /etc/apt/sources.list.d/php.list >/dev/null
+  fi
+  sudo apt-get update -qq
+  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq "${packages[@]}" >/dev/null
+}
+
+install_composer() {
+  if command -v composer >/dev/null 2>&1; then
+    echo "    Composer already installed"
+    return
+  fi
+  local installer
+  installer="$(mktemp)"
+  curl -fsSL https://getcomposer.org/installer -o "$installer"
+  expected="$(curl -fsSL https://composer.github.io/installer.sig)"
+  actual="$(php -r "echo hash_file('sha384', '$installer');")"
+  if [ "$expected" != "$actual" ]; then
+    echo "Composer installer checksum mismatch" >&2
+    rm -f "$installer"
+    exit 1
+  fi
+  sudo php "$installer" --quiet --install-dir=/usr/local/bin --filename=composer
+  rm -f "$installer"
+}
+
+step "Installing PHP ${PHP_VERSION}"
+timed install_php
+
+step "Installing Composer"
+timed install_composer
+
+# composer.lock is not committed, so resolve against composer.json like CI does.
+step "Installing Composer dependencies"
+timed composer update --no-interaction --no-progress --prefer-dist
+
+step "Setup complete: $(php -r 'echo PHP_VERSION;'), $(composer --version 2>/dev/null | head -1)"
