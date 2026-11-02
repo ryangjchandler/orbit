@@ -133,6 +133,40 @@ Although the API was undocumented in 1.x, it was possible to define a custom "pa
 
 This method has been removed and is no longer supported. It could potentially come back in a future release, but the API was weird and didn't have a great set of features.
 
+### Files are the source of truth, SQLite is a cache
+
+Orbit still answers queries from a SQLite database, but that database is now a disposable cache of your content files:
+
+* On the first query of each request, Orbit compares the name, modification time and size of every file in a model's directory, and the model's schema, with what it last indexed. If anything differs (including files deleted by hand), the model's table is rebuilt from the files.
+* Saves and deletes write the file first, inside a transaction. If the file can't be written, the cached row is rolled back.
+* If a file doesn't contain the model's key, the file name is used instead, so `content/posts/hello-world.md` can be written by hand.
+* Array/JSON casts are stored as real lists and maps, and dates as ISO 8601 strings, so files stay readable and editable.
+
+#### Known limitation: bulk queries don't write files
+
+Queries that write without loading models don't fire model events, so Orbit doesn't update your files. This includes `update()`, `delete()`, `increment()`, `decrement()`, `insert()`, `upsert()` and `truncate()` on a query, such as `Post::where('draft', true)->delete()`, as well as writes made with `DB::connection('orbit')`.
+
+The cache then disagrees with your files until the next rebuild, and changes that never reached a file are lost when it happens. Load the models and save or delete each one instead:
+
+```php
+Post::where('draft', true)->get()->each->delete();
+```
+
+### `orbit:cache` and `orbit:clear`
+
+In production, run `php artisan orbit:cache` when you deploy. It rebuilds the cache for the Orbit models in `app/Models` and stops Orbit from checking files for changes. Models elsewhere are indexed when they're first used. Run `orbit:cache` again, or `orbit:clear`, after changing content.
+
+`orbit:clear` no longer asks for confirmation, and the `--force` option has been removed.
+
+### `Orbit\Concerns\SoftDeletes` has been removed
+
+Use Laravel's own `SoftDeletes` trait instead. Soft deleting a model writes `deleted_at` to its file; force deleting removes the file.
+
+```diff
+- use Orbit\Concerns\SoftDeletes;
++ use Illuminate\Database\Eloquent\SoftDeletes;
+```
+
 ## Missing information?
 
 If you encounter anything that is missing from this upgrade guide, please open an issue on the repository with the missing information and any changes you made to resolve the error / issue.

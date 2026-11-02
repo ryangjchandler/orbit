@@ -3,87 +3,43 @@
 namespace Orbit\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
-use Orbit\Actions\DeleteSourceFile;
-use Orbit\Actions\InitialiseOrbitalTable;
-use Orbit\Actions\MaybeCreateOrbitDirectories;
-use Orbit\Actions\MaybeRefreshDatabaseContent;
-use Orbit\Actions\SaveCompiledAttributesToFile;
-use Orbit\Contracts\Driver;
 use Orbit\Contracts\Orbit;
 use Orbit\Drivers\Markdown;
-use Orbit\Exceptions\InvalidDriverException;
-use Orbit\Support\ModelAttributeFormatter;
-use Orbit\Support\ModelUsesSoftDeletes;
-use ReflectionClass;
+use Orbit\Index;
 
-/**
- * @mixin \Illuminate\Database\Eloquent\Model
- * @mixin \Orbit\Contracts\Orbit
- */
 trait Orbital
 {
-    public static function bootOrbital()
+    public static function bootOrbital(): void
     {
-        $model = (new ReflectionClass(static::class))->newInstanceWithoutConstructor();
+        // Saves and deletes run in a transaction (see below), so a failed file write
+        // rolls back the cached row and the cache never holds what isn't on disk.
+        static::saved(fn (Model&Orbit $model) => app(Index::class)->write($model));
 
-        $maybeCreateOrbitDirectories = new MaybeCreateOrbitDirectories();
-        $maybeCreateOrbitDirectories->execute($model);
-
-        $driver = $model->getOrbitDriver();
-
-        if (! class_exists($driver)) {
-            throw InvalidDriverException::make($driver);
-        }
-
-        $driver = app($driver);
-
-        if (! $driver instanceof Driver) {
-            throw InvalidDriverException::make($driver::class);
-        }
-
-        $initialiseOrbitTable = new InitialiseOrbitalTable();
-        $maybeRefreshDatabaseContent = new MaybeRefreshDatabaseContent();
-        $refreshed = false;
-
-        if ($initialiseOrbitTable->shouldInitialise($model)) {
-            $initialiseOrbitTable->migrate($model, $driver);
-            $maybeRefreshDatabaseContent->refresh($model, $driver);
-
-            $refreshed = true;
-        }
-
-        if (! $refreshed && $maybeRefreshDatabaseContent->shouldRefresh($model)) {
-            $maybeRefreshDatabaseContent->refresh($model, $driver);
-        }
-
-        $saveCompiledAttributesToFile = new SaveCompiledAttributesToFile();
-
-        static::created(function (Orbit&Model $model) use ($driver, $saveCompiledAttributesToFile) {
-            $model->refresh();
-
-            $attributes = ModelAttributeFormatter::format($model, $model->getAttributes());
-            $compiledAttributes = $driver->compile($attributes);
-
-            $saveCompiledAttributesToFile->execute($model, $compiledAttributes, $driver);
-        });
-
-        static::updated(function (Orbit&Model $model) use ($driver, $saveCompiledAttributesToFile) {
-            $model->refresh();
-
-            $attributes = ModelAttributeFormatter::format($model, $model->getAttributes());
-            $compiledAttributes = $driver->compile($attributes);
-
-            $saveCompiledAttributesToFile->execute($model, $compiledAttributes, $driver);
-        });
-
-        static::deleted(function (Orbit&Model $model) use ($driver) {
-            if (ModelUsesSoftDeletes::check($model)) {
-                return;
+        static::deleted(function (Model&Orbit $model) {
+            // Soft deletes keep the file and record `deleted_at` in it.
+            if (method_exists($model, 'isForceDeleting') && ! $model->isForceDeleting()) {
+                app(Index::class)->write($model);
+            } else {
+                app(Index::class)->delete($model);
             }
-
-            $deleteSourceFile = new DeleteSourceFile();
-            $deleteSourceFile->execute($model, $driver);
         });
+    }
+
+    public function save(array $options = [])
+    {
+        return $this->getConnection()->transaction(fn () => parent::save($options));
+    }
+
+    public function delete()
+    {
+        return $this->getConnection()->transaction(fn () => parent::delete());
+    }
+
+    public function getConnection()
+    {
+        app(Index::class)->ensure($this);
+
+        return static::resolveConnection();
     }
 
     public static function resolveConnection($connection = null)
@@ -109,5 +65,41 @@ trait Orbital
             ->lower()
             ->plural()
             ->toString();
+    }
+
+    public function toOrbitAttributes(): array
+    {
+        $attributes = [$this->getKeyName() => $this->getKey()] + $this->getAttributes();
+
+        foreach ($attributes as $key => $value) {
+            if ($value === null || $this->isEncryptedCastable($key)) {
+                continue;
+            }
+
+            if ($this->isJsonCastable($key) && is_string($value)) {
+                $attributes[$key] = json_decode($value, true);
+            } elseif ($this->isDateAttribute($key)) {
+                $attributes[$key] = $this->asDateTime($value)->toIso8601String();
+            }
+        }
+
+        return $attributes;
+    }
+
+    public function fromOrbitAttributes(array $attributes): array
+    {
+        foreach ($attributes as $key => $value) {
+            if ($value === null || $this->isEncryptedCastable($key)) {
+                continue;
+            }
+
+            if ($this->isJsonCastable($key) && ! is_string($value)) {
+                $attributes[$key] = json_encode($value);
+            } elseif ($this->isDateAttribute($key)) {
+                $attributes[$key] = $this->fromDateTime($value);
+            }
+        }
+
+        return $attributes;
     }
 }

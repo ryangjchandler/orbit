@@ -3,3 +3,6 @@ parameters:
         - src
 
     level: 5
+
+    ignoreErrors:
+        - identifier: trait.unused

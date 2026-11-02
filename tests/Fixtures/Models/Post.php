@@ -20,6 +20,16 @@ class Post extends Model implements Orbit
         $table->id();
         $table->string('title');
         $table->longText('content')->nullable();
+        $table->json('tags')->nullable();
+        $table->dateTime('published_at')->nullable();
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'tags' => 'array',
+            'published_at' => 'datetime',
+        ];
     }
 
     public function title(): Attribute
