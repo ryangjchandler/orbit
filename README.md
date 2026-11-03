@@ -78,6 +78,21 @@ public function getOrbitDriver(): string
 
 To store a model's files in a different directory, override `getOrbitSource()`.
 
+### Storing every record in one file
+
+The `FlatJson` and `FlatYaml` drivers store all of a model's records in a single file, `content/posts.json` or `content/posts.yml`, keyed by each record's key:
+
+```json
+{
+    "1": {
+        "id": 1,
+        "title": "Hello world"
+    }
+}
+```
+
+As with one file per record, a record that doesn't include its key uses its key in the file. A record that can't be indexed is skipped and left in the file.
+
 ### Custom drivers
 
 To support another file format, write a class that implements `Orbit\Contracts\Driver`:
@@ -109,6 +124,8 @@ Then return it from `getOrbitDriver()`. Orbit resolves drivers from the containe
 `compile()` receives attributes that are ready to store: array casts are arrays, dates are ISO 8601 strings, and `null` values are left out. `parse()` should return attributes in the same shape.
 
 If the driver needs extra columns, also implement `Orbit\Contracts\ModifiesSchema` and add them in its `schema(Blueprint $table)` method. The Markdown driver uses this to add the `content` column.
+
+To store every record in one file, also implement `Orbit\Contracts\SingleFile`. `parse()` then returns all of the records in the file, and `compile()` receives them, keyed by each record's key.
 
 ### Multitenancy
 
