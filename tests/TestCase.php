@@ -16,7 +16,13 @@ abstract class TestCase extends BaseTestCase
         parent::setUp();
 
         File::deleteDirectory(config('orbit.paths.content'));
-        File::ensureDirectoryExists(config('orbit.paths.content').'/posts');
         $this->app->make(Index::class)->clear();
+    }
+
+    protected function tearDown(): void
+    {
+        File::deleteDirectory(config('orbit.paths.content'));
+
+        parent::tearDown();
     }
 }
