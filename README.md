@@ -5,7 +5,7 @@ Orbit is a flat-file driver for Laravel Eloquent. Your records live in Markdown,
 ## Installation
 
 ```bash
-composer require ryangjchandler/eloquent-flat-file
+composer require ryangjchandler/orbit
 ```
 
 ## Usage
