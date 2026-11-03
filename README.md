@@ -80,7 +80,7 @@ To store a model's files in a different directory, override `getOrbitSource()`.
 
 ### Storing every record in one file
 
-The `FlatJson` and `FlatYaml` drivers store all of a model's records in a single file, `content/posts.json` or `content/posts.yml`, keyed by each record's key:
+The `FlatJson` driver stores all of a model's records in a single file, such as `content/posts.json`, keyed by each record's key:
 
 ```json
 {

@@ -2,29 +2,20 @@
 
 use Illuminate\Support\Facades\Log;
 use Orbit\Drivers\FlatJson;
-use Orbit\Drivers\FlatYaml;
 use Tests\Fixtures\Models\Post;
 
-/** A post stored with a single-file driver in `content/flat_posts.{extension}`. */
+/** A post stored in `content/flat_posts.json`. */
 class FlatPost extends Post
 {
-    public static string $driver = FlatJson::class;
-
     protected $table = 'flat_posts';
 
     public function getOrbitDriver(): string
     {
-        return static::$driver;
+        return FlatJson::class;
     }
 }
 
-beforeEach(function () {
-    FlatPost::$driver = FlatJson::class;
-});
-
-it('stores every record in one file keyed by its key', function (string $driver, string $file) {
-    FlatPost::$driver = $driver;
-
+it('stores every record in one file keyed by its key', function () {
     $first = FlatPost::create(['title' => 'first', 'tags' => ['php']]);
     $second = FlatPost::create(['title' => 'second']);
     $third = FlatPost::create(['title' => 'third']);
@@ -33,16 +24,13 @@ it('stores every record in one file keyed by its key', function (string $driver,
     $second->delete();
     $third->update(['id' => 30]);
 
-    $records = readContent($file, $driver);
+    $records = readContent('flat_posts.json', FlatJson::class);
 
     expect(array_keys($records))->toBe([1, 30])
         ->and($records[1])->toMatchArray(['id' => 1, 'title' => 'updated', 'tags' => ['php']])
         ->and($records[30])->toMatchArray(['id' => 30, 'title' => 'third'])
         ->and(content_path('flat_posts'))->not->toBeDirectory();
-})->with([
-    'json' => [FlatJson::class, 'flat_posts.json'],
-    'yaml' => [FlatYaml::class, 'flat_posts.yml'],
-]);
+});
 
 it('indexes records written by hand', function () {
     Log::spy();
