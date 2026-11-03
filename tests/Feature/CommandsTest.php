@@ -22,7 +22,7 @@ it('builds the cache for every Orbit model in the configured directories', funct
         ->assertSuccessful();
 
     // Abstract and non-Orbit models in the directory are skipped.
-    expect(orbitTables())->toEqualCanonicalizing(['_orbit_meta', 'authors', 'categories', 'pages', 'posts', 'post_tags', 'site_settings'])
+    expect(orbitTables())->toEqualCanonicalizing(['_orbit_meta', 'authors', 'categories', 'pages', 'posts', 'post_tag', 'post_tags', 'site_settings'])
         ->and(DB::connection('orbit')->table('posts')->pluck('id')->all())->toBe([1]);
 });
 
