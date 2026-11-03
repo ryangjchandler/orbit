@@ -2,6 +2,7 @@
 
 use Tests\Fixtures\Models\Author;
 use Tests\Fixtures\Models\Post;
+use Tests\Fixtures\Models\Tag;
 
 beforeEach(function () {
     writeContent('people/1.yml', "id: 1\nname: Ryan\n");
@@ -36,6 +37,18 @@ it('eager loads relationships between Orbit models', function () {
     $authors = Author::with('posts')->orderBy('id')->get();
 
     expect($authors->map(fn (Author $author) => $author->posts->count())->all())->toBe([3, 2]);
+});
+
+// The relationship joins the pivot table without using the pivot model, so the pivot
+// table must exist even when nothing else has used the pivot model yet.
+it('resolves many-to-many relationships through Orbit pivot models', function () {
+    writeContent('tags/1.md', "---\nid: 1\nname: php\n---\n");
+    writeContent('tags/2.md', "---\nid: 2\nname: laravel\n---\n");
+    writeContent('post_tags/1.md', "---\nid: 1\npost_id: 2\ntag_id: 1\n---\n");
+    writeContent('post_tags/2.md', "---\nid: 2\npost_id: 4\ntag_id: 1\n---\n");
+
+    expect(Tag::find(1)->posts->pluck('id')->all())->toBe([2, 4])
+        ->and(Tag::find(2)->posts)->toBeEmpty();
 });
 
 it('queries relationship existence between Orbit models', function () {

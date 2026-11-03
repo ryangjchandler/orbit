@@ -2,9 +2,11 @@
 
 namespace Orbit\Concerns;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Orbit\Drivers\Markdown;
 use Orbit\Index;
+use Orbit\Relations\BelongsToMany;
 
 trait Orbital
 {
@@ -69,6 +71,11 @@ trait Orbital
 
             return $result;
         });
+    }
+
+    protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName = null)
+    {
+        return new BelongsToMany($query, $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName);
     }
 
     public function getConnection()
