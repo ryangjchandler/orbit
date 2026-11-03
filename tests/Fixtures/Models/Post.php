@@ -22,6 +22,7 @@ class Post extends Model implements Orbit
         $table->longText('content')->nullable();
         $table->json('tags')->nullable();
         $table->dateTime('published_at')->nullable();
+        $table->integer('views')->default(0);
     }
 
     protected function casts(): array

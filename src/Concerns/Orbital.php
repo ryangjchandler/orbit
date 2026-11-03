@@ -3,36 +3,72 @@
 namespace Orbit\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
-use Orbit\Contracts\Orbit;
 use Orbit\Drivers\Markdown;
 use Orbit\Index;
 
 trait Orbital
 {
-    public static function bootOrbital(): void
-    {
-        // Saves and deletes run in a transaction (see below), so a failed file write
-        // rolls back the cached row and the cache never holds what isn't on disk.
-        static::saved(fn (Model&Orbit $model) => app(Index::class)->write($model));
-
-        static::deleted(function (Model&Orbit $model) {
-            // Soft deletes keep the file and record `deleted_at` in it.
-            if (method_exists($model, 'isForceDeleting') && ! $model->isForceDeleting()) {
-                app(Index::class)->write($model);
-            } else {
-                app(Index::class)->delete($model);
-            }
-        });
-    }
-
+    // Writes run in a transaction and write the file afterwards, so a failed file
+    // write rolls back the cached row. Files are written here rather than in model
+    // events so that quiet saves and increments still reach the file.
     public function save(array $options = [])
     {
-        return $this->getConnection()->transaction(fn () => parent::save($options));
+        $previousKey = $this->exists ? $this->getOriginal($this->getKeyName()) : null;
+
+        return $this->getConnection()->transaction(function () use ($options, $previousKey) {
+            if (! parent::save($options)) {
+                return false;
+            }
+
+            app(Index::class)->write($this, $previousKey);
+
+            return true;
+        });
     }
 
     public function delete()
     {
-        return $this->getConnection()->transaction(fn () => parent::delete());
+        return $this->getConnection()->transaction(function () {
+            $deleted = parent::delete();
+
+            if (! $deleted) {
+                return $deleted;
+            }
+
+            // Soft deletes keep the file and record `deleted_at` in it.
+            if (method_exists($this, 'isForceDeleting') && ! $this->isForceDeleting()) {
+                app(Index::class)->write($this);
+            } else {
+                app(Index::class)->delete($this);
+            }
+
+            return $deleted;
+        });
+    }
+
+    protected function incrementOrDecrement($column, $amount, $extra, $method)
+    {
+        return $this->writeAfter(fn () => parent::incrementOrDecrement($column, $amount, $extra, $method));
+    }
+
+    protected function incrementOrDecrementEach(array $columns, array $extra, string $method)
+    {
+        return $this->writeAfter(fn () => parent::incrementOrDecrementEach($columns, $extra, $method));
+    }
+
+    private function writeAfter(callable $update): int|false
+    {
+        return $this->getConnection()->transaction(function () use ($update) {
+            // A model that doesn't exist yet runs a bulk query instead, which doesn't write files.
+            $exists = $this->exists;
+            $result = $update();
+
+            if ($exists && $result !== false) {
+                app(Index::class)->write($this);
+            }
+
+            return $result;
+        });
     }
 
     public function getConnection()
@@ -83,7 +119,8 @@ trait Orbital
             }
         }
 
-        return $attributes;
+        // Leave out nulls so files only contain values that are set.
+        return array_filter($attributes, fn ($value) => $value !== null);
     }
 
     public function fromOrbitAttributes(array $attributes): array

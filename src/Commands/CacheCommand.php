@@ -4,10 +4,11 @@ namespace Orbit\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 use Orbit\Contracts\Orbit;
 use Orbit\Index;
+use ReflectionClass;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 
 class CacheCommand extends Command
 {
@@ -27,17 +28,27 @@ class CacheCommand extends Command
     /** @return array<class-string<Model&Orbit>> */
     private function models(): array
     {
-        if (! is_dir(app_path('Models'))) {
+        $paths = array_filter(config('orbit.models', []), 'is_dir');
+
+        if ($paths === []) {
             return [];
         }
 
-        return collect(Finder::create()->in(app_path('Models'))->files()->name('*.php'))
-            ->map(fn ($file) => $this->laravel->getNamespace().str_replace(
-                ['/', '.php'],
-                ['\\', ''],
-                Str::after($file->getRealPath(), realpath(app_path()).DIRECTORY_SEPARATOR),
-            ))
-            ->filter(fn (string $class) => class_exists($class) && is_subclass_of($class, Model::class) && is_subclass_of($class, Orbit::class))
+        return collect(Finder::create()->in($paths)->files()->name('*.php'))
+            ->map(function (SplFileInfo $file) {
+                $contents = $file->getContents();
+
+                if (! preg_match('/^namespace\s+([^;\s]+)\s*;/m', $contents, $namespace)) {
+                    return null;
+                }
+
+                return $namespace[1].'\\'.$file->getBasename('.php');
+            })
+            ->filter(fn (?string $class) => $class !== null
+                && class_exists($class)
+                && is_subclass_of($class, Model::class)
+                && is_subclass_of($class, Orbit::class)
+                && (new ReflectionClass($class))->isInstantiable())
             ->values()
             ->all();
     }

@@ -6,6 +6,8 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Log;
+use InvalidArgumentException;
 use Orbit\Contracts\Driver;
 use Orbit\Contracts\ModifiesSchema;
 use Orbit\Contracts\Orbit;
@@ -47,7 +49,7 @@ class Index
 
             $meta = $this->meta($model);
 
-            if ($meta !== null && ($this->cached() || ($meta['schema'] === $this->signature($model) && $meta['files'] == $this->manifest($model)))) {
+            if ($meta !== null && ($this->cached() || ($meta['schema'] === $this->signature($model) && ! $this->changed($model, $meta)))) {
                 return;
             }
 
@@ -59,14 +61,8 @@ class Index
         }
     }
 
-    public function write(Model&Orbit $model): void
+    public function write(Model&Orbit $model, mixed $previousKey = null): void
     {
-        $keyName = $model->getKeyName();
-
-        if ($model->wasChanged($keyName) && $model->getOriginal($keyName) !== null) {
-            $this->delete($model, $model->getOriginal($keyName));
-        }
-
         $path = $this->path($model, $model->getKey());
         $temporary = $path.'.'.bin2hex(random_bytes(4)).'.tmp';
 
@@ -78,6 +74,10 @@ class Index
         }
 
         $this->record($model, $path);
+
+        if ($previousKey !== null && (string) $previousKey !== (string) $model->getKey()) {
+            $this->delete($model, $previousKey);
+        }
     }
 
     public function delete(Model&Orbit $model, mixed $key = null): void
@@ -107,13 +107,13 @@ class Index
 
     public function clear(): void
     {
-        $this->db->purge('orbit');
+        // Drop the tables rather than deleting the database, so long-running workers
+        // that still have it open see the rebuild instead of a deleted file.
+        if (is_file(config('orbit.paths.database'))) {
+            $schema = $this->connection()->getSchemaBuilder();
 
-        $database = config('orbit.paths.database');
-
-        foreach ([$database, "{$database}-journal", "{$database}-wal", "{$database}-shm"] as $file) {
-            if (is_file($file)) {
-                unlink($file);
+            foreach (array_column($schema->getTables(), 'name') as $table) {
+                $schema->drop($table);
             }
         }
 
@@ -138,11 +138,13 @@ class Index
 
                 try {
                     $attributes = $driver->parse(file_get_contents($path));
-                    $attributes[$model->getKeyName()] ??= pathinfo($file, PATHINFO_FILENAME);
+                    $attributes[$model->getKeyName()] ??= $this->keyFromFileName($model, $file);
 
                     $connection->table($table)->insert($model->fromOrbitAttributes($attributes));
                 } catch (Throwable $e) {
-                    throw new RuntimeException("Unable to index Orbit file [{$path}]: {$e->getMessage()}", previous: $e);
+                    // One bad file shouldn't break every query on the model. It stays in the
+                    // manifest, so it's retried once it changes rather than on every request.
+                    Log::warning("Orbit skipped [{$path}] because it could not be indexed: {$e->getMessage()}", ['exception' => $e]);
                 }
             }
 
@@ -151,6 +153,21 @@ class Index
                 'files' => $this->manifest($model),
             ]);
         });
+    }
+
+    private function keyFromFileName(Model&Orbit $model, string $file): string
+    {
+        $key = pathinfo($file, PATHINFO_FILENAME);
+
+        if ($model->getKeyType() === 'int' && ! ctype_digit($key)) {
+            throw new RuntimeException(sprintf(
+                'The file has no `%s`, and its name can\'t be used as the integer key of [%s]. Add the key to the file, or give the model a string key.',
+                $model->getKeyName(),
+                $model::class,
+            ));
+        }
+
+        return $key;
     }
 
     private function record(Model&Orbit $model, string $path): void
@@ -223,9 +240,49 @@ class Index
         return $manifest;
     }
 
+    // Modification times only change once per second, so an edit later in the same
+    // second can keep the same time and size. Files modified that recently are
+    // recorded with a hash of their contents too.
     private function stamp(string $path): string
     {
-        return filemtime($path).':'.filesize($path);
+        $stamp = filemtime($path).':'.filesize($path);
+
+        return filemtime($path) >= time() - 1 ? $stamp.':'.md5_file($path) : $stamp;
+    }
+
+    /** @param  array{schema: string, files: array<string, string>}  $meta */
+    private function changed(Model&Orbit $model, array $meta): bool
+    {
+        $recorded = $meta['files'];
+        $current = $this->manifest($model);
+
+        if (count($current) !== count($recorded) || array_diff_key($current, $recorded) !== []) {
+            return true;
+        }
+
+        $settled = false;
+
+        foreach ($recorded as $file => $stamp) {
+            if ($stamp === $current[$file]) {
+                continue;
+            }
+
+            // A file recorded with its hash that is no longer recent: compare its
+            // contents once, then record it without the hash.
+            [$mtime, $size, $hash] = explode(':', $stamp) + [2 => null];
+
+            if ($hash === null || "{$mtime}:{$size}" !== $current[$file] || md5_file($this->directory($model).DIRECTORY_SEPARATOR.$file) !== $hash) {
+                return true;
+            }
+
+            $settled = true;
+        }
+
+        if ($settled) {
+            $this->store($model, [...$meta, 'files' => $current]);
+        }
+
+        return false;
     }
 
     /** @return array{schema: string, files: array<string, string>}|null */
@@ -283,6 +340,12 @@ class Index
 
     private function path(Model&Orbit $model, mixed $key): string
     {
+        $key = (string) $key;
+
+        if ($key === '' || strpbrk($key, "/\\\0") !== false) {
+            throw new InvalidArgumentException("[{$key}] can't be used as an Orbit file name.");
+        }
+
         return $this->directory($model).DIRECTORY_SEPARATOR.$key.'.'.$this->driver($model)->extension();
     }
 

@@ -138,9 +138,12 @@ This method has been removed and is no longer supported. It could potentially co
 Orbit still answers queries from a SQLite database, but that database is now a disposable cache of your content files:
 
 * On the first query of each request, Orbit compares the name, modification time and size of every file in a model's directory, and the model's schema, with what it last indexed. If anything differs (including files deleted by hand), the model's table is rebuilt from the files.
-* Saves and deletes write the file first, inside a transaction. If the file can't be written, the cached row is rolled back.
-* If a file doesn't contain the model's key, the file name is used instead, so `content/posts/hello-world.md` can be written by hand.
-* Array/JSON casts are stored as real lists and maps, and dates as ISO 8601 strings, so files stay readable and editable.
+* Saves, deletes and increments on a model write its file inside a transaction, even when model events are disabled (`saveQuietly()`, `withoutEvents()`). If the file can't be written, the cached row is rolled back.
+* A file that can't be parsed or indexed is skipped and a warning is logged. The rest of the model's files are still indexed.
+* If a file doesn't contain the model's key, the file name is used instead. With the default integer key, the file name must be a number; give the model a string key to use names like `content/posts/hello-world.md`.
+* Keys containing `/`, `\` or null bytes are rejected, because they would write files outside the model's directory.
+* Array/JSON casts are stored as real lists and maps, and dates as ISO 8601 strings, so files stay readable and editable. `null` values are left out of files.
+* Files modified in the last second are also compared by content hash, so quick edits that keep the same size are still picked up.
 
 #### Known limitation: bulk queries don't write files
 
@@ -154,9 +157,9 @@ Post::where('draft', true)->get()->each->delete();
 
 ### `orbit:cache` and `orbit:clear`
 
-In production, run `php artisan orbit:cache` when you deploy. It rebuilds the cache for the Orbit models in `app/Models` and stops Orbit from checking files for changes. Models elsewhere are indexed when they're first used. Run `orbit:cache` again, or `orbit:clear`, after changing content.
+In production, run `php artisan orbit:cache` when you deploy. It rebuilds the cache for the Orbit models in the directories listed in the `models` config option (`app/Models` by default) and stops Orbit from checking files for changes. Models elsewhere are indexed when they're first used. Run `orbit:cache` again, or `orbit:clear`, after changing content.
 
-`orbit:clear` no longer asks for confirmation, and the `--force` option has been removed.
+`orbit:clear` no longer asks for confirmation, and the `--force` option has been removed. It now drops the cached tables instead of deleting the database file, so queue workers and Octane pick up the rebuild without restarting.
 
 ### `Orbit\Concerns\SoftDeletes` has been removed
 

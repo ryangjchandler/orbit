@@ -1,7 +1,11 @@
 <?php
 
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Orbit\Drivers\Markdown;
+use Tests\Fixtures\Models\Page;
 use Tests\Fixtures\Models\Post;
 
 // Each request gets a fresh index, which is when files are checked for changes.
@@ -75,6 +79,127 @@ it('does not keep a record when its file cannot be written', function () {
 
     expect(fn () => Post::create(['title' => 'Unwritten']))->toThrow(RuntimeException::class, 'Disk full')
         ->and(Post::count())->toBe(0);
+});
+
+it('writes files for quiet writes and increments', function () {
+    $post = Post::withoutEvents(fn () => Post::create(['title' => 'Quiet']));
+
+    $post->increment('views');
+    $post->incrementEach(['views' => 2]);
+    $post->updateQuietly(['title' => 'Still written']);
+
+    $this->artisan('orbit:clear');
+
+    $fresh = Post::find($post->id);
+
+    expect($fresh->views)->toBe(3)
+        ->and($fresh->getRawOriginal('title'))->toBe('Still written');
+
+    $fresh->deleteQuietly();
+
+    expect(base_path("content/posts/{$post->id}.md"))->not->toBeFile();
+});
+
+it('moves the file when the key changes', function () {
+    $post = Post::create(['title' => 'Moving']);
+    $old = $post->id;
+
+    $post->update(['id' => 500]);
+
+    expect(base_path("content/posts/{$old}.md"))->not->toBeFile()
+        ->and(base_path('content/posts/500.md'))->toBeFile();
+});
+
+it('skips files that cannot be indexed and logs a warning once', function () {
+    Log::spy();
+
+    $post = Post::create(['title' => 'Good']);
+    file_put_contents(base_path('content/posts/7.md'), "---\nid: 7\ntitle: [unclosed\n---\n");
+    nextRequest();
+
+    expect(Post::pluck('id')->all())->toBe([$post->id]);
+
+    nextRequest();
+    Post::count();
+
+    Log::shouldHaveReceived('warning')->once()->withArgs(fn (string $message) => str_contains($message, '7.md'));
+});
+
+it('rebuilds the table when the schema changes', function () {
+    $post = Post::create(['title' => 'Schema']);
+
+    file_put_contents(base_path("content/posts/{$post->id}.md"), <<<MD
+    ---
+    id: {$post->id}
+    title: Schema
+    subtitle: 'New column'
+    ---
+    MD);
+    touch(base_path("content/posts/{$post->id}.md"), filemtime(base_path("content/posts/{$post->id}.md")));
+
+    $model = new class extends Post
+    {
+        protected $table = 'posts';
+
+        public function getOrbitSource(): string
+        {
+            return 'posts';
+        }
+
+        public function schema(Blueprint $table): void
+        {
+            parent::schema($table);
+            $table->string('subtitle')->nullable();
+        }
+    };
+
+    nextRequest();
+
+    expect($model->newQuery()->find($post->id)->subtitle)->toBe('New column');
+});
+
+it('picks up an edit made in the same second that keeps the file size', function () {
+    $post = Post::create(['title' => 'aaaa']);
+    $path = base_path("content/posts/{$post->id}.md");
+    $mtime = filemtime($path);
+
+    file_put_contents($path, str_replace('aaaa', 'bbbb', file_get_contents($path)));
+    touch($path, $mtime);
+    nextRequest();
+
+    expect(Post::find($post->id)->getRawOriginal('title'))->toBe('bbbb');
+});
+
+it('rejects keys that would write outside the content directory', function () {
+    expect(fn () => Page::create(['slug' => '../escape', 'title' => 'Nope']))
+        ->toThrow(InvalidArgumentException::class)
+        ->and(base_path('content/escape.md'))->not->toBeFile()
+        ->and(Page::count())->toBe(0);
+});
+
+it('uses file names as string keys', function () {
+    File::ensureDirectoryExists(base_path('content/pages'));
+    file_put_contents(base_path('content/pages/hello-world.md'), "---\ntitle: Hello\n---\nBody");
+
+    expect(Page::find('hello-world')?->title)->toBe('Hello');
+});
+
+it('skips non-numeric file names for integer keys with a clear warning', function () {
+    Log::spy();
+
+    file_put_contents(base_path('content/posts/hello-world.md'), "---\ntitle: Hello\n---\n");
+
+    expect(Post::count())->toBe(0);
+
+    Log::shouldHaveReceived('warning')->once()->withArgs(fn (string $message) => str_contains($message, 'integer key'));
+});
+
+it('does not write null values to files', function () {
+    $post = Post::create(['title' => 'Sparse']);
+
+    expect(file_get_contents(base_path("content/posts/{$post->id}.md")))
+        ->not->toContain('content:')
+        ->not->toContain('null');
 });
 
 it('stops checking files after orbit:cache until orbit:clear', function () {
