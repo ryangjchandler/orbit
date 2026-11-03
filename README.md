@@ -110,6 +110,24 @@ Then return it from `getOrbitDriver()`. Orbit resolves drivers from the containe
 
 If the driver needs extra columns, also implement `Orbit\Contracts\ModifiesSchema` and add them in its `schema(Blueprint $table)` method. The Markdown driver uses this to add the `content` column.
 
+### Multitenancy
+
+To keep each tenant's records apart, return a different table and directory per tenant:
+
+```php
+public function getTable()
+{
+    return 'posts_'.tenant()->id;
+}
+
+public function getOrbitSource(): string
+{
+    return 'tenants/'.tenant()->id.'/posts';
+}
+```
+
+Orbit builds a separate cache for each table and directory, the first time it's queried.
+
 ## How it works
 
 Your files are the source of truth. Orbit keeps a SQLite cache of them so queries, relationships and pagination behave exactly like a normal database.

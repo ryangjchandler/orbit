@@ -3,6 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Orbit\Index;
 use Tests\Fixtures\Models\Page;
 use Tests\Fixtures\Models\Post;
 use Tests\Fixtures\Models\SiteSetting;
@@ -274,4 +275,54 @@ it('skips files whose names cannot be integer keys', function () {
     expect(Post::count())->toBe(0);
 
     Log::shouldHaveReceived('warning')->once()->withArgs(fn (string $message) => str_contains($message, 'integer key'));
+});
+
+/** A model whose table and source depend on the current tenant. */
+class TenantPost extends Post
+{
+    public static string $tenant = 'one';
+
+    public function getTable()
+    {
+        return 'posts_'.static::$tenant;
+    }
+
+    public function getOrbitSource(): string
+    {
+        return 'tenants/'.static::$tenant.'/posts';
+    }
+}
+
+function tenantTitles(string $tenant): array
+{
+    TenantPost::$tenant = $tenant;
+
+    return TenantPost::orderBy('id')->toBase()->pluck('title')->all();
+}
+
+it('indexes each table and source a model switches to', function () {
+    writeContent('tenants/one/posts/1.md', "---\nid: 1\ntitle: One\n---\n");
+    writeContent('tenants/two/posts/1.md', "---\nid: 1\ntitle: Two\n---\n");
+
+    expect(tenantTitles('one'))->toBe(['One'])
+        ->and(tenantTitles('two'))->toBe(['Two']);
+
+    // Switching back and forth across requests doesn't rebuild either table.
+    DB::connection('orbit')->table('posts_one')->insert(['id' => 999, 'title' => 'Sentinel']);
+    nextRequest();
+    tenantTitles('two');
+    nextRequest();
+
+    expect(tenantTitles('one'))->toBe(['One', 'Sentinel']);
+});
+
+it('indexes a table and source that was not cached when first used while cached', function () {
+    writeContent('tenants/one/posts/1.md', "---\nid: 1\ntitle: One\n---\n");
+    writeContent('tenants/two/posts/1.md', "---\nid: 1\ntitle: Two\n---\n");
+
+    TenantPost::$tenant = 'one';
+    $this->app->make(Index::class)->cache([TenantPost::class]);
+    nextRequest();
+
+    expect(tenantTitles('two'))->toBe(['Two']);
 });

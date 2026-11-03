@@ -17,7 +17,7 @@ use Throwable;
 
 class Index
 {
-    /** @var array<class-string, true> */
+    /** @var array<string, true> */
     private array $ensured = [];
 
     /** @var array<class-string, Driver> */
@@ -33,12 +33,14 @@ class Index
 
     public function ensure(Model&Orbit $model): void
     {
-        if (isset($this->ensured[$model::class])) {
+        $key = $this->key($model);
+
+        if (isset($this->ensured[$key])) {
             return;
         }
 
         // Mark first: rebuilding uses the model, which asks for its connection again.
-        $this->ensured[$model::class] = true;
+        $this->ensured[$key] = true;
 
         try {
             $this->prepare();
@@ -55,7 +57,7 @@ class Index
 
             $this->rebuild($model);
         } catch (Throwable $e) {
-            unset($this->ensured[$model::class]);
+            unset($this->ensured[$key]);
 
             throw $e;
         }
@@ -288,7 +290,7 @@ class Index
     /** @return array{schema: string, files: array<string, string>}|null */
     private function meta(Model&Orbit $model): ?array
     {
-        $value = $this->connection()->table('_orbit_meta')->where('key', $model::class)->value('value');
+        $value = $this->connection()->table('_orbit_meta')->where('key', $this->key($model))->value('value');
 
         return $value === null ? null : json_decode($value, true);
     }
@@ -296,9 +298,16 @@ class Index
     private function store(Model&Orbit $model, array $meta): void
     {
         $this->connection()->table('_orbit_meta')->upsert(
-            ['key' => $model::class, 'value' => json_encode($meta)],
+            ['key' => $this->key($model), 'value' => json_encode($meta)],
             ['key'],
         );
+    }
+
+    // A model can change its table and source at runtime, such as one per tenant, so
+    // each combination is indexed and tracked on its own.
+    private function key(Model&Orbit $model): string
+    {
+        return implode('|', [$model::class, $model->getTable(), $model->getOrbitSource()]);
     }
 
     private function cached(): bool
