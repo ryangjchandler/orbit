@@ -4,7 +4,7 @@ One of the main goals of the 2.x release is simplifying the package's code to ma
 
 Part of this process is dramatically improving the type-safety of the code. As such, the changes required for this upgrade _might_ take more time than usual.
 
-**Before** going through the rest of the upgrade guide, Orbit 2.x **now requires PHP 8.2 or newer**, as well as **Laravel 10.x**. Support for Laravel 9.x has been dropped and I highly recommend you upgrade your applications.
+**Before** going through the rest of the upgrade guide, Orbit 2.x **now requires PHP 8.3 or newer**, as well as **Laravel 13.x**. Support for older versions of Laravel has been dropped and I highly recommend you upgrade your applications.
 
 ### The new `Orbit` interface
 
