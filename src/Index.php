@@ -11,6 +11,7 @@ use InvalidArgumentException;
 use Orbit\Contracts\Driver;
 use Orbit\Contracts\ModifiesSchema;
 use Orbit\Contracts\Orbit;
+use Orbit\Contracts\SingleFile;
 use Orbit\Exceptions\InvalidDriverException;
 use RuntimeException;
 use Throwable;
@@ -65,16 +66,23 @@ class Index
 
     public function write(Model&Orbit $model, mixed $previousKey = null): void
     {
-        $path = $this->path($model, $model->getKey());
-        $temporary = $path.'.'.bin2hex(random_bytes(4)).'.tmp';
+        if ($this->driver($model) instanceof SingleFile) {
+            $this->rewrite($model, function (array $records) use ($model, $previousKey) {
+                if ($previousKey !== null) {
+                    unset($records[$previousKey]);
+                }
 
-        // Write to a temporary file and rename it so readers never see a partial file.
-        if (file_put_contents($temporary, $this->driver($model)->compile($model->toOrbitAttributes())) === false || ! rename($temporary, $path)) {
-            @unlink($temporary);
+                $records[$model->getKey()] = $model->toOrbitAttributes();
 
-            throw new RuntimeException("Unable to write Orbit file [{$path}].");
+                return $records;
+            });
+
+            return;
         }
 
+        $path = $this->path($model, $model->getKey());
+
+        $this->put($path, $this->driver($model)->compile($model->toOrbitAttributes()));
         $this->record($model, $path);
 
         if ($previousKey !== null && (string) $previousKey !== (string) $model->getKey()) {
@@ -84,6 +92,16 @@ class Index
 
     public function delete(Model&Orbit $model, mixed $key = null): void
     {
+        if ($this->driver($model) instanceof SingleFile) {
+            $this->rewrite($model, function (array $records) use ($model, $key) {
+                unset($records[$key ?? $model->getKey()]);
+
+                return $records;
+            });
+
+            return;
+        }
+
         $path = $this->path($model, $key ?? $model->getKey());
 
         if (is_file($path) && ! unlink($path)) {
@@ -135,18 +153,29 @@ class Index
             $schema->dropIfExists($table);
             $schema->create($table, fn (Blueprint $blueprint) => $this->define($model, $blueprint));
 
+            // One bad file or record shouldn't break every query on the model. It stays in
+            // the manifest, so it's retried once it changes rather than on every request.
+            $skip = fn (string $source, Throwable $e) => Log::warning("Orbit skipped {$source} because it could not be indexed: {$e->getMessage()}", ['exception' => $e]);
+
             foreach (array_keys($this->manifest($model)) as $file) {
                 $path = $this->directory($model).DIRECTORY_SEPARATOR.$file;
 
                 try {
-                    $attributes = $driver->parse(file_get_contents($path));
-                    $attributes[$model->getKeyName()] ??= $this->keyFromFileName($model, $file);
-
-                    $connection->table($table)->insert($model->fromOrbitAttributes($attributes));
+                    $records = $this->records($model, $path);
                 } catch (Throwable $e) {
-                    // One bad file shouldn't break every query on the model. It stays in the
-                    // manifest, so it's retried once it changes rather than on every request.
-                    Log::warning("Orbit skipped [{$path}] because it could not be indexed: {$e->getMessage()}", ['exception' => $e]);
+                    $skip("[{$path}]", $e);
+
+                    continue;
+                }
+
+                foreach ($records as $key => $attributes) {
+                    try {
+                        $attributes[$model->getKeyName()] ??= $this->keyFromName($model, (string) $key);
+
+                        $connection->table($table)->insert($model->fromOrbitAttributes($attributes));
+                    } catch (Throwable $e) {
+                        $skip($driver instanceof SingleFile ? "record [{$key}] in [{$path}]" : "[{$path}]", $e);
+                    }
                 }
             }
 
@@ -157,19 +186,67 @@ class Index
         });
     }
 
-    private function keyFromFileName(Model&Orbit $model, string $file): string
+    /**
+     * The records in a file, keyed by their key, or by their file name or key in the
+     * file when they don't include it.
+     *
+     * @return array<array-key, mixed>
+     */
+    private function records(Model&Orbit $model, string $path): array
     {
-        $key = pathinfo($file, PATHINFO_FILENAME);
+        $driver = $this->driver($model);
+        $contents = file_get_contents($path);
 
+        if (! $driver instanceof SingleFile) {
+            return [pathinfo($path, PATHINFO_FILENAME) => $driver->parse($contents)];
+        }
+
+        $records = [];
+
+        foreach ($driver->parse($contents) as $key => $attributes) {
+            $records[is_array($attributes) ? ($attributes[$model->getKeyName()] ?? $key) : $key] = $attributes;
+        }
+
+        return $records;
+    }
+
+    private function keyFromName(Model&Orbit $model, string $key): string
+    {
         if ($model->getKeyType() === 'int' && ! ctype_digit($key)) {
             throw new RuntimeException(sprintf(
-                'The file has no `%s`, and its name can\'t be used as the integer key of [%s]. Add the key to the file, or give the model a string key.',
+                'The record has no `%s`, and [%s] can\'t be used as the integer key of [%s]. Add the key to the record, or give the model a string key.',
                 $model->getKeyName(),
+                $key,
                 $model::class,
             ));
         }
 
         return $key;
+    }
+
+    /** @param  callable(array<array-key, mixed>): array<array-key, mixed>  $change */
+    private function rewrite(Model&Orbit $model, callable $change): void
+    {
+        $path = $this->file($model);
+
+        // A file that can't be parsed throws here, so the write is rolled back rather
+        // than replacing the file's records.
+        $records = is_file($path) ? $this->records($model, $path) : [];
+
+        $this->put($path, $this->driver($model)->compile($change($records)));
+        $this->record($model, $path);
+    }
+
+    private function put(string $path, string $contents): void
+    {
+        $temporary = $path.'.'.bin2hex(random_bytes(4)).'.tmp';
+
+        // Write to a temporary file and rename it so readers never see a partial file.
+        if (file_put_contents($temporary, $contents) === false || ! rename($temporary, $path)) {
+            @unlink($temporary);
+
+            throw new RuntimeException("Unable to write Orbit file [{$path}].");
+        }
     }
 
     private function record(Model&Orbit $model, string $path): void
@@ -229,12 +306,13 @@ class Index
     {
         $directory = $this->directory($model);
         $extension = '.'.$this->driver($model)->extension();
+        $single = $this->driver($model) instanceof SingleFile ? basename($this->file($model)) : null;
         $manifest = [];
 
         clearstatcache();
 
         foreach (scandir($directory) as $file) {
-            if (str_ends_with($file, $extension) && is_file($directory.DIRECTORY_SEPARATOR.$file)) {
+            if (($single === null ? str_ends_with($file, $extension) : $file === $single) && is_file($directory.DIRECTORY_SEPARATOR.$file)) {
                 $manifest[$file] = $this->stamp($directory.DIRECTORY_SEPARATOR.$file);
             }
         }
@@ -342,9 +420,17 @@ class Index
         return $this->db->connection('orbit');
     }
 
+    // The directory holding the model's files, or its single file.
     private function directory(Model&Orbit $model): string
     {
-        return config('orbit.paths.content').DIRECTORY_SEPARATOR.$model->getOrbitSource();
+        $source = config('orbit.paths.content').DIRECTORY_SEPARATOR.$model->getOrbitSource();
+
+        return $this->driver($model) instanceof SingleFile ? dirname($source) : $source;
+    }
+
+    private function file(Model&Orbit $model): string
+    {
+        return config('orbit.paths.content').DIRECTORY_SEPARATOR.$model->getOrbitSource().'.'.$this->driver($model)->extension();
     }
 
     private function path(Model&Orbit $model, mixed $key): string
