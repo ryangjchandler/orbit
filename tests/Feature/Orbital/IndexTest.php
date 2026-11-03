@@ -2,11 +2,13 @@
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Orbit\Drivers\Markdown;
 use Tests\Fixtures\Models\Page;
 use Tests\Fixtures\Models\Post;
+use Tests\Fixtures\Models\Tag;
 
 // Each request gets a fresh index, which is when files are checked for changes.
 function nextRequest(): void
@@ -66,6 +68,35 @@ it('stores casted attributes as readable values that round trip', function () {
 
     expect($post->tags)->toBe(['php', 'laravel'])
         ->and($post->published_at->toDateTimeString())->toBe('2026-01-02 03:04:05');
+});
+
+// Eloquent merges `casts()` and reads class attributes like `#[Table]` in the model's
+// constructor, so indexing must use a constructed model. See #183.
+it('applies casts declared in the casts method to files written by hand', function () {
+    // YAML parses an unquoted date as a Unix timestamp.
+    file_put_contents(base_path('content/posts/1.md'), <<<'MD'
+    ---
+    id: 1
+    title: 'By hand'
+    published_at: 2026-08-31 10:00:00
+    ---
+    MD);
+
+    expect(Post::find(1)->getRawOriginal('published_at'))->toBe('2026-08-31 10:00:00')
+        ->and(Post::whereDate('published_at', '2026-08-31')->exists())->toBeTrue();
+});
+
+it('indexes models into the table named by the table attribute', function () {
+    File::ensureDirectoryExists(base_path('content/tags'));
+    file_put_contents(base_path('content/tags/1.md'), <<<'MD'
+    ---
+    id: 1
+    name: 'php'
+    ---
+    MD);
+
+    expect(Tag::pluck('name')->all())->toBe(['php'])
+        ->and(DB::connection('orbit')->getSchemaBuilder()->hasTable('post_tags'))->toBeTrue();
 });
 
 it('does not keep a record when its file cannot be written', function () {
