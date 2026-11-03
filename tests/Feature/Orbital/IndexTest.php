@@ -84,8 +84,7 @@ it('does not keep a record when its file cannot be written', function () {
 it('writes files for quiet writes and increments', function () {
     $post = Post::withoutEvents(fn () => Post::create(['title' => 'Quiet']));
 
-    $post->increment('views');
-    $post->incrementEach(['views' => 2]);
+    $post->increment('views', 3);
     $post->updateQuietly(['title' => 'Still written']);
 
     $this->artisan('orbit:clear');
