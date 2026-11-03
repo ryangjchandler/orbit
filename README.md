@@ -76,7 +76,39 @@ public function getOrbitDriver(): string
 }
 ```
 
-A custom driver implements `Orbit\Contracts\Driver`. To store a model's files in a different directory, override `getOrbitSource()`.
+To store a model's files in a different directory, override `getOrbitSource()`.
+
+### Custom drivers
+
+To support another file format, write a class that implements `Orbit\Contracts\Driver`:
+
+```php
+use Orbit\Contracts\Driver;
+
+class Toml implements Driver
+{
+    public function parse(string $fileContents): array
+    {
+        // Turn the contents of a file into an array of attributes.
+    }
+
+    public function compile(array $attributes): string
+    {
+        // Turn an array of attributes into the contents of a file.
+    }
+
+    public function extension(): string
+    {
+        return 'toml';
+    }
+}
+```
+
+Then return it from `getOrbitDriver()`. Orbit resolves drivers from the container, so their constructor dependencies are injected.
+
+`compile()` receives attributes that are ready to store: array casts are arrays, dates are ISO 8601 strings, and `null` values are left out. `parse()` should return attributes in the same shape.
+
+If the driver needs extra columns, also implement `Orbit\Contracts\ModifiesSchema` and add them in its `schema(Blueprint $table)` method. The Markdown driver uses this to add the `content` column.
 
 ## How it works
 

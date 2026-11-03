@@ -101,7 +101,7 @@ interface Driver
 }
 ```
 
-* The `parse()` method will receive a file path and should return an array of attributes for the given file.
+* The `parse()` method will receive the contents of a file and should return an array of attributes for that file.
 * The `compile()` method will receive an array of attributes and should return a string that represents the attributes.
 * The `extension()` method should return a string defining the file extension that the driver supports.
 
