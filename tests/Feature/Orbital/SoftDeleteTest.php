@@ -42,9 +42,7 @@ it('updates the source file when restoring a soft deleted model', function () {
     expect(base_path("content/categories/{$category->id}.md"))
         ->toBeFile()
         ->and(file_get_contents(base_path("content/categories/{$category->id}.md")))
-        ->toContain(<<<'MD'
-        deleted_at: null
-        MD);
+        ->not->toContain('deleted_at');
 });
 
 it('deletes the source file when force deleting a model', function () {

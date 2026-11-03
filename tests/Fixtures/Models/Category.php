@@ -3,9 +3,9 @@
 namespace Tests\Fixtures\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Orbit\Concerns\Orbital;
-use Orbit\Concerns\SoftDeletes;
 use Orbit\Contracts\Orbit;
 
 class Category extends Model implements Orbit

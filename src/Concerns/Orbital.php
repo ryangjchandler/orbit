@@ -3,87 +3,79 @@
 namespace Orbit\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
-use Orbit\Actions\DeleteSourceFile;
-use Orbit\Actions\InitialiseOrbitalTable;
-use Orbit\Actions\MaybeCreateOrbitDirectories;
-use Orbit\Actions\MaybeRefreshDatabaseContent;
-use Orbit\Actions\SaveCompiledAttributesToFile;
-use Orbit\Contracts\Driver;
-use Orbit\Contracts\Orbit;
 use Orbit\Drivers\Markdown;
-use Orbit\Exceptions\InvalidDriverException;
-use Orbit\Support\ModelAttributeFormatter;
-use Orbit\Support\ModelUsesSoftDeletes;
-use ReflectionClass;
+use Orbit\Index;
 
-/**
- * @mixin \Illuminate\Database\Eloquent\Model
- * @mixin \Orbit\Contracts\Orbit
- */
 trait Orbital
 {
-    public static function bootOrbital()
+    // Writes run in a transaction and write the file afterwards, so a failed file
+    // write rolls back the cached row. Files are written here rather than in model
+    // events so that quiet saves and increments still reach the file.
+    public function save(array $options = [])
     {
-        $model = (new ReflectionClass(static::class))->newInstanceWithoutConstructor();
+        $previousKey = $this->exists ? $this->getOriginal($this->getKeyName()) : null;
 
-        $maybeCreateOrbitDirectories = new MaybeCreateOrbitDirectories();
-        $maybeCreateOrbitDirectories->execute($model);
-
-        $driver = $model->getOrbitDriver();
-
-        if (! class_exists($driver)) {
-            throw InvalidDriverException::make($driver);
-        }
-
-        $driver = app($driver);
-
-        if (! $driver instanceof Driver) {
-            throw InvalidDriverException::make($driver::class);
-        }
-
-        $initialiseOrbitTable = new InitialiseOrbitalTable();
-        $maybeRefreshDatabaseContent = new MaybeRefreshDatabaseContent();
-        $refreshed = false;
-
-        if ($initialiseOrbitTable->shouldInitialise($model)) {
-            $initialiseOrbitTable->migrate($model, $driver);
-            $maybeRefreshDatabaseContent->refresh($model, $driver);
-
-            $refreshed = true;
-        }
-
-        if (! $refreshed && $maybeRefreshDatabaseContent->shouldRefresh($model)) {
-            $maybeRefreshDatabaseContent->refresh($model, $driver);
-        }
-
-        $saveCompiledAttributesToFile = new SaveCompiledAttributesToFile();
-
-        static::created(function (Orbit&Model $model) use ($driver, $saveCompiledAttributesToFile) {
-            $model->refresh();
-
-            $attributes = ModelAttributeFormatter::format($model, $model->getAttributes());
-            $compiledAttributes = $driver->compile($attributes);
-
-            $saveCompiledAttributesToFile->execute($model, $compiledAttributes, $driver);
-        });
-
-        static::updated(function (Orbit&Model $model) use ($driver, $saveCompiledAttributesToFile) {
-            $model->refresh();
-
-            $attributes = ModelAttributeFormatter::format($model, $model->getAttributes());
-            $compiledAttributes = $driver->compile($attributes);
-
-            $saveCompiledAttributesToFile->execute($model, $compiledAttributes, $driver);
-        });
-
-        static::deleted(function (Orbit&Model $model) use ($driver) {
-            if (ModelUsesSoftDeletes::check($model)) {
-                return;
+        return $this->getConnection()->transaction(function () use ($options, $previousKey) {
+            if (! parent::save($options)) {
+                return false;
             }
 
-            $deleteSourceFile = new DeleteSourceFile();
-            $deleteSourceFile->execute($model, $driver);
+            app(Index::class)->write($this, $previousKey);
+
+            return true;
         });
+    }
+
+    public function delete()
+    {
+        return $this->getConnection()->transaction(function () {
+            $deleted = parent::delete();
+
+            if (! $deleted) {
+                return $deleted;
+            }
+
+            // Soft deletes keep the file and record `deleted_at` in it.
+            if (method_exists($this, 'isForceDeleting') && ! $this->isForceDeleting()) {
+                app(Index::class)->write($this);
+            } else {
+                app(Index::class)->delete($this);
+            }
+
+            return $deleted;
+        });
+    }
+
+    protected function incrementOrDecrement($column, $amount, $extra, $method)
+    {
+        return $this->writeAfter(fn () => parent::incrementOrDecrement($column, $amount, $extra, $method));
+    }
+
+    protected function incrementOrDecrementEach(array $columns, array $extra, string $method)
+    {
+        return $this->writeAfter(fn () => parent::incrementOrDecrementEach($columns, $extra, $method));
+    }
+
+    private function writeAfter(callable $update): int|false
+    {
+        return $this->getConnection()->transaction(function () use ($update) {
+            // A model that doesn't exist yet runs a bulk query instead, which doesn't write files.
+            $exists = $this->exists;
+            $result = $update();
+
+            if ($exists && $result !== false) {
+                app(Index::class)->write($this);
+            }
+
+            return $result;
+        });
+    }
+
+    public function getConnection()
+    {
+        app(Index::class)->ensure($this);
+
+        return static::resolveConnection();
     }
 
     public static function resolveConnection($connection = null)
@@ -109,5 +101,42 @@ trait Orbital
             ->lower()
             ->plural()
             ->toString();
+    }
+
+    public function toOrbitAttributes(): array
+    {
+        $attributes = [$this->getKeyName() => $this->getKey()] + $this->getAttributes();
+
+        foreach ($attributes as $key => $value) {
+            if ($value === null || $this->isEncryptedCastable($key)) {
+                continue;
+            }
+
+            if ($this->isJsonCastable($key) && is_string($value)) {
+                $attributes[$key] = json_decode($value, true);
+            } elseif ($this->isDateAttribute($key)) {
+                $attributes[$key] = $this->asDateTime($value)->toIso8601String();
+            }
+        }
+
+        // Leave out nulls so files only contain values that are set.
+        return array_filter($attributes, fn ($value) => $value !== null);
+    }
+
+    public function fromOrbitAttributes(array $attributes): array
+    {
+        foreach ($attributes as $key => $value) {
+            if ($value === null || $this->isEncryptedCastable($key)) {
+                continue;
+            }
+
+            if ($this->isJsonCastable($key) && ! is_string($value)) {
+                $attributes[$key] = json_encode($value);
+            } elseif ($this->isDateAttribute($key)) {
+                $attributes[$key] = $this->fromDateTime($value);
+            }
+        }
+
+        return $attributes;
     }
 }

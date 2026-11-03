@@ -3,24 +3,19 @@
 namespace Orbit\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Filesystem\Filesystem;
+use Orbit\Index;
 
 class ClearCommand extends Command
 {
-    protected $signature = 'orbit:clear {--force}';
+    protected $signature = 'orbit:clear';
 
-    protected $description = 'Clear Orbit\'s cache.';
+    protected $description = 'Clear Orbit\'s cache so it is rebuilt from your content files.';
 
-    public function handle()
+    public function handle(Index $index): int
     {
-        if (! $this->option('force') && ! $this->confirm('Are you sure you want to clear Orbit\'s cache?')) {
-            return self::SUCCESS;
-        }
+        $index->clear();
 
-        $fs = new Filesystem();
-        $fs->delete(config('orbit.paths.database'));
-
-        $this->info('Cache cleared.');
+        $this->components->info('Orbit cache cleared.');
 
         return self::SUCCESS;
     }
